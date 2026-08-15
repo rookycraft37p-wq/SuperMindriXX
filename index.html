@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SuperDrix 3D</title>
+    <title>SuperDrix 3D - Ultimate Edition</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; font-family: 'Arial', sans-serif; margin: 0; padding: 0; }
@@ -16,14 +16,14 @@
             display: flex; flex-direction: column; justify-content: space-between; padding: 20px;
         }
         .top-hud { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .score-box { background: rgba(0, 0, 0, 0.7); color: #ffcc00; padding: 10px 22px; border-radius: 25px; font-size: 24px; font-weight: 900; border: 3px solid #fff; }
+        .score-box { background: rgba(0, 0, 0, 0.75); color: #ffcc00; padding: 10px 22px; border-radius: 25px; font-size: 24px; font-weight: 900; border: 3px solid #fff; }
         
         .controls-bar {
-            position: absolute; bottom: 30px; width: 100%; left: 0; display: flex; justify-content: space-between; padding: 0 40px; z-index: 20; pointer-events: auto;
+            position: absolute; bottom: 30px; width: 100%; left: 0; display: flex; justify-content: space-between; padding: 0 30px; z-index: 20; pointer-events: auto;
         }
         .control-btn {
-            width: 80px; height: 80px; background: rgba(255, 255, 255, 0.9); border: 4px solid #333; border-radius: 50%;
-            font-size: 32px; font-weight: bold; color: #333; display: flex; justify-content: center; align-items: center;
+            width: 75px; height: 75px; background: rgba(255, 255, 255, 0.9); border: 4px solid #333; border-radius: 50%;
+            font-size: 28px; font-weight: bold; color: #333; display: flex; justify-content: center; align-items: center;
             box-shadow: 0 6px 0px rgba(0,0,0,0.4); cursor: pointer;
         }
         .control-btn:active { transform: translateY(4px); box-shadow: 0 2px 0px rgba(0,0,0,0.4); }
@@ -32,15 +32,15 @@
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85);
             z-index: 30; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; gap: 20px; text-align: center;
         }
-        #start-screen h1 { font-size: 50px; color: #ffcc00; text-shadow: 4px 4px #d32f2f; font-weight: 900; }
-        .start-btn { background: #00e676; color: #000; font-size: 24px; font-weight: 900; padding: 15px 50px; border-radius: 35px; border: 4px solid #fff; cursor: pointer; box-shadow: 0 6px 0px #00793c; }
+        #start-screen h1 { font-size: 45px; color: #ffcc00; text-shadow: 4px 4px #d32f2f; font-weight: 900; }
+        .start-btn { background: #00e676; color: #000; font-size: 24px; font-weight: 900; padding: 15px 45px; border-radius: 35px; border: 4px solid #fff; cursor: pointer; box-shadow: 0 6px 0px #00793c; }
     </style>
 </head>
 <body>
 
     <div id="start-screen">
         <h1>SUPERDRIX 3D</h1>
-        <p style="font-size: 18px; font-weight: bold;">انطلق بالمكعب الشرس واجمع العملات الذهبية!</p>
+        <p style="font-size: 18px; font-weight: bold;">تجنب الوحوش، اجمع العملات، وانطلق في عالم ضخم!</p>
         <button class="start-btn" onclick="startGame()">▶ ابدأ اللعبة</button>
     </div>
 
@@ -52,7 +52,7 @@
     </div>
 
     <div class="controls-bar">
-        <div style="display: flex; gap: 20px;">
+        <div style="display: flex; gap: 15px;">
             <button class="control-btn" id="btn-left">◀</button>
             <button class="control-btn" id="btn-right">▶</button>
         </div>
@@ -62,7 +62,7 @@
     <div id="game-canvas"></div>
 
 <script>
-    // --- المؤثرات الصوتية (Web Audio API) ---
+    // --- المؤثرات الصوتية ---
     let audioCtx;
     function initAudio() {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -79,53 +79,52 @@
         if (type === 'jump') {
             osc.type = 'square';
             osc.frequency.setValueAtTime(150, now);
-            osc.frequency.exponentialRampYToValueAtTime ? osc.frequency.exponentialRampToValueAtTime(400, now + 0.15) : osc.frequency.linearRampToValueAtTime(400, now + 0.15);
+            osc.frequency.linearRampToValueAtTime(400, now + 0.15);
             gain.gain.setValueAtTime(0.2, now);
             gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
             osc.start(now); osc.stop(now + 0.15);
         } else if (type === 'coin') {
             osc.type = 'sine';
             osc.frequency.setValueAtTime(600, now);
-            osc.frequency.setValueAtTime(900, now + 0.08);
+            osc.frequency.setValueAtTime(950, now + 0.08);
             gain.gain.setValueAtTime(0.25, now);
             gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
             osc.start(now); osc.stop(now + 0.25);
-        } else if (type === 'fall') {
+        } else if (type === 'hit') {
             osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(200, now);
-            osc.frequency.linearRampToValueAtTime(50, now + 0.4);
+            osc.frequency.setValueAtTime(180, now);
+            osc.frequency.linearRampToValueAtTime(40, now + 0.3);
             gain.gain.setValueAtTime(0.3, now);
-            gain.gain.linearRampToValueAtTime(0.01, now + 0.4);
-            osc.start(now); osc.stop(now + 0.4);
+            gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
         }
     }
 
-    // --- إعداد المشهد الثلاثي الأبعاد ---
     let scene, camera, renderer;
-    let player, platforms = [], coins = [];
+    let player, platforms = [], coins = [], monsters = [];
     let score = 0, lives = 3;
     let gameActive = false;
 
     let playerVelocity = new THREE.Vector3(0, 0, 0);
     let isGrounded = false;
     let moveLeft = false, moveRight = false;
+    let facingDirection = 1; // 1 يمين، -1 يسار (ليظل الوجه ظاهراً دائماً)
 
     function init() {
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x5c94fc); // لون السماء الأزرق المطابق للصورة
-        scene.fog = new THREE.Fog(0x5c94fc, 30, 80);
+        scene.background = new THREE.Color(0x5c94fc);
+        scene.fog = new THREE.Fog(0x5c94fc, 35, 90);
 
-        // الكاميرا بعيدة وواسعة لترى كامل العالم بوضوح تام
+        // كاميرا واسعة وبعيدة لرؤية عالم ضخم
         camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.set(0, 7, 22);
+        camera.position.set(0, 8, 24);
         camera.lookAt(0, 1, 0);
 
-        renderer = new THREE.WebGLRenderer({ antialias: false }); // بدون تلميع ليعطي طابع Pixel Art حاد
+        renderer = new THREE.WebGLRenderer({ antialias: false });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.shadowMap.enabled = true;
         document.getElementById('game-canvas').appendChild(renderer.domElement);
 
-        // إضاءة واضحة ومشرقة
         const ambientLight = new THREE.AmbientLight(0xffffff, 0.85);
         scene.add(ambientLight);
 
@@ -134,84 +133,119 @@
         scene.add(dirLight);
 
         createPlayer();
-        createLevel();
+        createHugeLevel();
         setupControls();
         animate();
     }
 
-    // تصميم الشخصية مطابقة تماماً للمكعب الأحمر الشرس في الصورة
+    // تصميم المكعب الشرس مع جعل الوجه يلتفت باتجاه الحركة لئلا يختفي أبداً
     function createPlayer() {
         const playerGroup = new THREE.Group();
 
-        // المكعب الأحمر الأساسي
         const bodyMat = new THREE.MeshStandardMaterial({ color: 0xe52521, roughness: 0.3 });
         const body = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.2, 1.2), bodyMat);
         body.position.y = 0.6;
         playerGroup.add(body);
 
-        // عيون شرسة وغاضبة مطابقة للصورة
+        // مجموعة الوجه الأمامية التي تدور مع اتجاه اللاعب
+        const faceGroup = new THREE.Group();
+        faceGroup.position.z = 0.61;
+
         const eyeWhiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
         const eyePupilMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
 
-        // العين اليمنى
-        const eyeR = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.25, 0.1), eyeWhiteMat);
-        eyeR.position.set(0.25, 0.75, 0.62);
-        playerGroup.add(eyeR);
-        const pupilR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.15, 0.1), eyePupilMat);
-        pupilR.position.set(0.32, 0.75, 0.65);
-        playerGroup.add(pupilR);
+        const eyeR = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.25, 0.05), eyeWhiteMat);
+        eyeR.position.set(0.25, 0.75, 0);
+        faceGroup.add(eyeR);
+        const pupilR = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.15, 0.08), eyePupilMat);
+        pupilR.position.set(0.32, 0.75, 0.02);
+        faceGroup.add(pupilR);
 
-        // العين اليسرى
-        const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.25, 0.1), eyeWhiteMat);
-        eyeL.position.set(-0.25, 0.75, 0.62);
-        playerGroup.add(eyeL);
-        const pupilL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.15, 0.1), eyePupilMat);
-        pupilL.position.set(-0.18, 0.75, 0.65);
-        playerGroup.add(pupilL);
+        const eyeL = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.25, 0.05), eyeWhiteMat);
+        eyeL.position.set(-0.25, 0.75, 0);
+        faceGroup.add(eyeL);
+        const pupilL = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.15, 0.08), eyePupilMat);
+        pupilL.position.set(-0.18, 0.75, 0.02);
+        faceGroup.add(pupilL);
+
+        playerGroup.add(faceGroup);
+        playerGroup.userData.faceGroup = faceGroup; // لحفظ الإشارة
 
         player = playerGroup;
         player.position.set(0, 3, 0);
         scene.add(player);
     }
 
-    // إنشاء المنصات الترابية بحدود خضراء مطابقة للصورة
-    function createLevel() {
-        for (let i = -2; i < 15; i++) {
+    // بناء عالم ضخم وطويل مليء بالمنصات والعملات والوحوش
+    function createHugeLevel() {
+        for (let i = -3; i < 35; i++) {
             let xPos = i * 4;
-            let yPos = (i > 5 && i < 8) ? 2 : (i >= 8 ? 1 : 0);
+            // تصميم تضاريس متدرجة (مرتفعات ومنخفضات)
+            let yPos = (i > 6 && i < 11) ? 2 : (i >= 15 && i < 20) ? 3 : (i >= 25 ? 1 : 0);
             
-            // قاعدة ترابية برتقالية
+            // قاعدة ترابية
             let groundMat = new THREE.MeshStandardMaterial({ color: 0xd95700, roughness: 0.9 });
-            let groundGeo = new THREE.BoxGeometry(3.8, 1.8, 3.8);
-            let groundMesh = new THREE.Mesh(groundGeo, groundMat);
-            groundMesh.position.set(xPos, yPos - 0.9, 0);
+            let groundMesh = new THREE.Mesh(new THREE.BoxGeometry(3.8, 2.0, 3.8), groundMat);
+            groundMesh.position.set(xPos, yPos - 1.0, 0);
             scene.add(groundMesh);
             platforms.push(groundMesh);
 
-            // طبقة عشب خضراء في الأعلى
+            // طبقة عشب خضراء
             let grassMat = new THREE.MeshStandardMaterial({ color: 0x38b764, roughness: 0.8 });
-            let grassGeo = new THREE.BoxGeometry(3.8, 0.3, 3.8);
-            let grassMesh = new THREE.Mesh(grassGeo, grassMat);
-            grassMesh.position.set(xPos, yPos + 0.15, 0);
+            let grassMesh = new THREE.Mesh(new THREE.BoxGeometry(3.8, 0.35, 3.8), grassMat);
+            grassMesh.position.set(xPos, yPos + 0.17, 0);
             scene.add(grassMesh);
             platforms.push(grassMesh);
 
-            // إضافة عملات ذهبية فوق المنصات
+            // إضافة عملات ذهبية
             if (i > 1 && i % 2 === 0) {
                 createCoin(xPos, yPos + 2.2, 0);
+            }
+
+            // إضافة وحوش تتجول على المنصات في مناطق متفرقة
+            if (i > 4 && i % 4 === 0) {
+                createMonster(xPos, yPos + 0.6);
             }
         }
     }
 
-    // إنشاء عملة ذهبية لامعة مشابهة للصورة
     function createCoin(x, y, z) {
-        const mat = new THREE.MeshStandardMaterial({ color: 0xffcc00, metalness: 0.6, roughness: 0.2, emissive: 0x554400 });
-        const geo = new THREE.CylinderGeometry(0.7, 0.7, 0.15, 20);
-        const mesh = new THREE.Mesh(geo, mat);
+        const mat = new THREE.MeshStandardMaterial({ color: 0xffcc00, metalness: 0.6, roughness: 0.2, emissive: 0x443300 });
+        const mesh = new THREE.Mesh(new THREE.CylinderGeometry(0.7, 0.7, 0.15, 20), mat);
         mesh.rotation.x = Math.PI / 2;
         mesh.position.set(x, y, z);
         scene.add(mesh);
         coins.push(mesh);
+    }
+
+    // إنشاء وحش شرس يتحرك يميناً ويساراً
+    function createMonster(x, y) {
+        const monsterGroup = new THREE.Group();
+        // جسم الوحش (بنفسجي أو أزرق داكن بشرس)
+        const mat = new THREE.MeshStandardMaterial({ color: 0x7b1fa2, roughness: 0.5 });
+        const body = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.9, 1.0), mat);
+        body.position.y = 0.45;
+        monsterGroup.add(body);
+
+        // عيون شرسة للوحش
+        const eyeMat = new THREE.MeshBasicMaterial({ color: 0xffeb3b });
+        const eye1 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.15, 0.1), eyeMat);
+        eye1.position.set(0.2, 0.6, 0.52);
+        monsterGroup.add(eye1);
+        const eye2 = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.15, 0.1), eyeMat);
+        eye2.position.set(-0.2, 0.6, 0.52);
+        monsterGroup.add(eye2);
+
+        monsterGroup.position.set(x, y, 0);
+        scene.add(monsterGroup);
+
+        monsters.push({
+            mesh: monsterGroup,
+            startX: x,
+            range: 2.0,
+            speed: 0.04,
+            direction: 1
+        });
     }
 
     function setupControls() {
@@ -229,7 +263,7 @@
         document.getElementById('btn-jump').addEventListener('click', () => {
             initAudio();
             if (isGrounded) {
-                playerVelocity.y = 0.24;
+                playerVelocity.y = 0.25;
                 isGrounded = false;
                 playSound('jump');
             }
@@ -240,7 +274,7 @@
             if (e.key === 'ArrowLeft' || e.key === 'a') moveLeft = true;
             if (e.key === 'ArrowRight' || e.key === 'd') moveRight = true;
             if ((e.key === ' ' || e.key === 'ArrowUp') && isGrounded) {
-                playerVelocity.y = 0.24;
+                playerVelocity.y = 0.25;
                 isGrounded = false;
                 playSound('jump');
             }
@@ -263,19 +297,43 @@
         requestAnimationFrame(animate);
 
         if (gameActive) {
+            // حركة اللاعب وتوجيه الوجه باتجاه الحركة لئلا يختفي أبدًا
             if (moveLeft) {
                 player.position.x -= 0.14;
-                player.rotation.y = Math.PI;
+                facingDirection = -1;
+                player.rotation.y = Math.PI; // تدوير الجسم لليسار
                 animTimer += 0.25;
                 player.position.y += Math.sin(animTimer) * 0.04;
             } else if (moveRight) {
                 player.position.x += 0.14;
-                player.rotation.y = 0;
+                facingDirection = 1;
+                player.rotation.y = 0; // تدوير الجسم لليمين
                 animTimer += 0.25;
                 player.position.y += Math.sin(animTimer) * 0.04;
             }
 
-            // الجاذبية
+            // حركة الوحوش ذهاباً وإياباً على المنصات
+            monsters.forEach(m => {
+                m.mesh.position.x += m.speed * m.direction;
+                if (m.mesh.position.x > m.startX + m.range || m.mesh.position.x < m.startX - m.range) {
+                    m.direction *= -1;
+                }
+
+                // فحص الاصطدام بين اللاعب والوحش
+                if (player.position.distanceTo(m.mesh.position) < 1.1) {
+                    playSound('hit');
+                    lives--;
+                    document.getElementById('lives-val').innerText = lives;
+                    player.position.set(player.position.x - 2, 5, 0); // إرجاع اللاعب للخلف قليلاً
+                    playerVelocity.set(0, 0, 0);
+                    if (lives <= 0) {
+                        alert('انتهت اللعبة! الأعداء ألحقوا بك الضرر.');
+                        location.reload();
+                    }
+                }
+            });
+
+            // الجاذبية والفيزياء
             playerVelocity.y -= 0.012;
             player.position.y += playerVelocity.y;
 
@@ -303,20 +361,20 @@
                 }
             });
 
-            // السقوط والخسارة
+            // السقوط في الفراغ
             if (player.position.y < -10) {
-                playSound('fall');
+                playSound('hit');
                 lives--;
                 document.getElementById('lives-val').innerText = lives;
-                player.position.set(0, 5, 0);
+                player.position.set(player.position.x, 5, 0);
                 playerVelocity.set(0, 0, 0);
                 if (lives <= 0) {
-                    alert('انتهت اللعبة! حاول مجدداً.');
+                    alert('انتهت اللعبة!');
                     location.reload();
                 }
             }
 
-            // الكاميرا البعيدة والواسعة تتبع اللاعب بنعومة
+            // الكاميرا تتبع اللاعب بسلاسة في عالم واسع وبعيد
             camera.position.x += (player.position.x - camera.position.x) * 0.08;
             camera.position.y += ((player.position.y + 5) - camera.position.y) * 0.08;
         }
