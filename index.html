@@ -104,7 +104,7 @@
             box-sizing: border-box;
             pointer-events: none;
             z-index: 10;
-            display: none; /* تظهر فقط عند بدء اللعبة */
+            display: none;
         }
 
         .dir-buttons, .action-buttons {
@@ -170,6 +170,127 @@
 </div>
 
 <script>
+    // --- نظام المؤثرات الصوتية والموسيقى (Web Audio API) ---
+    let audioCtx = null;
+    let bgmTimer = null;
+
+    function initAudio() {
+        if (!audioCtx) {
+            audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+    }
+
+    // صوت القفز
+    function playJumpSound() {
+        if (!audioCtx) return;
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(450, audioCtx.currentTime + 0.15);
+        
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+        
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+    }
+
+    // صوت جمع العملة
+    function playCoinSound() {
+        if (!audioCtx) return;
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(987.77, audioCtx.currentTime); // نغمة B5
+        osc.frequency.setValueAtTime(1318.51, audioCtx.currentTime + 0.08); // نغمة E6
+        
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.25);
+        
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.25);
+    }
+
+    // صوت القضاء على العدو
+    function playStompSound() {
+        if (!audioCtx) return;
+        let osc = audioCtx.createOscillator();
+        let gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(120, audioCtx.currentTime);
+        osc.frequency.linearRampToValueAtTime(40, audioCtx.currentTime + 0.15);
+        
+        gain.gain.setValueAtTime(0.2, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+        
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.15);
+    }
+
+    // صوت الخسارة
+    function playGameOverSound() {
+        if (!audioCtx) return;
+        let notes = [300, 250, 200, 150];
+        notes.forEach((freq, index) => {
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime + (index * 0.12));
+            
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime + (index * 0.12));
+            gain.gain.linearRampToValueAtTime(0.01, audioCtx.currentTime + (index * 0.12) + 0.1);
+            
+            osc.start(audioCtx.currentTime + (index * 0.12));
+            osc.stop(audioCtx.currentTime + (index * 0.12) + 0.1);
+        });
+    }
+
+    // موسيقى خلفية كلاسيكية بسيطة ومتكررة
+    function startBGM() {
+        if (bgmTimer) clearInterval(bgmTimer);
+        let melody = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63];
+        let index = 0;
+        bgmTimer = setInterval(() => {
+            if (!audioCtx || gameState !== 'PLAYING') return;
+            let osc = audioCtx.createOscillator();
+            let gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(melody[index], audioCtx.currentTime);
+            
+            gain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+            
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.2);
+            
+            index = (index + 1) % melody.length;
+        }, 300);
+    }
+
+    function stopBGM() {
+        if (bgmTimer) {
+            clearInterval(bgmTimer);
+            bgmTimer = null;
+        }
+    }
+
+    // --- إعدادات اللعبة الرسمية ---
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
     const scoreElement = document.getElementById('score');
@@ -191,7 +312,7 @@
     window.addEventListener('resize', resize);
     resize();
 
-    let gameState = 'START'; // START, PLAYING, GAMEOVER
+    let gameState = 'START';
     let score = 0;
     let cameraX = 0;
 
@@ -246,15 +367,19 @@
     }
 
     function startGame() {
+        initAudio();
         startScreen.style.display = 'none';
         gameoverScreen.style.display = 'none';
         scoreBoard.style.display = 'block';
         uiControls.style.display = 'flex';
         initLevel();
         gameState = 'PLAYING';
+        startBGM();
     }
 
     function gameOver() {
+        stopBGM();
+        playGameOverSound();
         gameState = 'GAMEOVER';
         uiControls.style.display = 'none';
         scoreBoard.style.display = 'none';
@@ -267,7 +392,10 @@
     window.addEventListener('keydown', (e) => {
         if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = true;
         if (e.code === 'ArrowLeft' || e.code === 'KeyA') keys.left = true;
-        if (e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') keys.up = true;
+        if ((e.code === 'ArrowUp' || e.code === 'KeyW' || e.code === 'Space') && gameState === 'PLAYING') {
+            if (!keys.up && player.grounded) playJumpSound();
+            keys.up = true;
+        }
     });
     window.addEventListener('keyup', (e) => {
         if (e.code === 'ArrowRight' || e.code === 'KeyD') keys.right = false;
@@ -278,7 +406,13 @@
     function setupTouchControls() {
         const bindTouch = (id, key) => {
             const btn = document.getElementById(id);
-            btn.addEventListener('touchstart', (e) => { e.preventDefault(); keys[key] = true; });
+            btn.addEventListener('touchstart', (e) => { 
+                e.preventDefault(); 
+                if (key === 'up' && player.grounded && gameState === 'PLAYING') {
+                    playJumpSound();
+                }
+                keys[key] = true; 
+            });
             btn.addEventListener('touchend', (e) => { e.preventDefault(); keys[key] = false; });
         };
         bindTouch('btn-left', 'left');
@@ -346,6 +480,7 @@
                     if (player.dy > 0 && player.y + player.height - player.dy <= enemy.y + 10) {
                         enemy.isDead = true;
                         player.dy = -8;
+                        playStompSound();
                         score += 100;
                         scoreElement.innerText = score;
                     } else {
@@ -357,6 +492,7 @@
             coins.forEach(coin => {
                 if (!coin.collected && checkCollision(player, coin)) {
                     coin.collected = true;
+                    playCoinSound();
                     score += 50;
                     scoreElement.innerText = score;
                 }
@@ -366,7 +502,8 @@
             if (player.y > GAME_HEIGHT) gameOver();
 
             if (checkCollision(player, goal)) {
-                alert(`مبروك يا قهرمان! فزت باللعبة. نتيجتك: ${score}`);
+                stopBGM();
+                alert(`مبروك يا بطل! فزت باللعبة. نتيجتك: ${score}`);
                 startGame();
             }
 
