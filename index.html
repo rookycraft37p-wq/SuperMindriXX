@@ -26,6 +26,7 @@
         .btn-shop { background: #ff9800; box-shadow: 0 6px 0px #e65100; }
         .btn-levels { background: #03a9f4; box-shadow: 0 6px 0px #01579b; }
         .btn-back { background: #f44336; box-shadow: 0 6px 0px #b71c1c; margin-top: 30px; }
+        .btn-retry { background: #ffcc00; box-shadow: 0 6px 0px #f57f17; }
 
         /* المتجر والمراحل */
         .grid-container { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; max-width: 600px; padding: 10px; }
@@ -36,7 +37,7 @@
         .buy-btn:disabled { background: #888; color: #ccc; cursor: not-allowed; }
         .buy-btn.equipped { background: #00e676; }
 
-        /* واجهة اللعب - تم إصلاح مشكلة التداخل هنا */
+        /* واجهة اللعب */
         #ui-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none;
             display: none; flex-direction: column; justify-content: space-between; padding: 15px;
@@ -49,7 +50,6 @@
         .home-icon-btn { font-size: 22px; background: #fff; border: 3px solid #111; border-radius: 50%; width: 42px; height: 42px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 0px #111; }
         .home-icon-btn:active { transform: translateY(4px); box-shadow: 0 0px 0px #111; }
 
-        /* تم فصل مؤشر المرحلة تحت الصف العلوي لمنع التداخل */
         .level-indicator { background: rgba(0,0,0,0.8); color: #fff; padding: 5px 20px; border-radius: 20px; font-size: 18px; font-weight: bold; border: 2px solid #fff; margin: 10px auto 0; width: fit-content; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
 
         .controls-bar {
@@ -87,10 +87,19 @@
         <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
     </div>
 
+    <!-- شاشة الفوز الاحترافية -->
     <div id="win-screen" class="screen">
         <h1 class="title" style="color: #00e676;">اكتملت المرحلة!</h1>
         <p style="font-size: 24px; margin-bottom: 20px;">جمعت: <span id="win-coins">0</span> 🪙</p>
         <button class="btn-main" onclick="nextLevel()">المرحلة التالية ⏩</button>
+        <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
+    </div>
+
+    <!-- شاشة الخسارة الاحترافية الجديدة -->
+    <div id="game-over-screen" class="screen">
+        <h1 class="title" style="color: #f44336;">انتهت المحاولات!</h1>
+        <p style="font-size: 24px; margin-bottom: 20px;">لقد جمعت: <span id="game-over-coins">0</span> 🪙 (تم حفظها)</p>
+        <button class="btn-main btn-retry" onclick="startLevel(currentLevel)">إعادة المحاولة 🔄</button>
         <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
     </div>
 
@@ -117,7 +126,7 @@
     <canvas id="gameCanvas"></canvas>
 
 <script>
-    // نظام الصوت (تم استعادته)
+    // --- نظام الصوت الشامل ---
     let audioCtx;
     function initAudio() {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -143,10 +152,23 @@
             osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(40, now + 0.3);
             gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
             osc.start(now); osc.stop(now + 0.3);
+        } else if (type === 'click') {
+            // صوت النقر للأزرار
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
+            gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+            osc.start(now); osc.stop(now + 0.05);
         }
     }
 
-    // إعدادات المتصفح والحفظ السحابي
+    // إضافة صوت النقر لأي زر في اللعبة
+    document.addEventListener('pointerdown', function(e) {
+        if(e.target.tagName === 'BUTTON' || e.target.classList.contains('home-icon-btn') || e.target.closest('button')) {
+            initAudio();
+            playSound('click');
+        }
+    });
+
+    // --- إعدادات اللعبة والحفظ ---
     let totalCoins = parseInt(localStorage.getItem('superdrix_coins')) || 0;
     let unlockedLevels = parseInt(localStorage.getItem('superdrix_unlocked_levels')) || 1;
     let unlockedSkins = JSON.parse(localStorage.getItem('superdrix_skins')) || [0];
@@ -161,7 +183,7 @@
     const maxLevels = 3;
     let currentLevel = 1;
     let score = 0, lives = 3, gameActive = false;
-    let animationFrameId = null; // متغیر تم إضافته لمنع تضاعف سرعة اللعبة
+    let isLooping = false; // المتغير السحري لحل مشكلة تضاعف السرعة
 
     function updateDisplayData() {
         document.getElementById('home-coins').innerText = totalCoins;
@@ -181,7 +203,7 @@
     }
 
     function goHome() { gameActive = false; showScreen('home-screen'); }
-    function quitToHome() { if(confirm("هل أنت متأكد أنك تريد الخروج للبيت؟ ستفقد تقدمك في هذه المرحلة.")) goHome(); }
+    function quitToHome() { if(confirm("هل أنت متأكد أنك تريد الخروج؟ ستفقد تقدمك في هذه المرحلة.")) goHome(); }
 
     function openShop() {
         showScreen('shop-screen');
@@ -208,6 +230,14 @@
         }
     }
 
+    // دالة الخسارة الجديدة
+    function triggerGameOver() {
+        gameActive = false;
+        totalCoins += score; // هنا يتم حفظ الأموال التي جمعتها حتى لو خسرت
+        document.getElementById('game-over-coins').innerText = score;
+        showScreen('game-over-screen');
+    }
+
     function startLevel(lvl) {
         initAudio();
         currentLevel = lvl; score = 0; lives = 3;
@@ -221,9 +251,11 @@
         
         gameActive = true; 
         
-        // إصلاح مشكلة تضاعف السرعة (نقوم بإلغاء أي حلقة قديمة قبل بدء حلقة جديدة)
-        if (animationFrameId) cancelAnimationFrame(animationFrameId);
-        loop();
+        // الحل النهائي لمشكلة السرعة: التأكد من عدم تشغيل حلقة جديدة إذا كانت هناك حلقة تعمل بالفعل
+        if (!isLooping) {
+            isLooping = true;
+            requestAnimationFrame(loop);
+        }
     }
 
     function winLevel() {
@@ -289,7 +321,7 @@
             initAudio(); 
             if (player.grounded) { 
                 player.vy = player.jumpForce; player.grounded = false; 
-                playSound('jump'); // تشغيل صوت القفز
+                playSound('jump'); 
                 createParticles(player.x + 20, player.y + 40, '#ffffff'); 
             }
         });
@@ -330,13 +362,13 @@
             if (player.x + player.width > en.x && player.x < en.x + en.width && player.y + player.height > en.y && player.y < en.y + en.height) {
                 if (player.vy > 0 && player.y + player.height - player.vy <= en.y + 15) {
                     en.alive = false; player.vy = -9; score += 50; document.getElementById('score-val').innerText = score;
-                    playSound('jump'); // صوت الاصطدام الإيجابي
+                    playSound('jump'); 
                     createParticles(en.x + 20, en.y + 20, '#ff0000');
                 } else {
-                    playSound('hit'); // تشغيل صوت الضرر
+                    playSound('hit'); 
                     lives--; document.getElementById('lives-val').innerText = lives;
                     shakeTime = 15; player.vy = -6; player.x += (player.x < en.x) ? -50 : 50; createParticles(player.x, player.y, player.color);
-                    if (lives <= 0) { alert('انتهت المحاولات!'); startLevel(currentLevel); }
+                    if (lives <= 0) { triggerGameOver(); }
                 }
             }
         });
@@ -345,16 +377,16 @@
             c.float += 0.1; c.y += Math.sin(c.float) * 0.5;
             if (!c.collected && player.x + player.width > c.x && player.x < c.x + c.width && player.y + player.height > c.y && player.y < c.y + c.height) {
                 c.collected = true; score += 10; document.getElementById('score-val').innerText = score;
-                playSound('coin'); // تشغيل صوت العملة
+                playSound('coin'); 
                 createParticles(c.x + 13, c.y + 13, '#ffcc00');
             }
         });
 
         if (player.y > canvas.height) {
-            playSound('hit'); // تشغيل صوت السقوط
+            playSound('hit'); 
             lives--; document.getElementById('lives-val').innerText = lives; shakeTime = 20;
             player.x = cameraX + 100; player.y = 50; player.vy = 0;
-            if (lives <= 0) { alert('انتهت المحاولات!'); startLevel(currentLevel); }
+            if (lives <= 0) { triggerGameOver(); }
         }
 
         if (finishLine && player.x + player.width > finishLine.x && player.x < finishLine.x + finishLine.width) {
@@ -452,11 +484,13 @@
     }
 
     function loop() { 
-        if(gameActive) { 
-            update(); 
-            draw(); 
-            animationFrameId = requestAnimationFrame(loop); 
-        } 
+        if(!gameActive) {
+            isLooping = false; // إيقاف الحلقة رسمياً
+            return;
+        }
+        update(); 
+        draw(); 
+        requestAnimationFrame(loop); 
     }
     
     setupControls();
