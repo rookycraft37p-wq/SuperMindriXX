@@ -28,7 +28,7 @@
         .btn-back { background: #f44336; box-shadow: 0 6px 0px #b71c1c; margin-top: 30px; }
 
         /* المتجر والمراحل */
-        .grid-container { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; max-width: 600px; }
+        .grid-container { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; max-width: 600px; padding: 10px; }
         .card { background: rgba(255,255,255,0.1); border: 3px solid #fff; border-radius: 15px; padding: 15px; width: 120px; text-align: center; }
         .card.locked { opacity: 0.5; filter: grayscale(100%); pointer-events: none; }
         .card-title { font-size: 18px; margin-bottom: 10px; }
@@ -36,28 +36,28 @@
         .buy-btn:disabled { background: #888; color: #ccc; cursor: not-allowed; }
         .buy-btn.equipped { background: #00e676; }
 
-        /* واجهة اللعب */
+        /* واجهة اللعب - تم إصلاح مشكلة التداخل هنا */
         #ui-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none;
-            display: none; flex-direction: column; justify-content: space-between; padding: 20px;
+            display: none; flex-direction: column; justify-content: space-between; padding: 15px;
         }
-        .top-hud { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .score-box { background: rgba(0, 0, 0, 0.8); color: #ffcc00; padding: 8px 15px; border-radius: 15px; font-size: 20px; font-weight: 800; border: 3px solid #fff; display: flex; gap: 10px; align-items: center; }
+        .top-hud-container { width: 100%; pointer-events: auto; }
+        .top-row { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
+        .hud-group { display: flex; gap: 10px; align-items: center; }
         
-        .home-icon-btn { pointer-events: auto; font-size: 24px; background: #fff; border: 3px solid #111; border-radius: 50%; width: 45px; height: 45px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 0px #111; }
+        .score-box { background: rgba(0, 0, 0, 0.8); color: #ffcc00; padding: 6px 12px; border-radius: 15px; font-size: 20px; font-weight: 800; border: 3px solid #fff; display: flex; align-items: center; }
+        .home-icon-btn { font-size: 22px; background: #fff; border: 3px solid #111; border-radius: 50%; width: 42px; height: 42px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 0px #111; }
         .home-icon-btn:active { transform: translateY(4px); box-shadow: 0 0px 0px #111; }
 
-        .level-indicator { position: absolute; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: #fff; padding: 5px 20px; border-radius: 20px; font-size: 20px; font-weight: bold; border: 2px solid #fff; }
+        /* تم فصل مؤشر المرحلة تحت الصف العلوي لمنع التداخل */
+        .level-indicator { background: rgba(0,0,0,0.8); color: #fff; padding: 5px 20px; border-radius: 20px; font-size: 18px; font-weight: bold; border: 2px solid #fff; margin: 10px auto 0; width: fit-content; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
 
         .controls-bar {
-            position: absolute; bottom: 30px; width: 100%; left: 0; display: flex; justify-content: space-between; padding: 0 30px; z-index: 20; pointer-events: auto;
-            direction: ltr; /* لحل مشكلة اتجاه الأزرار */
+            position: absolute; bottom: 30px; width: 100%; left: 0; display: flex; justify-content: space-between; padding: 0 30px; z-index: 20; pointer-events: auto; direction: ltr;
         }
         .control-group { display: flex; gap: 15px; }
         .control-btn {
-            width: 75px; height: 75px; background: rgba(255, 255, 255, 0.9); border: 4px solid #111; border-radius: 50%;
-            font-size: 30px; font-weight: bold; color: #111; display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 6px 0px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.05s;
+            width: 75px; height: 75px; background: rgba(255, 255, 255, 0.9); border: 4px solid #111; border-radius: 50%; font-size: 30px; font-weight: bold; color: #111; display: flex; justify-content: center; align-items: center; box-shadow: 0 6px 0px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.05s;
         }
         .control-btn:active { transform: translateY(6px); box-shadow: 0 0px 0px rgba(0,0,0,0.5); background: #ddd; }
         #btn-jump { background: #ffcc00; color: #111; }
@@ -67,7 +67,6 @@
 </head>
 <body>
 
-    <!-- الشاشة الرئيسية -->
     <div id="home-screen" class="screen">
         <h1 class="title">SUPERDRIX</h1>
         <div id="total-coins-display">🪙 <span id="home-coins">0</span></div>
@@ -75,14 +74,12 @@
         <button class="btn-main btn-shop" onclick="openShop()">🛒 المتجر والشخصيات</button>
     </div>
 
-    <!-- شاشة المراحل -->
     <div id="levels-screen" class="screen">
         <h2 class="subtitle">المراحل</h2>
         <div class="grid-container" id="levels-grid"></div>
         <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
     </div>
 
-    <!-- شاشة المتجر -->
     <div id="shop-screen" class="screen">
         <h2 class="subtitle">المتجر</h2>
         <div id="total-coins-display">رصيدك: 🪙 <span id="shop-coins">0</span></div>
@@ -90,7 +87,6 @@
         <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
     </div>
 
-    <!-- شاشة الفوز -->
     <div id="win-screen" class="screen">
         <h1 class="title" style="color: #00e676;">اكتملت المرحلة!</h1>
         <p style="font-size: 24px; margin-bottom: 20px;">جمعت: <span id="win-coins">0</span> 🪙</p>
@@ -98,15 +94,16 @@
         <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
     </div>
 
-    <!-- واجهة اللعب -->
     <div id="ui-layer">
-        <div class="top-hud">
-            <div class="score-box">❤️ <span id="lives-val">3</span></div>
-            <div class="level-indicator">مرحلة <span id="current-level-text">1</span></div>
-            <div style="display:flex; gap:15px; align-items:center;">
-                <div class="score-box">🪙 <span id="score-val">0</span></div>
-                <div class="home-icon-btn" onclick="quitToHome()">🏠</div>
+        <div class="top-hud-container">
+            <div class="top-row">
+                <div class="hud-group">
+                    <div class="home-icon-btn" onclick="quitToHome()">🏠</div>
+                    <div class="score-box">🪙 <span id="score-val">0</span></div>
+                </div>
+                <div class="score-box">❤️ <span id="lives-val">3</span></div>
             </div>
+            <div class="level-indicator">مرحلة <span id="current-level-text">1</span></div>
         </div>
         <div class="controls-bar" id="controls">
             <div class="control-group">
@@ -120,7 +117,36 @@
     <canvas id="gameCanvas"></canvas>
 
 <script>
-    // إعدادات المتصفح والحفظ السحابي (Local Storage)
+    // نظام الصوت (تم استعادته)
+    let audioCtx;
+    function initAudio() {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playSound(type) {
+        if (!audioCtx) return;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        const now = audioCtx.currentTime;
+
+        if (type === 'jump') {
+            osc.type = 'square'; osc.frequency.setValueAtTime(200, now); osc.frequency.exponentialRampToValueAtTime(400, now + 0.1);
+            gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
+        } else if (type === 'coin') {
+            osc.type = 'sine'; osc.frequency.setValueAtTime(800, now); osc.frequency.setValueAtTime(1200, now + 0.05);
+            gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+            osc.start(now); osc.stop(now + 0.2);
+        } else if (type === 'hit') {
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(40, now + 0.3);
+            gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
+        }
+    }
+
+    // إعدادات المتصفح والحفظ السحابي
     let totalCoins = parseInt(localStorage.getItem('superdrix_coins')) || 0;
     let unlockedLevels = parseInt(localStorage.getItem('superdrix_unlocked_levels')) || 1;
     let unlockedSkins = JSON.parse(localStorage.getItem('superdrix_skins')) || [0];
@@ -135,8 +161,8 @@
     const maxLevels = 3;
     let currentLevel = 1;
     let score = 0, lives = 3, gameActive = false;
+    let animationFrameId = null; // متغیر تم إضافته لمنع تضاعف سرعة اللعبة
 
-    // تحديث الأرقام المعروضة
     function updateDisplayData() {
         document.getElementById('home-coins').innerText = totalCoins;
         document.getElementById('shop-coins').innerText = totalCoins;
@@ -147,112 +173,68 @@
     }
 
     function showScreen(id) {
+        initAudio();
         document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
         document.getElementById('ui-layer').style.display = 'none';
         if (id) document.getElementById(id).style.display = 'flex';
         updateDisplayData();
     }
 
-    function goHome() {
-        gameActive = false;
-        showScreen('home-screen');
-    }
+    function goHome() { gameActive = false; showScreen('home-screen'); }
+    function quitToHome() { if(confirm("هل أنت متأكد أنك تريد الخروج للبيت؟ ستفقد تقدمك في هذه المرحلة.")) goHome(); }
 
-    function quitToHome() {
-        if(confirm("هل أنت متأكد أنك تريد الخروج للبيت؟ ستفقد تقدمك في هذه المرحلة.")) {
-            goHome();
-        }
-    }
-
-    // المتجر
     function openShop() {
         showScreen('shop-screen');
-        const grid = document.getElementById('shop-grid');
-        grid.innerHTML = '';
+        const grid = document.getElementById('shop-grid'); grid.innerHTML = '';
         skinsData.forEach(skin => {
             const isUnlocked = unlockedSkins.includes(skin.id);
             const isEquipped = currentSkinId === skin.id;
-            
-            let btnHtml = '';
-            if (isEquipped) {
-                btnHtml = `<button class="buy-btn equipped" disabled>مُجهز ✔️</button>`;
-            } else if (isUnlocked) {
-                btnHtml = `<button class="buy-btn" onclick="equipSkin(${skin.id})">استخدام</button>`;
-            } else {
-                let canBuy = totalCoins >= skin.cost;
-                btnHtml = `<button class="buy-btn" ${!canBuy ? 'disabled' : ''} onclick="buySkin(${skin.id}, ${skin.cost})">شراء 🪙 ${skin.cost}</button>`;
-            }
-
-            grid.innerHTML += `
-                <div class="card">
-                    <div style="width: 50px; height: 50px; background:${skin.color}; margin: 0 auto 10px; border: 3px solid #000;"></div>
-                    <div class="card-title">${skin.name}</div>
-                    ${btnHtml}
-                </div>`;
+            let btnHtml = isEquipped ? `<button class="buy-btn equipped" disabled>مُجهز ✔️</button>` : 
+                          isUnlocked ? `<button class="buy-btn" onclick="equipSkin(${skin.id})">استخدام</button>` : 
+                          `<button class="buy-btn" ${totalCoins < skin.cost ? 'disabled' : ''} onclick="buySkin(${skin.id}, ${skin.cost})">شراء 🪙 ${skin.cost}</button>`;
+            grid.innerHTML += `<div class="card"><div style="width: 50px; height: 50px; background:${skin.color}; margin: 0 auto 10px; border: 3px solid #000;"></div><div class="card-title">${skin.name}</div>${btnHtml}</div>`;
         });
     }
 
-    function buySkin(id, cost) {
-        if (totalCoins >= cost) {
-            totalCoins -= cost;
-            unlockedSkins.push(id);
-            equipSkin(id);
-            openShop();
-        }
-    }
+    function buySkin(id, cost) { if (totalCoins >= cost) { totalCoins -= cost; unlockedSkins.push(id); equipSkin(id); openShop(); } }
+    function equipSkin(id) { currentSkinId = id; updateDisplayData(); openShop(); }
 
-    function equipSkin(id) {
-        currentSkinId = id;
-        updateDisplayData();
-        openShop();
-    }
-
-    // المراحل
     function openLevelsScreen() {
         showScreen('levels-screen');
-        const grid = document.getElementById('levels-grid');
-        grid.innerHTML = '';
+        const grid = document.getElementById('levels-grid'); grid.innerHTML = '';
         for (let i = 1; i <= maxLevels; i++) {
             let isUnlocked = i <= unlockedLevels;
-            grid.innerHTML += `
-                <div class="card ${isUnlocked ? '' : 'locked'}">
-                    <div style="font-size: 30px; margin-bottom: 10px;">${isUnlocked ? i : '🔒'}</div>
-                    <div class="card-title">مرحلة ${i}</div>
-                    ${isUnlocked ? `<button class="level-btn" onclick="startLevel(${i})">العب</button>` : ''}
-                </div>`;
+            grid.innerHTML += `<div class="card ${isUnlocked ? '' : 'locked'}"><div style="font-size: 30px; margin-bottom: 10px;">${isUnlocked ? i : '🔒'}</div><div class="card-title">مرحلة ${i}</div>${isUnlocked ? `<button class="level-btn" onclick="startLevel(${i})">العب</button>` : ''}</div>`;
         }
     }
 
     function startLevel(lvl) {
-        currentLevel = lvl;
-        score = 0; lives = 3;
+        initAudio();
+        currentLevel = lvl; score = 0; lives = 3;
         document.getElementById('current-level-text').innerText = currentLevel;
         document.getElementById('score-val').innerText = score;
         document.getElementById('lives-val').innerText = lives;
         
-        showScreen(''); // إخفاء الشاشات
+        showScreen(''); 
         document.getElementById('ui-layer').style.display = 'flex';
         initLevel(currentLevel);
-        gameActive = true; loop();
+        
+        gameActive = true; 
+        
+        // إصلاح مشكلة تضاعف السرعة (نقوم بإلغاء أي حلقة قديمة قبل بدء حلقة جديدة)
+        if (animationFrameId) cancelAnimationFrame(animationFrameId);
+        loop();
     }
 
     function winLevel() {
-        gameActive = false;
-        totalCoins += score;
-        if (currentLevel === unlockedLevels && unlockedLevels < maxLevels) {
-            unlockedLevels++;
-        }
-        document.getElementById('win-coins').innerText = score;
-        showScreen('win-screen');
+        gameActive = false; totalCoins += score;
+        if (currentLevel === unlockedLevels && unlockedLevels < maxLevels) unlockedLevels++;
+        document.getElementById('win-coins').innerText = score; showScreen('win-screen');
     }
 
     function nextLevel() {
-        if (currentLevel < maxLevels) {
-            startLevel(currentLevel + 1);
-        } else {
-            alert("لقد أنهيت جميع المراحل الحالية! مبروك يا بطل!");
-            goHome();
-        }
+        if (currentLevel < maxLevels) startLevel(currentLevel + 1);
+        else { alert("لقد أنهيت جميع المراحل الحالية! مبروك يا بطل!"); goHome(); }
     }
 
     // --- محرك اللعبة الأساسي ---
@@ -267,37 +249,23 @@
 
     function initLevel(lvl) {
         blocks = []; coins = []; enemies = []; clouds = []; particles = [];
-        
-        // إعدادات الشخصية
         let activeSkin = skinsData.find(s => s.id === currentSkinId) || skinsData[0];
-        player = {
-            x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0, speed: 6, jumpForce: -13,
-            grounded: false, dir: 1, trail: [], color: activeSkin.color, trailColors: activeSkin.trail
-        };
-
-        // توليد أرضية المرحلة بناءً على رقمها (كلما زاد الرقم زادت المسافة)
+        player = { x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0, speed: 6, jumpForce: -13, grounded: false, dir: 1, trail: [], color: activeSkin.color, trailColors: activeSkin.trail };
         let levelLength = 2000 + (lvl * 1500);
         finishLine = { x: levelLength - 300, y: canvas.height - 250, width: 60, height: 170 };
 
         for (let i = 0; i < levelLength / 55; i++) {
-            // حفر عشوائية تزيد في المراحل المتقدمة
-            if (Math.random() > 0.05 + (lvl * 0.02)) {
-                blocks.push({ x: i * 55, y: canvas.height - 80, width: 55, height: 80, type: 'ground' });
-            }
+            if (Math.random() > 0.05 + (lvl * 0.02)) blocks.push({ x: i * 55, y: canvas.height - 80, width: 55, height: 80, type: 'ground' });
         }
 
-        // المنصات، العملات والوحوش
         for (let i = 400; i < finishLine.x; i += 300) {
             if (Math.random() > 0.3) {
                 blocks.push({ x: i, y: canvas.height - 180 - Math.random() * 80, width: 150, height: 35, type: 'brick' });
                 coins.push({ x: i + 50, y: canvas.height - 300, width: 26, height: 26, collected: false, float: Math.random() * Math.PI });
             }
-            if (Math.random() > 0.5) {
-                enemies.push({ x: i + 100, y: canvas.height - 130, width: 45, height: 45, vx: 2 + (lvl * 0.5), minX: i, maxX: i + 300, alive: true });
-            }
+            if (Math.random() > 0.5) enemies.push({ x: i + 100, y: canvas.height - 130, width: 45, height: 45, vx: 2 + (lvl * 0.5), minX: i, maxX: i + 300, alive: true });
             coins.push({ x: i + 150, y: canvas.height - 150, width: 26, height: 26, collected: false, float: 0 });
         }
-
         for (let i = 0; i < 30; i++) clouds.push({ x: i * 300 + Math.random() * 100, y: 30 + Math.random() * 100, size: 40 + Math.random() * 40 });
         cameraX = 0;
     }
@@ -310,15 +278,20 @@
     function setupControls() {
         const bindBtn = (id, start, end) => {
             const el = document.getElementById(id);
-            el.addEventListener('touchstart', (e) => { e.preventDefault(); start(); });
+            el.addEventListener('touchstart', (e) => { e.preventDefault(); initAudio(); start(); });
             el.addEventListener('touchend', (e) => { e.preventDefault(); end(); });
-            el.addEventListener('mousedown', start);
+            el.addEventListener('mousedown', () => { initAudio(); start(); });
             el.addEventListener('mouseup', end);
         };
         bindBtn('btn-left', () => moveLeft = true, () => moveLeft = false);
         bindBtn('btn-right', () => moveRight = true, () => moveRight = false);
         document.getElementById('btn-jump').addEventListener('click', () => {
-            if (player.grounded) { player.vy = player.jumpForce; player.grounded = false; createParticles(player.x + 20, player.y + 40, '#ffffff'); }
+            initAudio(); 
+            if (player.grounded) { 
+                player.vy = player.jumpForce; player.grounded = false; 
+                playSound('jump'); // تشغيل صوت القفز
+                createParticles(player.x + 20, player.y + 40, '#ffffff'); 
+            }
         });
     }
 
@@ -329,11 +302,10 @@
         if (moveLeft) { player.vx = -player.speed; player.dir = -1; }
         if (moveRight) { player.vx = player.speed; player.dir = 1; }
         player.x += player.vx;
-        player.vy += 0.6; // Gravity
+        player.vy += 0.6; 
         player.y += player.vy;
         player.grounded = false;
 
-        // Trail
         if (Math.abs(player.vx) > 0 || player.vy !== 0) {
             player.trail.push({ x: player.x, y: player.y });
             if (player.trail.length > 10) player.trail.shift();
@@ -342,7 +314,6 @@
         particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.life -= 0.04; });
         particles = particles.filter(p => p.life > 0);
 
-        // التصادم مع الأرض
         blocks.forEach(b => {
             if (player.x + player.width > b.x && player.x < b.x + b.width && player.y + player.height > b.y && player.y < b.y + b.height) {
                 if (player.vy > 0 && player.y + player.height - player.vy <= b.y + 12) {
@@ -353,15 +324,16 @@
             }
         });
 
-        // الوحوش
         enemies.forEach(en => {
             if (!en.alive) return;
             en.x += en.vx; if (en.x < en.minX || en.x > en.maxX) en.vx *= -1;
             if (player.x + player.width > en.x && player.x < en.x + en.width && player.y + player.height > en.y && player.y < en.y + en.height) {
                 if (player.vy > 0 && player.y + player.height - player.vy <= en.y + 15) {
                     en.alive = false; player.vy = -9; score += 50; document.getElementById('score-val').innerText = score;
+                    playSound('jump'); // صوت الاصطدام الإيجابي
                     createParticles(en.x + 20, en.y + 20, '#ff0000');
                 } else {
+                    playSound('hit'); // تشغيل صوت الضرر
                     lives--; document.getElementById('lives-val').innerText = lives;
                     shakeTime = 15; player.vy = -6; player.x += (player.x < en.x) ? -50 : 50; createParticles(player.x, player.y, player.color);
                     if (lives <= 0) { alert('انتهت المحاولات!'); startLevel(currentLevel); }
@@ -369,24 +341,24 @@
             }
         });
 
-        // العملات
         coins.forEach(c => {
             c.float += 0.1; c.y += Math.sin(c.float) * 0.5;
             if (!c.collected && player.x + player.width > c.x && player.x < c.x + c.width && player.y + player.height > c.y && player.y < c.y + c.height) {
                 c.collected = true; score += 10; document.getElementById('score-val').innerText = score;
+                playSound('coin'); // تشغيل صوت العملة
                 createParticles(c.x + 13, c.y + 13, '#ffcc00');
             }
         });
 
-        // السقوط (خسارة)
         if (player.y > canvas.height) {
+            playSound('hit'); // تشغيل صوت السقوط
             lives--; document.getElementById('lives-val').innerText = lives; shakeTime = 20;
             player.x = cameraX + 100; player.y = 50; player.vy = 0;
             if (lives <= 0) { alert('انتهت المحاولات!'); startLevel(currentLevel); }
         }
 
-        // التحقق من الفوز (خط النهاية)
         if (finishLine && player.x + player.width > finishLine.x && player.x < finishLine.x + finishLine.width) {
+            playSound('coin');
             createParticles(player.x, player.y, '#00e676');
             createParticles(player.x+20, player.y-20, '#ffcc00');
             winLevel();
@@ -404,7 +376,6 @@
         if (shakeTime > 0) { shakeX = (Math.random() - 0.5) * 12; shakeY = (Math.random() - 0.5) * 12; shakeTime--; }
         ctx.translate(-cameraX + shakeX, shakeY);
 
-        // غيوم
         ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
         clouds.forEach(cl => {
             ctx.beginPath(); ctx.arc(cl.x, cl.y, cl.size * 0.5, 0, Math.PI * 2);
@@ -412,14 +383,12 @@
             ctx.arc(cl.x + cl.size * 0.8, cl.y, cl.size * 0.45, 0, Math.PI * 2); ctx.fill();
         });
 
-        // خط النهاية (العلم)
         if (finishLine) {
-            ctx.fillStyle = "#fff"; ctx.fillRect(finishLine.x, finishLine.y, 10, finishLine.height); // عمود العلم
-            ctx.fillStyle = "#00e676"; ctx.fillRect(finishLine.x + 10, finishLine.y, finishLine.width, 40); // القماش
+            ctx.fillStyle = "#fff"; ctx.fillRect(finishLine.x, finishLine.y, 10, finishLine.height);
+            ctx.fillStyle = "#00e676"; ctx.fillRect(finishLine.x + 10, finishLine.y, finishLine.width, 40);
             ctx.fillStyle = "#000"; ctx.font = "20px Changa"; ctx.fillText("النهاية", finishLine.x + 15, finishLine.y + 28);
         }
 
-        // البلوكات
         blocks.forEach(b => {
             if (b.type === 'ground') {
                 ctx.fillStyle = "#d95700"; ctx.fillRect(b.x, b.y + 15, b.width, b.height - 15);
@@ -431,7 +400,6 @@
             }
         });
 
-        // العملات
         coins.forEach(c => {
             if (!c.collected) {
                 ctx.fillStyle = "#ffcc00"; ctx.beginPath(); ctx.arc(c.x + c.width/2, c.y + c.height/2, c.width/2, 0, Math.PI*2); ctx.fill();
@@ -439,7 +407,6 @@
             }
         });
 
-        // الوحوش
         enemies.forEach(en => {
             if (en.alive) {
                 ctx.fillStyle = "#7b1fa2"; ctx.fillRect(en.x, en.y, en.width, en.height);
@@ -447,7 +414,6 @@
             }
         });
 
-        // رسم ذيل الأفاتار المخصص بناءً على السكن
         if(player && player.trailColors) {
             player.trail.forEach((t, i) => {
                 ctx.globalAlpha = (i / player.trail.length) * 0.6;
@@ -457,7 +423,6 @@
             ctx.globalAlpha = 1.0;
         }
 
-        // رسم الشخصية المتغيرة من المتجر
         if(player) {
             ctx.fillStyle = "#000000"; ctx.fillRect(player.x - 3, player.y - 3, player.width + 6, player.height + 6);
             ctx.fillStyle = player.color; ctx.fillRect(player.x, player.y, player.width, player.height);
@@ -465,7 +430,6 @@
             ctx.fillStyle = "#ffffff";
             let eyeOffset = player.dir === 1 ? 4 : -4;
             
-            // عيون غاضبة
             ctx.beginPath(); ctx.moveTo(player.x + 6 + eyeOffset, player.y + 10); ctx.lineTo(player.x + 18 + eyeOffset, player.y + 15);
             ctx.lineTo(player.x + 18 + eyeOffset, player.y + 26); ctx.lineTo(player.x + 6 + eyeOffset, player.y + 24); ctx.fill();
             
@@ -478,7 +442,6 @@
             ctx.fillRect(player.x + 28 + eyeOffset + pupilOffset, player.y + 18, 5, 6);
         }
 
-        // الجزيئات
         particles.forEach(p => {
             ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
             ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
@@ -488,9 +451,14 @@
         ctx.restore();
     }
 
-    function loop() { if(gameActive) { update(); draw(); requestAnimationFrame(loop); } }
+    function loop() { 
+        if(gameActive) { 
+            update(); 
+            draw(); 
+            animationFrameId = requestAnimationFrame(loop); 
+        } 
+    }
     
-    // تشغيل الصفحة الرئيسية عند البداية
     setupControls();
     goHome();
 </script>
