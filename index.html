@@ -276,19 +276,20 @@
         let activeSkin = skinsData.find(s => s.id === currentSkinId) || skinsData[0];
         player = { x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0, speed: 6, jumpForce: -13, grounded: false, dir: 1, trail: [], color: activeSkin.color, eyesColor: activeSkin.eyes, trailColors: activeSkin.trail, crown: activeSkin.crown };
         let levelLength = 2000 + (lvl * 1200);
-        finishLine = { x: levelLength - 300, y: canvas.height - 250, width: 60, height: 170 };
+        finishLine = { x: levelLength - 300, y: canvas.height - 320, width: 60, height: 240 };
 
         for (let i = 0; i < levelLength / 55; i++) {
-            if (Math.random() > 0.05 + (lvl * 0.015)) blocks.push({ x: i * 55, y: canvas.height - 80, width: 55, height: 80, type: 'ground' });
+            // اجعل طبقة الأرض تبدأ من ارتفاع معين وتستمر لنهاية الشاشة بالأسفل
+            blocks.push({ x: i * 55, y: canvas.height - 140, width: 55, height: 180, type: 'ground' });
         }
 
         for (let i = 400; i < finishLine.x; i += 280) {
             if (Math.random() > 0.3) {
-                blocks.push({ x: i, y: canvas.height - 180 - Math.random() * 80, width: 140, height: 35, type: 'brick' });
-                coins.push({ x: i + 50, y: canvas.height - 300, width: 26, height: 26, collected: false, float: Math.random() * Math.PI });
+                blocks.push({ x: i, y: canvas.height - 240 - Math.random() * 80, width: 140, height: 35, type: 'brick' });
+                coins.push({ x: i + 50, y: canvas.height - 340, width: 26, height: 26, collected: false, float: Math.random() * Math.PI });
             }
-            if (Math.random() > 0.4) enemies.push({ x: i + 100, y: canvas.height - 130, width: 45, height: 45, vx: 2 + (lvl * 0.4), minX: i, maxX: i + 280, alive: true });
-            coins.push({ x: i + 140, y: canvas.height - 150, width: 26, height: 26, collected: false, float: 0 });
+            if (Math.random() > 0.4) enemies.push({ x: i + 100, y: canvas.height - 190, width: 45, height: 45, vx: 2 + (lvl * 0.4), minX: i, maxX: i + 280, alive: true });
+            coins.push({ x: i + 140, y: canvas.height - 210, width: 26, height: 26, collected: false, float: 0 });
         }
         for (let i = 0; i < 30; i++) clouds.push({ x: i * 300 + Math.random() * 100, y: 30 + Math.random() * 100, size: 40 + Math.random() * 40 });
         cameraX = 0;
@@ -340,7 +341,7 @@
 
         blocks.forEach(b => {
             if (player.x + player.width > b.x && player.x < b.x + b.width && player.y + player.height > b.y && player.y < b.y + b.height) {
-                if (player.vy > 0 && player.y + player.height - player.vy <= b.y + 12) {
+                if (player.vy > 0 && player.y + player.height - player.vy <= b.y + 15) {
                     player.y = b.y - player.height; player.vy = 0; player.grounded = true;
                 } else if (player.vy < 0 && player.y - player.vy >= b.y + b.height - 12) {
                     player.y = b.y + b.height; player.vy = 0;
@@ -415,9 +416,59 @@
 
         blocks.forEach(b => {
             if (b.type === 'ground') {
-                ctx.fillStyle = "#d95700"; ctx.fillRect(b.x, b.y + 15, b.width, b.height - 15);
-                ctx.fillStyle = "#38b764"; ctx.fillRect(b.x, b.y, b.width, 18);
-                ctx.strokeStyle = "#1b5e20"; ctx.lineWidth = 3; ctx.strokeRect(b.x, b.y, b.width, 18);
+                let grassHeight = 22; // ارتفاع طبقة العشب بالأعلى
+                let totalHeightToBottom = canvas.height - b.y; // يمتد للأسفل تماماً
+
+                // 1. قاعدة الطين وتمتد لنهاية الشاشة للأسفل
+                ctx.fillStyle = "#8B5A2B"; 
+                ctx.fillRect(b.x, b.y + grassHeight, b.width, totalHeightToBottom - grassHeight);
+
+                // 2. إضافة تفاصيل الطين والحجارة الصغيرة المعتمة والفاتحة والنقوش
+                ctx.fillStyle = "#5C3A21"; // ظلال وعروق الطين
+                ctx.fillRect(b.x + 6, b.y + 35, 12, 8);
+                ctx.fillRect(b.x + 28, b.y + 55, 16, 10);
+                ctx.fillRect(b.x + 12, b.y + 85, 10, 8);
+                ctx.fillRect(b.x + 35, b.y + 115, 14, 12);
+                ctx.fillRect(b.x + 8, b.y + 145, 18, 10);
+
+                ctx.fillStyle = "#A0653B"; // حبيبات طينية مضيئة
+                ctx.fillRect(b.x + 4, b.y + 50, 8, 6);
+                ctx.fillRect(b.x + 20, b.y + 70, 7, 7);
+                ctx.fillRect(b.x + 25, b.y + 100, 9, 8);
+                ctx.fillRect(b.x + 10, b.y + 130, 8, 6);
+
+                // رسم حجارة واقعية مبعثرة داخل طبقة الطين
+                ctx.fillStyle = "#6E6E6E";
+                ctx.beginPath();
+                ctx.arc(b.x + 15, b.y + 45, 5, 0, Math.PI*2);
+                ctx.arc(b.x + 40, b.y + 90, 7, 0, Math.PI*2);
+                ctx.arc(b.x + 22, b.y + 135, 6, 0, Math.PI*2);
+                ctx.fill();
+                ctx.strokeStyle = "#424242"; ctx.lineWidth = 1.5; ctx.stroke();
+
+                // رسم الجذور المتدلية من أعلى الطين بشكل فني رائع
+                ctx.strokeStyle = "#3D2314";
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.moveTo(b.x + 12, b.y + grassHeight);
+                ctx.quadraticCurveTo(b.x + 8, b.y + 40, b.x + 15, b.y + 60);
+                ctx.moveTo(b.x + 38, b.y + grassHeight);
+                ctx.quadraticCurveTo(b.x + 44, b.y + 50, b.x + 32, b.y + 80);
+                ctx.stroke();
+
+                // 3. رسم طبقة العشب الأخضر في النصف العلوي تماماً
+                ctx.fillStyle = "#43A047"; 
+                ctx.fillRect(b.x, b.y, b.width, grassHeight);
+                
+                // حواف العشب المتعرجة والجميلة بالأعلى
+                ctx.fillStyle = "#66BB6A";
+                for(let gx = 0; gx < b.width; gx += 10) {
+                    ctx.fillRect(b.x + gx, b.y - 3, 6, 5);
+                }
+
+                // إطار حدودي علوي مرتب
+                ctx.strokeStyle = "#1B5E20"; ctx.lineWidth = 2.5; 
+                ctx.strokeRect(b.x, b.y, b.width, grassHeight);
             } else {
                 ctx.fillStyle = "#e67e22"; ctx.fillRect(b.x, b.y, b.width, b.height);
                 ctx.strokeStyle = "#873600"; ctx.lineWidth = 3; ctx.strokeRect(b.x, b.y, b.width, b.height);
