@@ -11,33 +11,31 @@
         body, html { width: 100%; height: 100%; overflow: hidden; background: #2b8cbe; font-family: 'Changa', sans-serif; }
         canvas { display: block; background: linear-gradient(#2b8cbe, #74c2e1); }
 
-        /* الشاشات والقوائم */
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 20, 30, 0.95);
             z-index: 30; display: none; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center;
+            overflow-y: auto; padding: 20px;
         }
         #home-screen { display: flex; }
         
-        h1.title { font-size: 60px; color: #e52521; text-shadow: 4px 4px #000, -2px -2px #fff; font-weight: 900; letter-spacing: 2px; margin-bottom: 20px; }
-        h2.subtitle { font-size: 40px; color: #ffcc00; text-shadow: 2px 2px #000; margin-bottom: 20px; }
+        h1.title { font-size: 50px; color: #e52521; text-shadow: 4px 4px #000, -2px -2px #fff; font-weight: 900; letter-spacing: 2px; margin-bottom: 10px; }
+        h2.subtitle { font-size: 35px; color: #ffcc00; text-shadow: 2px 2px #000; margin-bottom: 15px; }
 
-        .btn-main { background: #00e676; color: #000; font-size: 24px; font-weight: 800; padding: 12px 40px; margin: 10px; border-radius: 40px; border: 4px solid #fff; cursor: pointer; box-shadow: 0 6px 0px #00793c; transition: all 0.2s; width: 250px; }
+        .btn-main { background: #00e676; color: #000; font-size: 22px; font-weight: 800; padding: 10px 30px; margin: 8px; border-radius: 40px; border: 4px solid #fff; cursor: pointer; box-shadow: 0 6px 0px #00793c; transition: all 0.2s; width: 250px; }
         .btn-main:active { transform: translateY(6px); box-shadow: 0 0px 0px #00793c; }
         .btn-shop { background: #ff9800; box-shadow: 0 6px 0px #e65100; }
         .btn-levels { background: #03a9f4; box-shadow: 0 6px 0px #01579b; }
-        .btn-back { background: #f44336; box-shadow: 0 6px 0px #b71c1c; margin-top: 30px; }
+        .btn-back { background: #f44336; box-shadow: 0 6px 0px #b71c1c; margin-top: 20px; }
         .btn-retry { background: #ffcc00; box-shadow: 0 6px 0px #f57f17; }
 
-        /* المتجر والمراحل */
-        .grid-container { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; max-width: 600px; padding: 10px; }
-        .card { background: rgba(255,255,255,0.1); border: 3px solid #fff; border-radius: 15px; padding: 15px; width: 120px; text-align: center; }
+        .grid-container { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; max-width: 700px; padding: 10px; }
+        .card { background: rgba(255,255,255,0.1); border: 3px solid #fff; border-radius: 15px; padding: 12px; width: 130px; text-align: center; }
         .card.locked { opacity: 0.5; filter: grayscale(100%); pointer-events: none; }
-        .card-title { font-size: 18px; margin-bottom: 10px; }
-        .buy-btn, .level-btn { background: #ffcc00; color: #000; font-weight: 800; border: 2px solid #000; padding: 5px 10px; border-radius: 10px; width: 100%; cursor: pointer; margin-top: 10px; }
+        .card-title { font-size: 16px; margin-bottom: 8px; font-weight: bold; }
+        .buy-btn, .level-btn { background: #ffcc00; color: #000; font-weight: 800; border: 2px solid #000; padding: 5px 8px; border-radius: 10px; width: 100%; cursor: pointer; margin-top: 8px; font-size: 14px; }
         .buy-btn:disabled { background: #888; color: #ccc; cursor: not-allowed; }
         .buy-btn.equipped { background: #00e676; }
 
-        /* واجهة اللعب */
         #ui-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none;
             display: none; flex-direction: column; justify-content: space-between; padding: 15px;
@@ -62,7 +60,7 @@
         .control-btn:active { transform: translateY(6px); box-shadow: 0 0px 0px rgba(0,0,0,0.5); background: #ddd; }
         #btn-jump { background: #ffcc00; color: #111; }
 
-        #total-coins-display { font-size: 24px; color: #ffcc00; font-weight: bold; margin-bottom: 20px; background: #000; padding: 10px 20px; border-radius: 20px; border: 2px solid #fff;}
+        #total-coins-display { font-size: 22px; color: #ffcc00; font-weight: bold; margin-bottom: 15px; background: #000; padding: 8px 20px; border-radius: 20px; border: 2px solid #fff;}
     </style>
 </head>
 <body>
@@ -81,13 +79,12 @@
     </div>
 
     <div id="shop-screen" class="screen">
-        <h2 class="subtitle">المتجر</h2>
+        <h2 class="subtitle">المتجر الأسطوري</h2>
         <div id="total-coins-display">رصيدك: 🪙 <span id="shop-coins">0</span></div>
         <div class="grid-container" id="shop-grid"></div>
         <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
     </div>
 
-    <!-- شاشة الفوز الاحترافية -->
     <div id="win-screen" class="screen">
         <h1 class="title" style="color: #00e676;">اكتملت المرحلة!</h1>
         <p style="font-size: 24px; margin-bottom: 20px;">جمعت: <span id="win-coins">0</span> 🪙</p>
@@ -95,7 +92,6 @@
         <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
     </div>
 
-    <!-- شاشة الخسارة الاحترافية الجديدة -->
     <div id="game-over-screen" class="screen">
         <h1 class="title" style="color: #f44336;">انتهت المحاولات!</h1>
         <p style="font-size: 24px; margin-bottom: 20px;">لقد جمعت: <span id="game-over-coins">0</span> 🪙 (تم حفظها)</p>
@@ -126,7 +122,6 @@
     <canvas id="gameCanvas"></canvas>
 
 <script>
-    // --- نظام الصوت الشامل ---
     let audioCtx;
     function initAudio() {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -153,14 +148,12 @@
             gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
             osc.start(now); osc.stop(now + 0.3);
         } else if (type === 'click') {
-            // صوت النقر للأزرار
             osc.type = 'triangle'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
             gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
             osc.start(now); osc.stop(now + 0.05);
         }
     }
 
-    // إضافة صوت النقر لأي زر في اللعبة
     document.addEventListener('pointerdown', function(e) {
         if(e.target.tagName === 'BUTTON' || e.target.classList.contains('home-icon-btn') || e.target.closest('button')) {
             initAudio();
@@ -168,22 +161,26 @@
         }
     });
 
-    // --- إعدادات اللعبة والحفظ ---
     let totalCoins = parseInt(localStorage.getItem('superdrix_coins')) || 0;
     let unlockedLevels = parseInt(localStorage.getItem('superdrix_unlocked_levels')) || 1;
     let unlockedSkins = JSON.parse(localStorage.getItem('superdrix_skins')) || [0];
     let currentSkinId = parseInt(localStorage.getItem('superdrix_current_skin')) || 0;
 
+    // قائمة السكنات المطورة والجديدة كلياً
     const skinsData = [
-        { id: 0, name: 'رُوكْ فِيكْس', cost: 0, color: '#e52521', trail: ['#ffffff', '#ff9999', '#99ccff'] },
-        { id: 1, name: 'النينجا الأزرق', cost: 100, color: '#00bcd4', trail: ['#e0f7fa', '#80deea', '#26c6da'] },
-        { id: 2, name: 'الملك الذهبي', cost: 300, color: '#ffcc00', trail: ['#fffde7', '#fff59d', '#ffeb3b'] }
+        { id: 0, name: 'رُوكْ فِيكْس', cost: 0, color: '#e52521', eyes: '#ffffff', trail: ['#ffffff', '#ff9999', '#99ccff'], crown: false },
+        { id: 1, name: 'النينجا الأزرق', cost: 100, color: '#00bcd4', eyes: '#ffeb3b', trail: ['#e0f7fa', '#80deea', '#26c6da'], crown: false },
+        { id: 2, name: 'الملك الذهبي', cost: 300, color: '#ffcc00', eyes: '#000000', trail: ['#fffde7', '#fff59d', '#ffeb3b'], crown: false },
+        { id: 3, name: 'سایبر نيون', cost: 500, color: '#9c27b0', eyes: '#00e676', trail: ['#e1bee7', '#ba68c8', '#7b1fa2'], crown: false },
+        { id: 4, name: 'الفضاء الحارق', cost: 800, color: '#ff5722', eyes: '#ffff00', trail: ['#ffccbc', '#ff7043', '#d84315'], crown: false },
+        { id: 5, name: 'شبح الظلام', cost: 1200, color: '#212121', eyes: '#00bcd4', trail: ['#bdbdbd', '#757575', '#212121'], crown: false },
+        { id: 6, name: 'الملك الأسطوري', cost: 2000, color: '#ffd700', eyes: '#ff0000', trail: ['#ffea00', '#ff9100', '#ff3d00'], crown: true } // أغلى سكن مع تاج وتأثيرات فخمة
     ];
 
-    const maxLevels = 3;
+    const maxLevels = 6; // تم زيادة عدد المراحل إلى 6 مراحل
     let currentLevel = 1;
     let score = 0, lives = 3, gameActive = false;
-    let isLooping = false; // المتغير السحري لحل مشكلة تضاعف السرعة
+    let isLooping = false;
 
     function updateDisplayData() {
         document.getElementById('home-coins').innerText = totalCoins;
@@ -214,7 +211,7 @@
             let btnHtml = isEquipped ? `<button class="buy-btn equipped" disabled>مُجهز ✔️</button>` : 
                           isUnlocked ? `<button class="buy-btn" onclick="equipSkin(${skin.id})">استخدام</button>` : 
                           `<button class="buy-btn" ${totalCoins < skin.cost ? 'disabled' : ''} onclick="buySkin(${skin.id}, ${skin.cost})">شراء 🪙 ${skin.cost}</button>`;
-            grid.innerHTML += `<div class="card"><div style="width: 50px; height: 50px; background:${skin.color}; margin: 0 auto 10px; border: 3px solid #000;"></div><div class="card-title">${skin.name}</div>${btnHtml}</div>`;
+            grid.innerHTML += `<div class="card"><div style="width: 45px; height: 45px; background:${skin.color}; margin: 0 auto 8px; border: 3px solid #000; border-radius: 8px; position:relative;">${skin.crown ? '<div style="position:absolute; top:-12px; left:10px; font-size:16px;">👑</div>' : ''}</div><div class="card-title">${skin.name}</div>${btnHtml}</div>`;
         });
     }
 
@@ -226,14 +223,13 @@
         const grid = document.getElementById('levels-grid'); grid.innerHTML = '';
         for (let i = 1; i <= maxLevels; i++) {
             let isUnlocked = i <= unlockedLevels;
-            grid.innerHTML += `<div class="card ${isUnlocked ? '' : 'locked'}"><div style="font-size: 30px; margin-bottom: 10px;">${isUnlocked ? i : '🔒'}</div><div class="card-title">مرحلة ${i}</div>${isUnlocked ? `<button class="level-btn" onclick="startLevel(${i})">العب</button>` : ''}</div>`;
+            grid.innerHTML += `<div class="card ${isUnlocked ? '' : 'locked'}"><div style="font-size: 26px; margin-bottom: 5px;">${isUnlocked ? i : '🔒'}</div><div class="card-title">مرحلة ${i}</div>${isUnlocked ? `<button class="level-btn" onclick="startLevel(${i})">العب</button>` : ''}</div>`;
         }
     }
 
-    // دالة الخسارة الجديدة
     function triggerGameOver() {
         gameActive = false;
-        totalCoins += score; // هنا يتم حفظ الأموال التي جمعتها حتى لو خسرت
+        totalCoins += score;
         document.getElementById('game-over-coins').innerText = score;
         showScreen('game-over-screen');
     }
@@ -250,8 +246,6 @@
         initLevel(currentLevel);
         
         gameActive = true; 
-        
-        // الحل النهائي لمشكلة السرعة: التأكد من عدم تشغيل حلقة جديدة إذا كانت هناك حلقة تعمل بالفعل
         if (!isLooping) {
             isLooping = true;
             requestAnimationFrame(loop);
@@ -266,10 +260,9 @@
 
     function nextLevel() {
         if (currentLevel < maxLevels) startLevel(currentLevel + 1);
-        else { alert("لقد أنهيت جميع المراحل الحالية! مبروك يا بطل!"); goHome(); }
+        else { alert("لقد أنهيت جميع المراحل الأسطورية الحالية! مبروك يا بطل!"); goHome(); }
     }
 
-    // --- محرك اللعبة الأساسي ---
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
@@ -282,21 +275,21 @@
     function initLevel(lvl) {
         blocks = []; coins = []; enemies = []; clouds = []; particles = [];
         let activeSkin = skinsData.find(s => s.id === currentSkinId) || skinsData[0];
-        player = { x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0, speed: 6, jumpForce: -13, grounded: false, dir: 1, trail: [], color: activeSkin.color, trailColors: activeSkin.trail };
-        let levelLength = 2000 + (lvl * 1500);
+        player = { x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0, speed: 6, jumpForce: -13, grounded: false, dir: 1, trail: [], color: activeSkin.color, eyesColor: activeSkin.eyes, trailColors: activeSkin.trail, crown: activeSkin.crown };
+        let levelLength = 2000 + (lvl * 1200);
         finishLine = { x: levelLength - 300, y: canvas.height - 250, width: 60, height: 170 };
 
         for (let i = 0; i < levelLength / 55; i++) {
-            if (Math.random() > 0.05 + (lvl * 0.02)) blocks.push({ x: i * 55, y: canvas.height - 80, width: 55, height: 80, type: 'ground' });
+            if (Math.random() > 0.05 + (lvl * 0.015)) blocks.push({ x: i * 55, y: canvas.height - 80, width: 55, height: 80, type: 'ground' });
         }
 
-        for (let i = 400; i < finishLine.x; i += 300) {
+        for (let i = 400; i < finishLine.x; i += 280) {
             if (Math.random() > 0.3) {
-                blocks.push({ x: i, y: canvas.height - 180 - Math.random() * 80, width: 150, height: 35, type: 'brick' });
+                blocks.push({ x: i, y: canvas.height - 180 - Math.random() * 80, width: 140, height: 35, type: 'brick' });
                 coins.push({ x: i + 50, y: canvas.height - 300, width: 26, height: 26, collected: false, float: Math.random() * Math.PI });
             }
-            if (Math.random() > 0.5) enemies.push({ x: i + 100, y: canvas.height - 130, width: 45, height: 45, vx: 2 + (lvl * 0.5), minX: i, maxX: i + 300, alive: true });
-            coins.push({ x: i + 150, y: canvas.height - 150, width: 26, height: 26, collected: false, float: 0 });
+            if (Math.random() > 0.4) enemies.push({ x: i + 100, y: canvas.height - 130, width: 45, height: 45, vx: 2 + (lvl * 0.4), minX: i, maxX: i + 280, alive: true });
+            coins.push({ x: i + 140, y: canvas.height - 150, width: 26, height: 26, collected: false, float: 0 });
         }
         for (let i = 0; i < 30; i++) clouds.push({ x: i * 300 + Math.random() * 100, y: 30 + Math.random() * 100, size: 40 + Math.random() * 40 });
         cameraX = 0;
@@ -456,22 +449,38 @@
         }
 
         if(player) {
+            // تأثير التوهج الفخم للملك الأسطوري والسكنات الفخمة
+            if(player.crown) {
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = "#ffea00";
+            }
+
             ctx.fillStyle = "#000000"; ctx.fillRect(player.x - 3, player.y - 3, player.width + 6, player.height + 6);
             ctx.fillStyle = player.color; ctx.fillRect(player.x, player.y, player.width, player.height);
 
-            ctx.fillStyle = "#ffffff";
-            let eyeOffset = player.dir === 1 ? 4 : -4;
-            
-            ctx.beginPath(); ctx.moveTo(player.x + 6 + eyeOffset, player.y + 10); ctx.lineTo(player.x + 18 + eyeOffset, player.y + 15);
-            ctx.lineTo(player.x + 18 + eyeOffset, player.y + 26); ctx.lineTo(player.x + 6 + eyeOffset, player.y + 24); ctx.fill();
-            
-            ctx.beginPath(); ctx.moveTo(player.x + 39 + eyeOffset, player.y + 10); ctx.lineTo(player.x + 27 + eyeOffset, player.y + 15);
-            ctx.lineTo(player.x + 27 + eyeOffset, player.y + 26); ctx.lineTo(player.x + 39 + eyeOffset, player.y + 24); ctx.fill();
+            ctx.shadowBlur = 0; // إلغاء التوهج لباقي العناصر
 
-            ctx.fillStyle = "#000000";
-            let pupilOffset = player.dir === 1 ? 2 : -4;
-            ctx.fillRect(player.x + 12 + eyeOffset + pupilOffset, player.y + 18, 5, 6);
-            ctx.fillRect(player.x + 28 + eyeOffset + pupilOffset, player.y + 18, 5, 6);
+            // العيون وتأثيرات الوجه الاحترافية
+            ctx.fillStyle = player.eyesColor;
+            let eyeOffset = player.dir === 1 ? 4 : -4;
+            ctx.fillRect(player.x + 10 + eyeOffset, player.y + 12, 8, 10);
+            ctx.fillRect(player.x + 26 + eyeOffset, player.y + 12, 8, 10);
+
+            // رسم التج الملكي الفخم إذا كان السكن يملكه
+            if(player.crown) {
+                ctx.fillStyle = "#ffcc00";
+                ctx.beginPath();
+                ctx.moveTo(player.x + 5, player.y - 2);
+                ctx.lineTo(player.x + 10, player.y - 14);
+                ctx.lineTo(player.x + 22, player.y - 6);
+                ctx.lineTo(player.x + 35, player.y - 14);
+                ctx.lineTo(player.x + 40, player.y - 2);
+                ctx.closePath();
+                ctx.fill();
+                ctx.strokeStyle = "#000";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
         }
 
         particles.forEach(p => {
@@ -485,7 +494,7 @@
 
     function loop() { 
         if(!gameActive) {
-            isLooping = false; // إيقاف الحلقة رسمياً
+            isLooping = false; 
             return;
         }
         update(); 
