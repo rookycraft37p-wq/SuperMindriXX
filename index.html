@@ -3,55 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SuperDrix Mario Edition</title>
+    <title>SuperDrix</title>
     <style>
-        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; font-family: 'Arial', sans-serif; margin: 0; padding: 0; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background: #5c94fc; }
+        @import url('https://fonts.googleapis.com/css2?family=Changa:wght@700;800&display=swap');
         
-        canvas { display: block; background: linear-space(#5c94fc, #87ceeb); }
+        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
+        body, html { width: 100%; height: 100%; overflow: hidden; background: #2b8cbe; font-family: 'Changa', sans-serif; }
+        
+        canvas { display: block; background: linear-gradient(#2b8cbe, #74c2e1); }
 
         #ui-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none;
             display: flex; flex-direction: column; justify-content: space-between; padding: 20px;
         }
         .top-hud { display: flex; justify-content: space-between; align-items: center; width: 100%; }
-        .score-box { background: rgba(0, 0, 0, 0.75); color: #ffcc00; padding: 8px 18px; border-radius: 20px; font-size: 20px; font-weight: 900; border: 3px solid #fff; }
+        .score-box { background: rgba(0, 0, 0, 0.8); color: #ffcc00; padding: 8px 20px; border-radius: 15px; font-size: 24px; font-weight: 800; border: 3px solid #fff; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
         
+        /* إجبار الأزرار على البقاء من اليسار لليمين LTR لحل مشكلة الانعكاس */
         .controls-bar {
-            position: absolute; bottom: 25px; width: 100%; left: 0; display: flex; justify-content: space-between; padding: 0 25px; z-index: 20; pointer-events: auto;
+            position: absolute; bottom: 30px; width: 100%; left: 0; display: flex; justify-content: space-between; padding: 0 30px; z-index: 20; pointer-events: auto;
+            direction: ltr; /* هذا السطر يحل المشكلة نهائياً */
         }
+        .control-group { display: flex; gap: 15px; }
         .control-btn {
-            width: 70px; height: 70px; background: rgba(255, 255, 255, 0.85); border: 4px solid #333; border-radius: 50%;
-            font-size: 26px; font-weight: bold; color: #333; display: flex; justify-content: center; align-items: center;
-            box-shadow: 0 6px 0px rgba(0,0,0,0.4); cursor: pointer;
+            width: 75px; height: 75px; background: rgba(255, 255, 255, 0.9); border: 4px solid #111; border-radius: 50%;
+            font-size: 30px; font-weight: bold; color: #111; display: flex; justify-content: center; align-items: center;
+            box-shadow: 0 6px 0px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.05s;
         }
-        .control-btn:active { transform: translateY(4px); box-shadow: 0 2px 0px rgba(0,0,0,0.4); }
+        .control-btn:active { transform: translateY(6px); box-shadow: 0 0px 0px rgba(0,0,0,0.5); background: #ddd; }
+        #btn-jump { background: #ffcc00; color: #111; }
+        #btn-jump:active { background: #e6b800; }
 
         #start-screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.88);
-            z-index: 30; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; gap: 20px; text-align: center;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 20, 30, 0.9);
+            z-index: 30; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; gap: 25px; text-align: center;
         }
-        #start-screen h1 { font-size: 40px; color: #ffcc00; text-shadow: 3px 3px #d32f2f; font-weight: 900; }
-        .start-btn { background: #00e676; color: #000; font-size: 22px; font-weight: 900; padding: 12px 40px; border-radius: 30px; border: 4px solid #fff; cursor: pointer; box-shadow: 0 5px 0px #00793c; }
+        #start-screen h1 { font-size: 60px; color: #e52521; text-shadow: 4px 4px #000, -2px -2px #fff; font-weight: 900; letter-spacing: 2px; margin: 0; }
+        .start-btn { background: #00e676; color: #000; font-size: 26px; font-weight: 800; padding: 15px 50px; border-radius: 40px; border: 5px solid #fff; cursor: pointer; box-shadow: 0 8px 0px #00793c; transition: all 0.2s; }
+        .start-btn:active { transform: translateY(6px); box-shadow: 0 2px 0px #00793c; }
     </style>
 </head>
 <body>
 
     <div id="start-screen">
-        <h1>SUPERDRIX MARIO</h1>
-        <p style="font-size: 16px; font-weight: bold;">اقفز فوق الوحوش، اجمع العملات، واقضِ على الأعداء!</p>
-        <button class="start-btn" onclick="startGame()">▶ ابدأ مغامرة ماريو</button>
+        <h1>SUPERDRIX</h1>
+        <p style="font-size: 20px; color: #ccc;">عالم مليء بالتحديات.. اجمع الذهب واقضِ على الأعداء!</p>
+        <button class="start-btn" onclick="startGame()">ابدأ اللعب الآن</button>
     </div>
 
     <div id="ui-layer">
         <div class="top-hud">
-            <div class="score-box">🪙 <span id="score-val">0</span></div>
             <div class="score-box">❤️ <span id="lives-val">3</span></div>
+            <div class="score-box">🪙 <span id="score-val">0</span></div>
         </div>
     </div>
 
-    <div class="controls-bar">
-        <div style="display: flex; gap: 12px;">
+    <div class="controls-bar" id="controls">
+        <div class="control-group">
             <button class="control-btn" id="btn-left">◀</button>
             <button class="control-btn" id="btn-right">▶</button>
         </div>
@@ -71,7 +79,6 @@
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
-    // --- المؤثرات الصوتية ---
     let audioCtx;
     function initAudio() {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -86,360 +93,230 @@
         const now = audioCtx.currentTime;
 
         if (type === 'jump') {
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(150, now);
-            osc.frequency.linearRampToValueAtTime(350, now + 0.12);
-            gain.gain.setValueAtTime(0.15, now);
-            gain.gain.linearRampToValueAtTime(0.01, now + 0.12);
-            osc.start(now); osc.stop(now + 0.12);
+            osc.type = 'square'; osc.frequency.setValueAtTime(200, now); osc.frequency.exponentialRampToValueAtTime(400, now + 0.1);
+            gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
         } else if (type === 'coin') {
-            osc.type = 'sine';
-            osc.frequency.setValueAtTime(600, now);
-            osc.frequency.setValueAtTime(900, now + 0.08);
-            gain.gain.setValueAtTime(0.2, now);
-            gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+            osc.type = 'sine'; osc.frequency.setValueAtTime(800, now); osc.frequency.setValueAtTime(1200, now + 0.05);
+            gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
             osc.start(now); osc.stop(now + 0.2);
-        } else if (type === 'stomp') {
-            osc.type = 'triangle';
-            osc.frequency.setValueAtTime(250, now);
-            osc.frequency.linearRampToValueAtTime(80, now + 0.15);
-            gain.gain.setValueAtTime(0.25, now);
-            gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
-            osc.start(now); osc.stop(now + 0.15);
         } else if (type === 'hit') {
-            osc.type = 'sawtooth';
-            osc.frequency.setValueAtTime(150, now);
-            osc.frequency.linearRampToValueAtTime(40, now + 0.25);
-            gain.gain.setValueAtTime(0.25, now);
-            gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
-            osc.start(now); osc.stop(now + 0.25);
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(40, now + 0.3);
+            gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+            osc.start(now); osc.stop(now + 0.3);
         }
     }
 
-    // إعدادات اللعبة
-    let gameActive = false;
-    let score = 0;
-    let lives = 3;
-    let cameraX = 0;
-
-    // اللاعب (المكعب الشرس مطابق للوجو تماماً)
+    let gameActive = false, score = 0, lives = 3, cameraX = 0, shakeTime = 0;
+    
     let player = {
         x: 100, y: 200, width: 45, height: 45,
-        vx: 0, vy: 0, speed: 4.5, jumpForce: -11,
-        grounded: false, dir: 1
+        vx: 0, vy: 0, speed: 5.5, jumpForce: -13,
+        grounded: false, dir: 1, trail: []
     };
 
-    // عناصر عالم ماريو (أرضيات، طابوق، أنابيب، عملات، أعداء)
-    let blocks = [];
-    let coins = [];
-    let enemies = [];
-    let pipes = [];
-    let clouds = [];
+    let blocks = [], coins = [], enemies = [], clouds = [], particles = [];
 
     function initLevel() {
-        blocks = [];
-        coins = [];
-        enemies = [];
-        pipes = [];
-        clouds = [];
-
-        // إنشاء أرضية طويلة جداً تشبه ماريو
-        for (let i = 0; i < 50; i++) {
-            if (i !== 12 && i !== 13 && i !== 28 && i !== 29) { // فجوات للحماس
-                blocks.push({ x: i * 50, y: canvas.height - 70, width: 50, height: 70, type: 'ground' });
+        blocks = []; coins = []; enemies = []; clouds = []; particles = [];
+        
+        for (let i = 0; i < 60; i++) {
+            if (i !== 10 && i !== 11 && i !== 25 && i !== 26) {
+                blocks.push({ x: i * 55, y: canvas.height - 80, width: 55, height: 80, type: 'ground' });
             }
         }
 
-        // منصات وطابوق عائم وصناديق عملات
         const platformConfigs = [
-            { x: 300, y: canvas.height - 180, w: 150, h: 25 },
-            { x: 550, y: canvas.height - 230, w: 200, h: 25 },
-            { x: 850, y: canvas.height - 190, w: 150, h: 25 },
-            { x: 1150, y: canvas.height - 220, w: 180, h: 25 },
-            { x: 1500, y: canvas.height - 200, w: 200, h: 25 }
+            { x: 300, y: canvas.height - 200, w: 150 }, { x: 600, y: canvas.height - 250, w: 200 },
+            { x: 900, y: canvas.height - 200, w: 150 }, { x: 1200, y: canvas.height - 280, w: 200 }
         ];
+        platformConfigs.forEach(p => blocks.push({ x: p.x, y: p.y, width: p.w, height: 35, type: 'brick' }));
 
-        platformConfigs.forEach(p => {
-            blocks.push({ x: p.x, y: p.y, width: p.w, height: p.h, type: 'brick' });
-        });
-
-        // أنابيب ماريو الشهيرة
-        pipes.push({ x: 700, y: canvas.height - 150, width: 50, height: 80 });
-        pipes.push({ x: 1350, y: canvas.height - 170, width: 50, height: 100 });
-
-        // عملات ذهبية لامعة موزعة في العالم
-        for (let i = 250; i < 1800; i += 120) {
-            coins.push({ x: i, y: canvas.height - 240 + Math.sin(i) * 40, width: 22, height: 22, collected: false });
+        for (let i = 250; i < 2500; i += 150) {
+            coins.push({ x: i, y: canvas.height - 280 + Math.sin(i) * 50, width: 26, height: 26, collected: false, float: Math.random() * Math.PI });
         }
 
-        // وحوش وأعداء تسير وتدور
-        enemies.push({ x: 400, y: canvas.height - 120, width: 40, height: 40, vx: 1.5, minX: 300, maxX: 500, alive: true });
-        enemies.push({ x: 900, y: canvas.height - 120, width: 40, height: 40, vx: -1.5, minX: 850, maxX: 1000, alive: true });
-        enemies.push({ x: 1200, y: canvas.height - 120, width: 40, height: 40, vx: 2, minX: 1150, maxX: 1300, alive: true });
+        enemies.push({ x: 450, y: canvas.height - 130, width: 45, height: 45, vx: 2, minX: 300, maxX: 600, alive: true });
+        enemies.push({ x: 1000, y: canvas.height - 130, width: 45, height: 45, vx: -2.5, minX: 800, maxX: 1100, alive: true });
 
-        // سحب في الخلفية
-        for (let i = 0; i < 15; i++) {
-            clouds.push({ x: i * 250 + Math.random() * 50, y: 50 + Math.random() * 100, size: 40 + Math.random() * 30 });
+        for (let i = 0; i < 20; i++) clouds.push({ x: i * 200 + Math.random() * 100, y: 30 + Math.random() * 100, size: 40 + Math.random() * 40 });
+    }
+
+    function createParticles(x, y, color) {
+        for(let i = 0; i < 15; i++) {
+            particles.push({
+                x: x, y: y, vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.5) * 10,
+                life: 1, color: color, size: Math.random() * 6 + 2
+            });
         }
     }
 
     let moveLeft = false, moveRight = false;
-
     function setupControls() {
-        const bindButton = (id, start, end) => {
+        const bindBtn = (id, start, end) => {
             const el = document.getElementById(id);
             el.addEventListener('touchstart', (e) => { e.preventDefault(); initAudio(); start(); });
             el.addEventListener('touchend', (e) => { e.preventDefault(); end(); });
             el.addEventListener('mousedown', () => { initAudio(); start(); });
-            el.addEventListener('mouseup', () => end());
+            el.addEventListener('mouseup', end);
         };
-
-        bindButton('btn-left', () => moveLeft = true, () => moveLeft = false);
-        bindButton('btn-right', () => moveRight = true, () => moveRight = false);
-        
+        bindBtn('btn-left', () => moveLeft = true, () => moveLeft = false);
+        bindBtn('btn-right', () => moveRight = true, () => moveRight = false);
         document.getElementById('btn-jump').addEventListener('click', () => {
-            initAudio();
-            if (player.grounded) {
-                player.vy = player.jumpForce;
-                player.grounded = false;
-                playSound('jump');
-            }
-        });
-
-        window.addEventListener('keydown', (e) => {
-            initAudio();
-            if (e.key === 'ArrowLeft' || e.key === 'a') moveLeft = true;
-            if (e.key === 'ArrowRight' || e.key === 'd') moveRight = true;
-            if ((e.key === ' ' || e.key === 'ArrowUp') && player.grounded) {
-                player.vy = player.jumpForce;
-                player.grounded = false;
-                playSound('jump');
-            }
-        });
-        window.addEventListener('keyup', (e) => {
-            if (e.key === 'ArrowLeft' || e.key === 'a') moveLeft = false;
-            if (e.key === 'ArrowRight' || e.key === 'd') moveRight = false;
+            initAudio(); if (player.grounded) { player.vy = player.jumpForce; player.grounded = false; playSound('jump'); createParticles(player.x + 20, player.y + 40, '#ffffff'); }
         });
     }
 
     function startGame() {
-        initAudio();
-        document.getElementById('start-screen').style.display = 'none';
-        initLevel();
-        gameActive = true;
-        loop();
+        initAudio(); document.getElementById('start-screen').style.display = 'none';
+        initLevel(); gameActive = true; loop();
     }
 
     function update() {
         if (!gameActive) return;
 
-        // الحركة الأفقية
         player.vx = 0;
         if (moveLeft) { player.vx = -player.speed; player.dir = -1; }
         if (moveRight) { player.vx = player.speed; player.dir = 1; }
-
         player.x += player.vx;
-
-        // الجاذبية والسرعة الرأسية
-        player.vy += 0.55; // جاذبية ماريو الكلاسيكية
+        player.vy += 0.6; // جاذبية
         player.y += player.vy;
-
         player.grounded = false;
 
-        // اصطدام اللاعب مع المنصات والطابوق
+        // ذيل السرعة (Trail)
+        if (Math.abs(player.vx) > 0 || player.vy !== 0) {
+            player.trail.push({ x: player.x, y: player.y });
+            if (player.trail.length > 10) player.trail.shift();
+        } else if (player.trail.length > 0) player.trail.shift();
+
+        // تحديث الجزيئات
+        particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.life -= 0.04; });
+        particles = particles.filter(p => p.life > 0);
+
         blocks.forEach(b => {
-            if (player.x + player.width > b.x && player.x < b.x + b.width &&
-                player.y + player.height > b.y && player.y < b.y + b.height) {
-                
-                // اصطدام من الأعلى (الوقوف على المنصة)
-                if (player.vy > 0 && player.y + player.height - player.vy <= b.y + 10) {
-                    player.y = b.y - player.height;
-                    player.vy = 0;
-                    player.grounded = true;
-                }
-                // اصطدام من الأسفل
-                else if (player.vy < 0 && player.y - player.vy >= b.y + b.height - 10) {
-                    player.y = b.y + b.height;
-                    player.vy = 0;
+            if (player.x + player.width > b.x && player.x < b.x + b.width && player.y + player.height > b.y && player.y < b.y + b.height) {
+                if (player.vy > 0 && player.y + player.height - player.vy <= b.y + 12) {
+                    player.y = b.y - player.height; player.vy = 0; player.grounded = true;
+                } else if (player.vy < 0 && player.y - player.vy >= b.y + b.height - 12) {
+                    player.y = b.y + b.height; player.vy = 0;
                 }
             }
         });
 
-        // اصطدام مع الأنابيب
-        pipes.forEach(p => {
-            if (player.x + player.width > p.x && player.x < p.x + p.width &&
-                player.y + player.height > p.y && player.y < p.y + p.height) {
-                if (player.vy > 0 && player.y + player.height - player.vy <= p.y + 10) {
-                    player.y = p.y - player.height;
-                    player.vy = 0;
-                    player.grounded = true;
-                } else if (player.vx > 0) {
-                    player.x = p.x - player.width;
-                } else if (player.vx < 0) {
-                    player.x = p.x + p.width;
-                }
-            }
-        });
-
-        // حركة الأعداء والوحوش والتحقق من القفز فوقهم
         enemies.forEach(en => {
             if (!en.alive) return;
-
-            en.x += en.vx;
-            if (en.x < en.minX || en.x > en.maxX) en.vx *= -1;
-
-            // فحص الاصطدام مع اللاعب
-            if (player.x + player.width > en.x && player.x < en.x + en.width &&
-                player.y + player.height > en.y && player.y < en.y + en.height) {
-                
-                // إذا سقط اللاعب فوق الوحش تماماً -> القضاء على الوحش مثل ماريو!
+            en.x += en.vx; if (en.x < en.minX || en.x > en.maxX) en.vx *= -1;
+            if (player.x + player.width > en.x && player.x < en.x + en.width && player.y + player.height > en.y && player.y < en.y + en.height) {
                 if (player.vy > 0 && player.y + player.height - player.vy <= en.y + 15) {
-                    en.alive = false;
-                    player.vy = -8; // ارتداد للأعلى
-                    score += 50;
-                    document.getElementById('score-val').innerText = score;
-                    playSound('stomp');
+                    en.alive = false; player.vy = -9; score += 50; document.getElementById('score-val').innerText = score;
+                    playSound('jump'); createParticles(en.x + 20, en.y + 20, '#ff0000');
                 } else {
-                    // إذا لمسه من الجانب -> يفقد حياة
-                    playSound('hit');
-                    lives--;
-                    document.getElementById('lives-val').innerText = lives;
-                    player.x -= 60; // إرجاع للخلف
-                    player.y -= 30;
-                    if (lives <= 0) {
-                        alert('انتهت اللعبة! حاول مرة أخرى.');
-                        location.reload();
-                    }
+                    playSound('hit'); lives--; document.getElementById('lives-val').innerText = lives;
+                    shakeTime = 15; player.vy = -6; player.x += (player.x < en.x) ? -40 : 40; createParticles(player.x, player.y, '#e52521');
+                    if (lives <= 0) { alert('لقد خسرت! حاول مجدداً.'); location.reload(); }
                 }
             }
         });
 
-        // جمع العملات
         coins.forEach(c => {
-            if (!c.collected &&
-                player.x + player.width > c.x && player.x < c.x + c.width &&
-                player.y + player.height > c.y && player.y < c.y + c.height) {
-                c.collected = true;
-                score += 10;
-                document.getElementById('score-val').innerText = score;
-                playSound('coin');
+            c.float += 0.1; c.y += Math.sin(c.float) * 0.5;
+            if (!c.collected && player.x + player.width > c.x && player.x < c.x + c.width && player.y + player.height > c.y && player.y < c.y + c.height) {
+                c.collected = true; score += 10; document.getElementById('score-val').innerText = score;
+                playSound('coin'); createParticles(c.x + 13, c.y + 13, '#ffcc00');
             }
         });
 
-        // السقوط في الفراغ
         if (player.y > canvas.height) {
-            playSound('hit');
-            lives--;
-            document.getElementById('lives-val').innerText = lives;
-            player.x = 100;
-            player.y = 200;
-            player.vy = 0;
-            if (lives <= 0) {
-                alert('انتهت اللعبة!');
-                location.reload();
-            }
+            playSound('hit'); lives--; document.getElementById('lives-val').innerText = lives; shakeTime = 20;
+            player.x = 100; player.y = 100; player.vy = 0;
+            if (lives <= 0) { alert('نهاية اللعبة!'); location.reload(); }
         }
 
-        // تحريك الكاميرا بسلاسة لتتبع اللاعب
-        cameraX = player.x - canvas.width / 3;
+        cameraX += ((player.x - canvas.width / 3) - cameraX) * 0.1; // كاميرا ناعمة
         if (cameraX < 0) cameraX = 0;
     }
 
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-
         ctx.save();
-        ctx.translate(-cameraX, 0);
+        
+        let shakeX = 0, shakeY = 0;
+        if (shakeTime > 0) { shakeX = (Math.random() - 0.5) * 12; shakeY = (Math.random() - 0.5) * 12; shakeTime--; }
+        ctx.translate(-cameraX + shakeX, shakeY);
 
-        // رسم الخلفية والسحب
-        ctx.fillStyle = "#ffffff";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
         clouds.forEach(cl => {
-            ctx.beginPath();
-            ctx.arc(cl.x, cl.y, cl.size * 0.5, 0, Math.PI * 2);
+            ctx.beginPath(); ctx.arc(cl.x, cl.y, cl.size * 0.5, 0, Math.PI * 2);
             ctx.arc(cl.x + cl.size * 0.4, cl.y - cl.size * 0.2, cl.size * 0.4, 0, Math.PI * 2);
-            ctx.arc(cl.x + cl.size * 0.8, cl.y, cl.size * 0.45, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.arc(cl.x + cl.size * 0.8, cl.y, cl.size * 0.45, 0, Math.PI * 2); ctx.fill();
         });
 
-        // رسم الأرضيات والطابوق (مطابق للوجو: عشب أخضر وتراب برتقالي)
         blocks.forEach(b => {
             if (b.type === 'ground') {
-                ctx.fillStyle = "#d95700"; // تراب
-                ctx.fillRect(b.x, b.y + 15, b.width, b.height - 15);
-                ctx.fillStyle = "#38b764"; // عشب علوي
-                ctx.fillRect(b.x, b.y, b.width, 18);
+                ctx.fillStyle = "#d95700"; ctx.fillRect(b.x, b.y + 15, b.width, b.height - 15);
+                ctx.fillStyle = "#38b764"; ctx.fillRect(b.x, b.y, b.width, 18);
+                ctx.strokeStyle = "#1b5e20"; ctx.lineWidth = 3; ctx.strokeRect(b.x, b.y, b.width, 18);
             } else {
-                ctx.fillStyle = "#e67e22"; // طابوق المنصات
-                ctx.fillRect(b.x, b.y, b.width, b.height);
-                ctx.strokeStyle = "#b94a00";
-                ctx.lineWidth = 2;
-                ctx.strokeRect(b.x, b.y, b.width, b.height);
+                ctx.fillStyle = "#e67e22"; ctx.fillRect(b.x, b.y, b.width, b.height);
+                ctx.strokeStyle = "#873600"; ctx.lineWidth = 3; ctx.strokeRect(b.x, b.y, b.width, b.height);
             }
         });
 
-        // رسم أنابيب ماريو
-        pipes.forEach(p => {
-            ctx.fillStyle = "#2ecc71";
-            ctx.fillRect(p.x, p.y, p.width, p.height);
-            ctx.fillStyle = "#27ae60";
-            ctx.fillRect(p.x - 4, p.y, p.width + 8, 22); // حافة الأنبوب
-            ctx.strokeStyle = "#145a32";
-            ctx.lineWidth = 2;
-            ctx.strokeRect(p.x, p.y, p.width, p.height);
-            ctx.strokeRect(p.x - 4, p.y, p.width + 8, 22);
-        });
-
-        // رسم العملات الذهبية اللامعة
         coins.forEach(c => {
             if (!c.collected) {
-                ctx.fillStyle = "#ffcc00";
-                ctx.beginPath();
-                ctx.arc(c.x + c.width / 2, c.y + c.height / 2, c.width / 2, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = "#b38600";
-                ctx.lineWidth = 2;
-                ctx.stroke();
+                ctx.fillStyle = "#ffcc00"; ctx.beginPath(); ctx.arc(c.x + c.width/2, c.y + c.height/2, c.width/2, 0, Math.PI*2); ctx.fill();
+                ctx.strokeStyle = "#fff"; ctx.lineWidth = 3; ctx.stroke();
             }
         });
 
-        // رسم الوحوش والأعداء
         enemies.forEach(en => {
             if (en.alive) {
-                ctx.fillStyle = "#8e44ad"; // جسم الوحش البنفسجي
-                ctx.fillRect(en.x, en.y, en.width, en.height);
-                // عيون الوحش الشرسة
-                ctx.fillStyle = "#f1c40f";
-                ctx.fillRect(en.x + 6, en.y + 8, 10, 10);
-                ctx.fillRect(en.x + 24, en.y + 8, 10, 10);
+                ctx.fillStyle = "#7b1fa2"; ctx.fillRect(en.x, en.y, en.width, en.height);
+                ctx.fillStyle = "#ffeb3b"; ctx.fillRect(en.x + 8, en.y + 10, 10, 10); ctx.fillRect(en.x + 28, en.y + 10, 10, 10);
             }
         });
 
-        // رسم اللاعب (المكعب الشرس المطابق تماماً للوجو بعينيه الحادتين)
-        ctx.fillStyle = "#e52521"; // أحمر زاهٍ مطابِق للوجو
-        ctx.fillRect(player.x, player.y, player.width, player.height);
-        ctx.strokeStyle = "#781c1c";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(player.x, player.y, player.width, player.height);
+        // رسم ذيل الأفاتار (Trail)
+        const trailColors = ["#ffffff", "#ff9999", "#99ccff"];
+        player.trail.forEach((t, i) => {
+            ctx.globalAlpha = (i / player.trail.length) * 0.6;
+            ctx.fillStyle = trailColors[i % 3];
+            ctx.fillRect(t.x + 2, t.y + 2, player.width - 4, player.height - 4);
+        });
+        ctx.globalAlpha = 1.0;
 
-        // عيون المكعب (تتجه حسب حركة اللاعب يميناً أو يساراً لئلا تختفي أبداً)
+        // رسم الأفاتار المطابق تماماً للوجو
+        ctx.fillStyle = "#000000"; ctx.fillRect(player.x - 3, player.y - 3, player.width + 6, player.height + 6); // إطار أسود
+        ctx.fillStyle = "#e52521"; ctx.fillRect(player.x, player.y, player.width, player.height); // جسم أحمر
+
         ctx.fillStyle = "#ffffff";
-        let eyeOffset = player.dir === 1 ? 24 : 4;
-        ctx.fillRect(player.x + eyeOffset, player.y + 10, 12, 14);
-        ctx.fillRect(player.x + eyeOffset + 8, player.y + 10, 12, 14);
+        let eyeOffset = player.dir === 1 ? 4 : -4;
         
+        // العين اليسرى الغاضبة
+        ctx.beginPath(); ctx.moveTo(player.x + 6 + eyeOffset, player.y + 10); ctx.lineTo(player.x + 18 + eyeOffset, player.y + 15);
+        ctx.lineTo(player.x + 18 + eyeOffset, player.y + 26); ctx.lineTo(player.x + 6 + eyeOffset, player.y + 24); ctx.fill();
+        
+        // العين اليمنى الغاضبة
+        ctx.beginPath(); ctx.moveTo(player.x + 39 + eyeOffset, player.y + 10); ctx.lineTo(player.x + 27 + eyeOffset, player.y + 15);
+        ctx.lineTo(player.x + 27 + eyeOffset, player.y + 26); ctx.lineTo(player.x + 39 + eyeOffset, player.y + 24); ctx.fill();
+
+        // البؤبؤ الأسود
         ctx.fillStyle = "#000000";
-        let pupilOffset = player.dir === 1 ? 30 : 10;
-        ctx.fillRect(player.x + pupilOffset, player.y + 14, 5, 8);
+        let pupilOffset = player.dir === 1 ? 2 : -4;
+        ctx.fillRect(player.x + 12 + eyeOffset + pupilOffset, player.y + 18, 5, 6);
+        ctx.fillRect(player.x + 28 + eyeOffset + pupilOffset, player.y + 18, 5, 6);
+
+        // الجزيئات المتطايرة
+        particles.forEach(p => {
+            ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
+            ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+        });
+        ctx.globalAlpha = 1.0;
 
         ctx.restore();
     }
 
-    function loop() {
-        update();
-        draw();
-        if (gameActive) requestAnimationFrame(loop);
-    }
-
+    function loop() { update(); draw(); if (gameActive) requestAnimationFrame(loop); }
     setupControls();
 </script>
 </body>
