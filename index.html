@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Super Mindrix Pro - 100 Levels & Skins</title>
+    <title>Super Mindrix Pro - 100 Levels & 50 Weapons</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Changa:wght@700;800&display=swap');
         
@@ -26,21 +26,23 @@
         }
         #home-screen { justify-content: center; background: radial-gradient(circle, #2b2b4e, #1a1a2e); }
         
-        h1.title { font-size: 50px; color: #00e676; text-shadow: 0 0 15px rgba(0,230,118,0.6), 4px 4px #000; font-weight: 900; letter-spacing: 2px; margin-bottom: 5px; }
-        h2.subtitle { font-size: 32px; color: #ffcc00; text-shadow: 2px 2px #000; margin-bottom: 20px; }
+        h1.title { font-size: 45px; color: #00e676; text-shadow: 0 0 15px rgba(0,230,118,0.6), 4px 4px #000; font-weight: 900; letter-spacing: 2px; margin-bottom: 5px; }
+        h2.subtitle { font-size: 28px; color: #ffcc00; text-shadow: 2px 2px #000; margin-bottom: 20px; }
 
-        .btn-main { background: #00e676; color: #000; font-size: 20px; font-weight: 800; padding: 12px 30px; margin: 8px; border-radius: 40px; border: 4px solid #fff; cursor: pointer; box-shadow: 0 6px 0px #00793c; transition: all 0.1s; width: 280px; }
-        .btn-main:active { transform: translateY(6px); box-shadow: 0 0px 0px #00793c; }
-        .btn-shop { background: #ff9800; box-shadow: 0 6px 0px #e65100; color: #fff; text-shadow: 1px 1px 2px #000;}
-        .btn-levels { background: #03a9f4; box-shadow: 0 6px 0px #01579b; color: #fff; }
-        .btn-back { background: #f44336; box-shadow: 0 6px 0px #b71c1c; margin: 30px 0; color: #fff; }
-        .btn-retry { background: #ffcc00; box-shadow: 0 6px 0px #f57f17; }
+        .btn-main { background: #00e676; color: #000; font-size: 18px; font-weight: 800; padding: 10px 25px; margin: 6px; border-radius: 40px; border: 4px solid #fff; cursor: pointer; box-shadow: 0 5px 0px #00793c; transition: all 0.1s; width: 280px; }
+        .btn-main:active { transform: translateY(5px); box-shadow: 0 0px 0px #00793c; }
+        .btn-shop { background: #ff9800; box-shadow: 0 5px 0px #e65100; color: #fff; text-shadow: 1px 1px 2px #000;}
+        .btn-weapons { background: #e91e63; box-shadow: 0 5px 0px #880e4f; color: #fff; text-shadow: 1px 1px 2px #000;}
+        .btn-promo { background: #9c27b0; box-shadow: 0 5px 0px #4a148c; color: #fff; text-shadow: 1px 1px 2px #000;}
+        .btn-levels { background: #03a9f4; box-shadow: 0 5px 0px #01579b; color: #fff; }
+        .btn-back { background: #f44336; box-shadow: 0 5px 0px #b71c1c; margin: 30px 0; color: #fff; width: 220px; }
+        .btn-retry { background: #ffcc00; box-shadow: 0 5px 0px #f57f17; }
 
         .grid-container { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; max-width: 850px; padding: 10px; margin-bottom: 20px; }
         
-        .card { background: rgba(255,255,255,0.08); border: 3px solid #555; border-radius: 15px; padding: 12px; width: 150px; text-align: center; backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); position: relative; transition: 0.2s; }
+        .card { background: rgba(255,255,255,0.08); border: 3px solid #555; border-radius: 15px; padding: 12px; width: 160px; text-align: center; backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); position: relative; transition: 0.2s; }
         .card.locked { opacity: 0.4; filter: grayscale(100%); pointer-events: none; }
-        .card-title { font-size: 15px; margin-bottom: 5px; font-weight: bold; text-shadow: 1px 1px #000; }
+        .card-title { font-size: 14px; margin-bottom: 5px; font-weight: bold; text-shadow: 1px 1px #000; }
         
         .card.tier-rare { border-color: #00bcd4; box-shadow: 0 0 10px rgba(0,188,212,0.5); }
         .card.tier-epic { border-color: #9c27b0; box-shadow: 0 0 15px rgba(156,39,176,0.6); }
@@ -49,7 +51,7 @@
 
         @keyframes rainbowGlow { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
 
-        .buy-btn, .level-btn { background: #ffcc00; color: #000; font-weight: 800; border: 2px solid #000; padding: 6px 8px; border-radius: 10px; width: 100%; cursor: pointer; margin-top: 6px; font-size: 14px; }
+        .buy-btn, .level-btn { background: #ffcc00; color: #000; font-weight: 800; border: 2px solid #000; padding: 6px 8px; border-radius: 10px; width: 100%; cursor: pointer; margin-top: 6px; font-size: 13px; }
         .buy-btn:disabled { background: #444; color: #888; cursor: not-allowed; border-color: #222; }
         .buy-btn.equipped { background: #00e676; border-color: #fff; color: #fff; }
 
@@ -68,14 +70,15 @@
         .level-indicator { background: rgba(0,0,0,0.8); color: #fff; padding: 3px 20px; border-radius: 20px; font-size: 16px; font-weight: bold; border: 2px solid #00e676; margin: 10px auto 0; width: fit-content; text-shadow: 1px 1px #000; }
 
         .controls-bar {
-            position: absolute; bottom: 25px; width: 100%; left: 0; display: flex; justify-content: space-between; padding: 0 25px; z-index: 20; pointer-events: auto; direction: ltr;
+            position: absolute; bottom: 20px; width: 100%; left: 0; display: flex; justify-content: space-between; padding: 0 20px; z-index: 20; pointer-events: auto; direction: ltr;
         }
-        .control-group { display: flex; gap: 15px; }
+        .control-group { display: flex; gap: 12px; }
         .control-btn {
-            width: 75px; height: 75px; background: rgba(255, 255, 255, 0.85); border: 4px solid #111; border-radius: 50%; font-size: 30px; font-weight: bold; color: #111; display: flex; justify-content: center; align-items: center; box-shadow: 0 6px 0px rgba(0,0,0,0.6); cursor: pointer;
+            width: 65px; height: 65px; background: rgba(255, 255, 255, 0.85); border: 4px solid #111; border-radius: 50%; font-size: 24px; font-weight: bold; color: #111; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 0px rgba(0,0,0,0.6); cursor: pointer;
         }
-        .control-btn:active { transform: translateY(6px); box-shadow: 0 0px 0px rgba(0,0,0,0.6); background: #ccc; }
+        .control-btn:active { transform: translateY(5px); box-shadow: 0 0px 0px rgba(0,0,0,0.6); background: #ccc; }
         #btn-jump { background: #ffcc00; color: #111; }
+        #btn-shoot { background: #e91e63; color: #fff; }
 
         #total-coins-display { font-size: 20px; color: #ffcc00; font-weight: bold; margin-bottom: 15px; background: rgba(0,0,0,0.6); padding: 6px 15px; border-radius: 20px; border: 2px solid #fff; }
     </style>
@@ -86,7 +89,28 @@
         <h1 class="title">SUPERDRIX</h1>
         <div id="total-coins-display">🪙 <span id="home-coins">0</span></div>
         <button class="btn-main" onclick="openLevelsScreen()">▶ المراحل (100)</button>
-        <button class="btn-main btn-shop" onclick="openShop()">🛒 المتجر (100 شخصية)</button>
+        <button class="btn-main btn-shop" onclick="openShop()">🛒 متجر الشخصيات (100)</button>
+        <button class="btn-main btn-weapons" onclick="openWeaponsShop()">🔫 متجر الأسلحة (50)</button>
+        <button class="btn-main btn-promo" onclick="openPromoScreen()">🎁 استرداد الأكواد</button>
+    </div>
+
+    <!-- شاشة استرداد الأكواد -->
+    <div id="promo-screen" class="screen" style="justify-content: center;">
+        <h2 class="subtitle">استرداد الأكواد والجوائز</h2>
+        <p style="margin-bottom: 20px; color: #ddd; font-size: 16px;">أدخل الكود الخاص هنا للحصول على مكافآت ضخمة:</p>
+        <input type="text" id="promo-input" placeholder="مثال: SUPER100K" style="padding: 12px 20px; font-size: 20px; border-radius: 20px; border: 3px solid #00e676; background: rgba(0,0,0,0.5); color: #fff; text-align: center; width: 280px; margin-bottom: 15px; font-family: 'Changa', sans-serif; outline: none; text-transform: uppercase;">
+        <br>
+        <button class="btn-main" onclick="redeemCode()" style="background: #00e676; width: 280px; margin-bottom: 10px;">تفعيل الكود 🎯</button>
+        <p id="promo-msg" style="font-size: 18px; margin-top: 15px; font-weight: bold; min-height: 30px;"></p>
+        <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
+    </div>
+
+    <!-- شاشة متجر الأسلحة -->
+    <div id="weapons-shop-screen" class="screen">
+        <h2 class="subtitle">متجر الأسلحة المتطورة (50 سلاحاً)</h2>
+        <div id="total-coins-display">رصيدك: 🪙 <span id="weapons-coins">0</span></div>
+        <div class="grid-container" id="weapons-grid"></div>
+        <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
     </div>
 
     <div id="levels-screen" class="screen">
@@ -125,14 +149,17 @@
                 </div>
                 <div class="score-box">❤️ <span id="lives-val">3</span></div>
             </div>
-            <div class="level-indicator">مرحلة <span id="current-level-text">1</span></div>
+            <div class="level-indicator">مرحلة <span id="current-level-text">1</span> | السلاح: <span id="current-weapon-name" style="color:#ffcc00">مسدس البداية</span></div>
         </div>
         <div class="controls-bar" id="controls">
             <div class="control-group">
                 <button class="control-btn" id="btn-left">◀</button>
                 <button class="control-btn" id="btn-right">▶</button>
             </div>
-            <button class="control-btn" id="btn-jump">⤒</button>
+            <div class="control-group">
+                <button class="control-btn" id="btn-shoot">🔥</button>
+                <button class="control-btn" id="btn-jump">⤒</button>
+            </div>
         </div>
     </div>
 
@@ -160,6 +187,10 @@
             osc.type = 'sine'; osc.frequency.setValueAtTime(1000, now); osc.frequency.setValueAtTime(1500, now + 0.08);
             gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
             osc.start(now); osc.stop(now + 0.2);
+        } else if (type === 'shoot') {
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(150, now + 0.1);
+            gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+            osc.start(now); osc.stop(now + 0.1);
         } else if (type === 'hit') {
             osc.type = 'sawtooth'; osc.frequency.setValueAtTime(100, now); osc.frequency.exponentialRampToValueAtTime(30, now + 0.4);
             gain.gain.setValueAtTime(0.4, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
@@ -177,47 +208,75 @@
         }
     });
 
+    // بيانات الـ 100 شخصية
     const skinsData = [];
     for (let i = 0; i < 100; i++) {
-        let cost = i === 0 ? 0 : (i === 99 ? 0 : i * 150); // جعل سعر سكن قوس قزح مجاني تماماً
+        let cost = i === 0 ? 0 : (i === 99 ? 0 : i * 150);
         let tierClass = "tier-common";
         let tierName = "عادي";
         let crown = false;
         let isRainbow = false;
         
         if (i === 99) {
-            tierClass = "tier-rainbow";
-            tierName = "ملك الألوان 🌈👑";
-            crown = true;
-            isRainbow = true;
+            tierClass = "tier-rainbow"; tierName = "ملك الألوان 🌈👑"; crown = true; isRainbow = true;
         } else if (i >= 85) { tierClass = "tier-legendary"; tierName = "أسطوري 🔥"; crown = true; }
         else if (i >= 50) { tierClass = "tier-epic"; tierName = "ملحمي 💎"; }
-        else if (i >= 25) { tierClass = "tier-rare"; tierName = "نادر ✨"; }
+        else if (i >= 25) { tierClass, tierName = "نادر ✨"; }
 
         let name = i === 0 ? "رُوكْ فِيكْس" : (i === 99 ? "الملك قوس قزح 👑" : `شخصية ${i + 1}`);
         let color = isRainbow ? '#ff0000' : `hsl(${i * 3.6}, 85%, 55%)`;
 
         skinsData.push({
+            id: i, name: name, cost: cost, color: color, eyes: '#ffeb3b',
+            trail: [color, '#ffffff', '#ff9999'], crown: crown, isRainbow: isRainbow,
+            tierName: tierName, cardClass: tierClass
+        });
+    }
+
+    // بيانات الـ 50 سلاحاً لإطلاق النار ومضاعفة العملات
+    const weaponsData = [];
+    for (let i = 0; i < 50; i++) {
+        let cost = i === 0 ? 0 : (i === 49 ? 0 : i * 1000);
+        let coinMultiplier = i + 1; // كلما كان السلاح أعلى، زادت مضاعفة العملات عند القضاء على الوحش
+        let damage = (i + 1) * 15;
+        let tierName = "عادي";
+        let tierClass = "tier-common";
+
+        if (i === 49) {
+            tierClass = "tier-rainbow"; tierName = "المدمر الكمومي المجرة 🌌👑";
+        } else if (i >= 40) { tierClass = "tier-legendary"; tierName = "سلاح أسطوري 🔥"; }
+        else if (i >= 25) { tierClass = "tier-epic"; tierName = "سلاح ملحمي 💎"; }
+        else if (i >= 12) { tierClass = "tier-rare"; tierName = "سلاح نادر ✨"; }
+
+        weaponsData.push({
             id: i,
-            name: name,
+            name: i === 0 ? "مسدس البداية" : (i === 49 ? "المدمر الكمومي 🌌" : `سلاح ليزر ${i + 1}`),
             cost: cost,
-            color: color,
-            eyes: '#ffeb3b',
-            trail: [color, '#ffffff', '#ff9999'],
-            crown: crown,
-            isRainbow: isRainbow,
+            damage: damage,
+            coinMultiplier: coinMultiplier,
             tierName: tierName,
             cardClass: tierClass
         });
     }
 
     const maxLevels = 100;
-    let totalCoins = parseInt(localStorage.getItem('superdrix_coins')) || 50000;
+    let totalCoins = parseInt(localStorage.getItem('superdrix_coins')) || 500;
     let unlockedLevels = parseInt(localStorage.getItem('superdrix_unlocked_levels')) || 1;
-    // جعل سكن الملك قوس قزح (رقم 99) مفتوح ومجهز افتراضياً للجميع
+    
     let unlockedSkins = JSON.parse(localStorage.getItem('superdrix_skins')) || [0, 99];
     if(!unlockedSkins.includes(99)) unlockedSkins.push(99);
-    let currentSkinId = parseInt(localStorage.getItem('superdrix_current_skin')) || 99;
+    let currentSkinId = parseInt(localStorage.getItem('superdrix_current_skin')) || 0;
+
+    let unlockedWeapons = JSON.parse(localStorage.getItem('superdrix_weapons')) || [0, 49];
+    if(!unlockedWeapons.includes(49)) unlockedWeapons.push(49);
+    let currentWeaponId = parseInt(localStorage.getItem('superdrix_current_weapon')) || 0;
+
+    const validPromoCodes = {
+        "SUPER100K": { coins: 100000, message: "تم شحن 100,000 عملة بنجاح! 🪙🔥" },
+        "GOLD50K": { coins: 50000, message: "تم شحن 50,000 عملة بنجاح! 🪙✨" },
+        "MINDRIX": { coins: 10000, message: "حصلت على 10,000 عملة هدية! 🎁" }
+    };
+    let usedPromoCodes = JSON.parse(localStorage.getItem('superdrix_used_codes')) || [];
 
     let currentLevel = 1;
     let score = 0, lives = 3, gameActive = false;
@@ -226,10 +285,16 @@
     function updateDisplayData() {
         document.getElementById('home-coins').innerText = totalCoins;
         document.getElementById('shop-coins').innerText = totalCoins;
+        document.getElementById('weapons-coins').innerText = totalCoins;
+        let curWep = weaponsData[currentWeaponId] || weaponsData[0];
+        document.getElementById('current-weapon-name').innerText = curWep.name;
+
         localStorage.setItem('superdrix_coins', totalCoins);
         localStorage.setItem('superdrix_unlocked_levels', unlockedLevels);
         localStorage.setItem('superdrix_skins', JSON.stringify(unlockedSkins));
         localStorage.setItem('superdrix_current_skin', currentSkinId);
+        localStorage.setItem('superdrix_weapons', JSON.stringify(unlockedWeapons));
+        localStorage.setItem('superdrix_current_weapon', currentWeaponId);
     }
 
     function showScreen(id) {
@@ -246,6 +311,37 @@
     function goHome() { gameActive = false; showScreen('home-screen'); }
     function quitToHome() { if(confirm("هل أنت متأكد أنك تريد الخروج؟")) goHome(); }
 
+    function openPromoScreen() {
+        showScreen('promo-screen');
+        document.getElementById('promo-input').value = '';
+        document.getElementById('promo-msg').innerText = '';
+    }
+
+    function redeemCode() {
+        const inputVal = document.getElementById('promo-input').value.trim().toUpperCase();
+        const msgEl = document.getElementById('promo-msg');
+        
+        if (!inputVal) {
+            msgEl.style.color = '#f44336'; msgEl.innerText = "الرجاء إدخال الكود أولاً!"; playSound('hit'); return;
+        }
+        if (usedPromoCodes.includes(inputVal)) {
+            msgEl.style.color = '#f44336'; msgEl.innerText = "لقد استخدمت هذا الكود مسبقاً!"; playSound('hit'); return;
+        }
+
+        if (validPromoCodes[inputVal]) {
+            let reward = validPromoCodes[inputVal];
+            totalCoins += reward.coins;
+            usedPromoCodes.push(inputVal);
+            localStorage.setItem('superdrix_used_codes', JSON.stringify(usedPromoCodes));
+            updateDisplayData();
+            
+            msgEl.style.color = '#00e676'; msgEl.innerText = reward.message; playSound('coin');
+            document.getElementById('promo-input').value = '';
+        } else {
+            msgEl.style.color = '#f44336'; msgEl.innerText = "الكود غير صحيح أو منتهي الصلاحية!"; playSound('hit');
+        }
+    }
+
     function openShop() {
         showScreen('shop-screen');
         const grid = document.getElementById('shop-grid'); grid.innerHTML = '';
@@ -259,8 +355,8 @@
             grid.innerHTML += `
                 <div class="card ${skin.cardClass}">
                     <div style="font-size:11px; color:#ffcc00; margin-bottom:3px;">#${skin.id + 1} (${skin.tierName})</div>
-                    <div style="width: 45px; height: 45px; background:${skin.isRainbow ? 'linear-gradient(45deg, red, yellow, green, cyan, magenta)' : skin.color}; margin: 0 auto 8px; border: 3px solid #000; border-radius: 8px; position:relative; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">
-                        ${skin.crown ? '<div style="position:absolute; top:-16px; left:10px; font-size:18px; text-shadow: 1px 1px 0 #000;">👑</div>' : ''}
+                    <div style="width: 40px; height: 40px; background:${skin.isRainbow ? 'linear-gradient(45deg, red, yellow, green, cyan, magenta)' : skin.color}; margin: 0 auto 8px; border: 3px solid #000; border-radius: 8px; position:relative;">
+                        ${skin.crown ? '<div style="position:absolute; top:-16px; left:8px; font-size:16px;">👑</div>' : ''}
                     </div>
                     <div class="card-title">${skin.name}</div>
                     ${btnHtml}
@@ -271,14 +367,37 @@
     function buySkin(id, cost) { if (totalCoins >= cost) { totalCoins -= cost; unlockedSkins.push(id); equipSkin(id); } }
     function equipSkin(id) { currentSkinId = id; updateDisplayData(); openShop(); }
 
+    function openWeaponsShop() {
+        showScreen('weapons-shop-screen');
+        const grid = document.getElementById('weapons-grid'); grid.innerHTML = '';
+        weaponsData.forEach(wep => {
+            const isUnlocked = unlockedWeapons.includes(wep.id);
+            const isEquipped = currentWeaponId === wep.id;
+            let btnHtml = isEquipped ? `<button class="buy-btn equipped" disabled>مُجهز ✔️</button>` : 
+                          isUnlocked ? `<button class="buy-btn" onclick="equipWeapon(${wep.id})">استخدام</button>` : 
+                          `<button class="buy-btn" ${totalCoins < wep.cost ? 'disabled' : ''} onclick="buyWeapon(${wep.id}, ${wep.cost})">شراء 🪙 ${wep.cost}</button>`;
+            
+            grid.innerHTML += `
+                <div class="card ${wep.cardClass}">
+                    <div style="font-size:11px; color:#ffcc00; margin-bottom:3px;">سلاح #${wep.id + 1}</div>
+                    <div class="card-title" style="font-size:13px; color:#ff4081;">${wep.name}</div>
+                    <div style="font-size:11px; color:#ccc; margin-bottom:6px;">الضرر: ${wep.damage}<br>مضاعف العملات: x${wep.coinMultiplier}</div>
+                    ${btnHtml}
+                </div>`;
+        });
+    }
+
+    function buyWeapon(id, cost) { if (totalCoins >= cost) { totalCoins -= cost; unlockedWeapons.push(id); equipWeapon(id); } }
+    function equipWeapon(id) { currentWeaponId = id; updateDisplayData(); openWeaponsShop(); }
+
     function openLevelsScreen() {
         showScreen('levels-screen');
         const grid = document.getElementById('levels-grid'); grid.innerHTML = '';
         for (let i = 1; i <= maxLevels; i++) {
             let isUnlocked = i <= unlockedLevels;
             grid.innerHTML += `
-                <div class="card ${isUnlocked ? '' : 'locked'}" style="width: 75px; height: 75px; justify-content: center; align-items: center; display: flex; flex-direction: column;">
-                    <div style="font-size: 20px; font-weight: bold; text-shadow: 2px 2px #000;">${isUnlocked ? i : '🔒'}</div>
+                <div class="card ${isUnlocked ? '' : 'locked'}" style="width: 70px; height: 70px; justify-content: center; align-items: center; display: flex; flex-direction: column;">
+                    <div style="font-size: 18px; font-weight: bold; text-shadow: 2px 2px #000;">${isUnlocked ? i : '🔒'}</div>
                     ${isUnlocked ? `<button class="level-btn" style="padding: 2px; font-size: 11px;" onclick="startLevel(${i})">العب</button>` : ''}
                 </div>`;
         }
@@ -316,12 +435,12 @@
     function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
-    let player, blocks = [], hazards = [], coins = [], enemies = [], clouds = [], particles = [], floatingTexts = [], finishLine = null;
+    let player, blocks = [], hazards = [], coins = [], enemies = [], clouds = [], particles = [], floatingTexts = [], bullets = [], finishLine = null;
     let cameraX = 0, shakeTime = 0, backgroundY = 0;
 
     function initLevel(lvl) {
-        blocks = []; hazards = []; coins = []; enemies = []; clouds = []; particles = []; floatingTexts = [];
-        let activeSkin = skinsData[currentSkinId] || skinsData[99];
+        blocks = []; hazards = []; coins = []; enemies = []; clouds = []; particles = []; floatingTexts = []; bullets = [];
+        let activeSkin = skinsData[currentSkinId] || skinsData[0];
         
         player = { 
             x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0, speed: 6.5, jumpForce: -14.5, grounded: false, dir: 1, trail: [], 
@@ -361,7 +480,8 @@
             coins.push({ x: i + 55, y: canvas.height - 380, width: 28, height: 28, collected: false, float: Math.random() * Math.PI });
             
             if (Math.random() > 0.2) {
-                enemies.push({ x: i + 80, y: canvas.height - 170, width: 45, height: 45, vx: 2 + (lvl * 0.05), minX: i, maxX: i + 250, alive: true });
+                // الوحوش بصحة تعتمد على مستواها
+                enemies.push({ x: i + 80, y: canvas.height - 170, width: 45, height: 45, vx: 2 + (lvl * 0.05), minX: i, maxX: i + 250, hp: 50 + (lvl * 10), maxHp: 50 + (lvl * 10), alive: true });
             }
         }
 
@@ -377,6 +497,22 @@
     
     function createFloatingText(x, y, text, color) {
         floatingTexts.push({ x: x, y: y, text: text, color: color, life: 1, vy: -2 });
+    }
+
+    function fireWeapon() {
+        if (!player || !gameActive) return;
+        playSound('shoot');
+        let activeWeapon = weaponsData[currentWeaponId] || weaponsData[0];
+        bullets.push({
+            x: player.x + (player.dir === 1 ? player.width : -10),
+            y: player.y + player.height / 2,
+            vx: player.dir * 14,
+            damage: activeWeapon.damage,
+            coinMultiplier: activeWeapon.coinMultiplier,
+            width: 16,
+            height: 8
+        });
+        player.scaleX = 1.2; player.scaleY = 0.8;
     }
 
     let moveLeft = false, moveRight = false;
@@ -408,6 +544,13 @@
             jumpBtn.addEventListener('touchstart', triggerJump);
             jumpBtn.addEventListener('click', triggerJump);
         }
+
+        const shootBtn = document.getElementById('btn-shoot');
+        if(shootBtn) {
+            const triggerShoot = (e) => { if(e) e.preventDefault(); fireWeapon(); };
+            shootBtn.addEventListener('touchstart', triggerShoot);
+            shootBtn.addEventListener('click', triggerShoot);
+        }
     }
 
     function update() {
@@ -430,6 +573,10 @@
             player.trail.push({ x: player.x, y: player.y, rainbowHue: Date.now() % 360 });
             if (player.trail.length > 10) player.trail.shift();
         } else if (player.trail.length > 0) player.trail.shift();
+
+        // تحديث الرصاص
+        bullets.forEach(b => { b.x += b.vx; });
+        bullets = bullets.filter(b => Math.abs(b.x - player.x) < 1200);
 
         particles.forEach(p => { p.vy += 0.3; p.x += p.vx; p.y += p.vy; p.life -= 0.03; p.size *= 0.95; });
         particles = particles.filter(p => p.life > 0);
@@ -457,19 +604,34 @@
             }
         });
 
+        // تصادم الرصاص مع الوحوش وإعطاء عملات بناءً على قوة السلاح
+        bullets.forEach((b, bIdx) => {
+            enemies.forEach(en => {
+                if (en.alive && b.x > en.x && b.x < en.x + en.width && b.y > en.y && b.y < en.y + en.height) {
+                    en.hp -= b.damage;
+                    createParticles(b.x, b.y, '#ffea00', 6);
+                    bullets.splice(bIdx, 1);
+
+                    if (en.hp <= 0) {
+                        en.alive = false;
+                        let earnedCoins = 50 * b.coinMultiplier; // السلاح الأقوى يعطي كمية عملات مضاعفة بكثير
+                        score += earnedCoins;
+                        document.getElementById('score-val').innerText = score;
+                        playSound('coin');
+                        createParticles(en.x + 20, en.y + 20, '#00e676', 25);
+                        createFloatingText(en.x, en.y, `+${earnedCoins} 🪙`, "#ffcc00");
+                    }
+                }
+            });
+        });
+
         enemies.forEach(en => {
             if (!en.alive) return;
             en.x += en.vx; if (en.x < en.minX || en.x > en.maxX) en.vx *= -1;
             if (player.x + player.width > en.x && player.x < en.x + en.width && player.y + player.height > en.y && player.y < en.y + en.height) {
-                if (player.vy > 0 && player.y + player.height - player.vy <= en.y + 20) {
-                    en.alive = false; player.vy = -10; score += 50; document.getElementById('score-val').innerText = score;
-                    playSound('jump'); createParticles(en.x + 20, en.y + 20, '#ff0000', 20);
-                    createFloatingText(en.x, en.y, "+50", "#ff1744");
-                } else {
-                    playSound('hit'); lives--; document.getElementById('lives-val').innerText = lives;
-                    shakeTime = 25; player.vy = -8; player.x += (player.x < en.x) ? -60 : 60; createParticles(player.x, player.y, player.color, 25);
-                    if (lives <= 0) { triggerGameOver(); }
-                }
+                playSound('hit'); lives--; document.getElementById('lives-val').innerText = lives;
+                shakeTime = 25; player.vy = -8; player.x += (player.x < en.x) ? -60 : 60; createParticles(player.x, player.y, player.color, 25);
+                if (lives <= 0) { triggerGameOver(); }
             }
         });
 
@@ -583,8 +745,19 @@
                 ctx.shadowBlur = 15; ctx.shadowColor = "#d50000";
                 ctx.fillStyle = "#212121"; ctx.fillRect(en.x, en.y, en.width, en.height);
                 ctx.fillStyle = "#ff1744"; ctx.fillRect(en.x + 8, en.y + 12, 12, 12); ctx.fillRect(en.x + 25, en.y + 12, 12, 12);
+                
+                // شريط صحة الوحش
+                ctx.fillStyle = "#555"; ctx.fillRect(en.x, en.y - 10, en.width, 6);
+                ctx.fillStyle = "#00e676"; ctx.fillRect(en.x, en.y - 10, en.width * (en.hp / en.maxHp), 6);
                 ctx.shadowBlur = 0;
             }
+        });
+
+        // رسم الرصاص
+        bullets.forEach(b => {
+            ctx.shadowBlur = 10; ctx.shadowColor = "#ff4081";
+            ctx.fillStyle = "#ff4081"; ctx.fillRect(b.x, b.y, b.width, b.height);
+            ctx.shadowBlur = 0;
         });
 
         if(player && player.trail) {
@@ -640,7 +813,7 @@
 
         floatingTexts.forEach(ft => {
             ctx.globalAlpha = ft.life; ctx.fillStyle = ft.color;
-            ctx.font = "bold 24px Changa";
+            ctx.font = "bold 22px Changa";
             ctx.shadowBlur = 4; ctx.shadowColor = "#000";
             ctx.fillText(ft.text, ft.x, ft.y);
             ctx.shadowBlur = 0;
