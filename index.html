@@ -3,10 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SuperDrix Pro</title>
+    <title>SuperDrix Pro - العوالم الأسطورية</title>
     <style>
-    
-  
         @import url('https://fonts.googleapis.com/css2?family=Changa:wght@700;800&display=swap');
         
         * { 
@@ -51,34 +49,47 @@
         .card.tier-epic { border-color: #9c27b0; box-shadow: 0 0 15px rgba(156,39,176,0.6); }
         .card.tier-legendary { border-color: #ff4500; box-shadow: 0 0 25px rgba(255,69,0,0.8), 0 0 40px #ffea00; }
         .card.tier-rainbow { border-color: #ff00ff; box-shadow: 0 0 30px #00ffff, 0 0 50px #ff00ff; animation: rainbowGlow 2s infinite linear; }
+        .tier-godlike { background: linear-gradient(135deg, #1a0000, #ff6600, #ffcc00, #ffffff); border: 3px solid #ffcc00; box-shadow: 0 0 25px #ff3300, inset 0 0 15px #ffff00; animation: godPulse 1.2s infinite alternate; }
 
         @keyframes rainbowGlow { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
+        @keyframes godPulse { 0% { transform: scale(1); filter: brightness(1); } 100% { transform: scale(1.06); filter: brightness(1.5); box-shadow: 0 0 35px #ffff00, 0 0 15px #ff3300; } }
 
         .buy-btn, .level-btn { background: #ffcc00; color: #000; font-weight: 800; border: 2px solid #000; padding: 6px 8px; border-radius: 10px; width: 100%; cursor: pointer; margin-top: 6px; font-size: 13px; }
         .buy-btn:disabled { background: #444; color: #888; cursor: not-allowed; border-color: #222; }
         .buy-btn.equipped { background: #00e676; border-color: #fff; color: #fff; }
 
-        /* Onboarding Screen Styles (Glassmorphism) */
+        /* شاشة اختيار العوالم والبيئات الجديدة (صور وبطاقات بصرية) */
+        #world-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 7, 15, 0.95); backdrop-filter: blur(10px); z-index: 100;
+            justify-content: center; align-items: center; flex-direction: column; padding: 20px;
+        }
+        .world-selection-box {
+            background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 25px; padding: 30px; max-width: 600px; width: 100%; text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+        }
+        .world-cards-container {
+            display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 20px;
+        }
+        .world-card {
+            width: 160px; height: 180px; border-radius: 18px; border: 3px solid #fff;
+            cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.5); transition: 0.3s; padding: 10px; position: relative;
+        }
+        .world-card:hover { transform: translateY(-8px) scale(1.05); }
+        .world-card h3 { font-size: 16px; color: #fff; text-shadow: 1px 1px #000; margin-top: 8px; }
+        .world-card p { font-size: 11px; color: #ddd; text-shadow: 1px 1px #000; margin-top: 4px; }
+
+        /* Onboarding Screen Styles */
         #onboarding-screen {
-            background: rgba(10, 12, 20, 0.95);
-            backdrop-filter: blur(12px);
-            z-index: 50;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            background: rgba(10, 12, 20, 0.95); backdrop-filter: blur(12px); z-index: 50;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
         .onboarding-card {
-            background: rgba(255, 255, 255, 0.07);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 25px;
-            padding: 30px 20px;
-            max-width: 420px;
-            width: 90%;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            backdrop-filter: blur(10px);
-            text-align: center;
-            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.07); border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px; padding: 30px 20px; max-width: 420px; width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); backdrop-filter: blur(10px); text-align: center; margin-bottom: 20px;
         }
         .onboarding-card h2 { color: #ff3d00; font-size: 28px; margin-bottom: 15px; text-shadow: 2px 2px #000; }
         .onboarding-card p { color: #ddd; font-size: 16px; line-height: 1.6; margin-bottom: 20px; }
@@ -119,23 +130,10 @@
         #btn-skill.cooldown { opacity: 0.4; pointer-events: none; }
 
         #total-coins-display { font-size: 20px; color: #ffcc00; font-weight: bold; margin-bottom: 12px; background: rgba(0,0,0,0.6); padding: 6px 15px; border-radius: 20px; border: 2px solid #fff; }
-    .tier-godlike {
-    background: linear-gradient(135deg, #1a0000, #ff6600, #ffcc00, #ffffff);
-    border: 3px solid #ffcc00;
-    box-shadow: 0 0 25px #ff3300, inset 0 0 15px #ffff00;
-    animation: godPulse 1.2s infinite alternate;
-}
-
-@keyframes godPulse {
-    0% { transform: scale(1); filter: brightness(1); }
-    100% { transform: scale(1.06); filter: brightness(1.5); box-shadow: 0 0 35px #ffff00, 0 0 15px #ff3300; }
-}
-
     </style>
 </head>
 <body>
 
-    <!-- Onboarding Screen (Glassmorphism) -->
     <div id="onboarding-screen" class="screen">
         <div class="onboarding-card">
             <h2 id="onboarding-title">مرحباً بك في عالم المغامرة!</h2>
@@ -153,11 +151,57 @@
         </div>
     </div>
 
+    <div id="world-modal">
+        <div class="world-selection-box">
+            <h2 style="color: #ffcc00; font-size: 26px; margin-bottom: 10px;">اختر بيئة وعالم المغامرة 🌍✨</h2>
+            <p style="color: #ddd; font-size: 14px; margin-bottom: 15px;">حدد وقت اليوم وطبيعة التضاريس قبل دخول المرحلة:</p>
+            
+            <div style="margin-bottom: 15px;">
+                <p style="color: #ff3d00; font-weight: bold; margin-bottom: 8px;">1. وقت اليوم (إضاءة وسماء):</p>
+                <div class="world-cards-container" style="margin-top:0;">
+                    <div class="world-card" id="time-day" onclick="selectTime('day')" style="background: linear-gradient(to bottom, #4a90e2, #7ed321); border-color: #ffcc00;">
+                        <span style="font-size: 40px;">☀️</span>
+                        <h3>نهار مشمس</h3>
+                        <p>سماء صافية وإضاءة واضحة</p>
+                    </div>
+                    <div class="world-card" id="time-night" onclick="selectTime('night')" style="background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364); border-color: #00ffff;">
+                        <span style="font-size: 40px;">🌙</span>
+                        <h3>ليل ومجرة</h3>
+                        <p>نجوم متلألئة وإضاءة ليلية</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <p style="color: #ff3d00; font-weight: bold; margin-bottom: 8px;">2. طبيعة التضاريس والفيزياء:</p>
+                <div class="world-cards-container" style="margin-top:0;">
+                    <div class="world-card" id="terrain-grass" onclick="selectTerrain('grass')" style="background: linear-gradient(to bottom, #2e7d32, #1b5e20); border-color: #00e676;">
+                        <span style="font-size: 40px;">🌿</span>
+                        <h3>عشب أخضر</h3>
+                        <p>سرعة وثبات طبيعي ممتاز</p>
+                    </div>
+                    <div class="world-card" id="terrain-mud" onclick="selectTerrain('mud')" style="background: linear-gradient(to bottom, #795548, #3e2723); border-color: #ff9800;">
+                        <span style="font-size: 40px;">🧱</span>
+                        <h3>طين ثقيل</h3>
+                        <p>حركة أبطأ وتحدي مضاعف</p>
+                    </div>
+                    <div class="world-card" id="terrain-snow" onclick="selectTerrain('snow')" style="background: linear-gradient(to bottom, #00acc1, #006064); border-color: #00ffff;">
+                        <span style="font-size: 40px;">❄️</span>
+                        <h3>شتاء منزلق</h3>
+                        <p>انزلاق جليدي وسرعة مذهلة</p>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-main" onclick="confirmWorldAndStart()" style="background: #00e676; color: #000; width: 100%; max-width: 320px; font-size: 18px;">ابدأ المغامرة الآن 🚀</button>
+        </div>
+    </div>
+
     <div id="home-screen" class="screen">
         <h1 class="title">SuperDrix</h1>
         <div id="total-coins-display">🪙 <span id="home-coins">0</span></div>
         <button class="btn-main" onclick="openLevelsScreen()">▶ المراحل (100)</button>
-        <button class="btn-main btn-shop" onclick="openShop()">🛒 متجر الشخصيات (100)</button>
+        <button class="btn-main btn-shop" onclick="openShop()">🛒 متجر الشخصيات (101)</button>
         <button class="btn-main btn-weapons" onclick="openWeaponsShop()">🔫 متجر الأسلحة (50)</button>
         <button class="btn-main btn-boosters" onclick="openBoostersScreen()">🛡️ متجر المعززات</button>
         <button class="btn-main btn-promo" onclick="openPromoScreen()">🎁 استرداد الأكواد</button>
@@ -194,7 +238,7 @@
     </div>
 
     <div id="shop-screen" class="screen">
-        <h2 class="subtitle">المتجر الأسطوري (100 شخصية)</h2>
+        <h2 class="subtitle">المتجر الأسطوري (101 شخصية)</h2>
         <div id="total-coins-display">رصيدك: 🪙 <span id="shop-coins">0</span></div>
         <div class="grid-container" id="shop-grid"></div>
         <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
@@ -207,21 +251,19 @@
         <button class="btn-main btn-back" onclick="goHome()" style="margin: 8px;">العودة للبيت 🏠</button>
     </div>
 
-    <!-- شاشة الموت العادية -->
     <div id="game-over-screen" class="screen" style="justify-content: center;">
         <h1 class="title" style="color: #f44336; text-shadow: 0 0 15px rgba(244,67,54,0.6), 4px 4px #000;">انتهت اللعبة!</h1>
         <p style="font-size: 22px; margin-bottom: 15px; color: #ffcc00;" id="normal-death-msg">لقد خسرت المحاولة!</p>
         <p style="font-size: 18px; margin-bottom: 15px;">النقاط المحفوظة: <span id="game-over-coins">0</span> 🪙</p>
-        <button class="btn-main btn-retry" onclick="startLevel(currentLevel)">إعادة المحاولة 🔄</button>
+        <button class="btn-main btn-retry" onclick="triggerLevelStart(currentLevel)">إعادة المحاولة 🔄</button>
         <button class="btn-main btn-back" onclick="goHome()" style="margin: 8px;">العودة للبيت 🏠</button>
     </div>
 
-    <!-- شاشة موت الزعيم المستقلة -->
     <div id="boss-game-over-screen" class="screen" style="justify-content: center;">
         <h1 class="title" style="color: #d32f2f; text-shadow: 0 0 25px rgba(211,47,47,0.9), 4px 4px #000;">قضى عليك الزعيم!</h1>
         <p style="font-size: 20px; margin-bottom: 15px; color: #ff5722;">أظهر لك الزعيم قوته المرعبة، لكن يمكنك محاربته مجدداً والانتصار عليه!</p>
         <p style="font-size: 18px; margin-bottom: 15px;">النقاط المحفوظة: <span id="boss-game-over-coins">0</span> 🪙</p>
-        <button class="btn-main btn-retry" onclick="startLevel(currentLevel)">إعادة مواجهة الزعيم 🔄</button>
+        <button class="btn-main btn-retry" onclick="triggerLevelStart(currentLevel)">إعادة مواجهة الزعيم 🔄</button>
         <button class="btn-main btn-back" onclick="goHome()" style="margin: 8px;">العودة للبيت 🏠</button>
     </div>
 
@@ -256,7 +298,7 @@
     <canvas id="gameCanvas"></canvas>
 
 <script>
-    // Onboarding Steps Logic
+    // Onboarding Logic
     let currentOnboardingStep = 0;
     const onboardingSteps = [
         { title: "مرحباً بك في SuperDrix", desc: "انطلق في مغامرة ملحمية عبر 100 مرحلة متنوعة وعوالم فخمة مليئة بالتحديات والمخاطر." },
@@ -275,24 +317,15 @@
     }
 
     function nextOnboardingStep() {
-        if (currentOnboardingStep < 2) {
-            currentOnboardingStep++;
-            updateOnboardingUI();
-        } else {
-            finishOnboarding();
-        }
+        if (currentOnboardingStep < 2) { currentOnboardingStep++; updateOnboardingUI(); }
+        else { finishOnboarding(); }
     }
 
     function prevOnboardingStep() {
-        if (currentOnboardingStep > 0) {
-            currentOnboardingStep--;
-            updateOnboardingUI();
-        }
+        if (currentOnboardingStep > 0) { currentOnboardingStep--; updateOnboardingUI(); }
     }
 
-    function skipOnboarding() {
-        finishOnboarding();
-    }
+    function skipOnboarding() { finishOnboarding(); }
 
     function finishOnboarding() {
         localStorage.setItem('superdrix_onboarding_done', 'true');
@@ -309,6 +342,7 @@
         }
     });
 
+    // Audio Engine
     let audioCtx;
     function initAudio() {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -359,6 +393,7 @@
         }
     });
 
+    // Skins Data (101 Skins including Godlike)
     const skinsData = [];
     for (let i = 0; i < 100; i++) {
         let cost = i === 0 ? 0 : (i * 200);
@@ -367,9 +402,8 @@
         let crown = false;
         let isRainbow = false;
         
-        if (i === 99) {
-            tierClass = "tier-rainbow"; tierName = "ملك الألوان 🌈👑"; crown = true; isRainbow = true;
-        } else if (i >= 85) { tierClass = "tier-legendary"; tierName = "أسطوري 🔥"; crown = true; }
+        if (i === 99) { tierClass = "tier-rainbow"; tierName = "ملك الألوان 🌈👑"; crown = true; isRainbow = true; }
+        else if (i >= 85) { tierClass = "tier-legendary"; tierName = "أسطوري 🔥"; crown = true; }
         else if (i >= 50) { tierClass = "tier-epic"; tierName = "ملحمي 💎"; }
         else if (i >= 25) { tierName = "نادر ✨"; }
 
@@ -382,20 +416,13 @@
             tierName: tierName, cardClass: tierClass
         });
     }
-skinsData.push({
-    id: 100,
-    name: "إله الثروة الأسطوري ⚡🔥",
-    cost: 1000000,
-    color: "#ff9900",
-    eyes: "#00ffff",
-    trail: ["#ff3300", "#ffaa00", "#ffff00", "#ffffff"],
-    crown: true,
-    isRainbow: false,
-    tierName: "مدمّر المليون 🌌⚡",
-    cardClass: "tier-godlike"
-});
+    skinsData.push({
+        id: 100, name: "إله الثروة الأسطوري ⚡🔥", cost: 1000000, color: "#ff9900", eyes: "#00ffff",
+        trail: ["#ff3300", "#ffaa00", "#ffff00", "#ffffff"], crown: true, isRainbow: false,
+        tierName: "مدمّر المليون 🌌⚡", cardClass: "tier-godlike"
+    });
 
-
+    // Weapons Data (50 Weapons)
     const weaponsData = [];
     for (let i = 0; i < 50; i++) {
         let cost = i === 0 ? 0 : (i * 1000);
@@ -404,20 +431,14 @@ skinsData.push({
         let tierName = "عادي";
         let tierClass = "tier-common";
 
-        if (i === 49) {
-            tierClass = "tier-rainbow"; tierName = "المدمر الكمومي المجرة 🌌👑";
-        } else if (i >= 40) { tierClass = "tier-legendary"; tierName = "سلاح أسطوري 🔥"; }
+        if (i === 49) { tierClass = "tier-rainbow"; tierName = "المدمر الكمومي المجرة 🌌👑"; }
+        else if (i >= 40) { tierClass = "tier-legendary"; tierName = "سلاح أسطوري 🔥"; }
         else if (i >= 25) { tierClass = "tier-epic"; tierName = "سلاح ملحمي 💎"; }
         else if (i >= 12) { tierClass = "tier-rare"; tierName = "سلاح نادر ✨"; }
 
         weaponsData.push({
-            id: i,
-            name: i === 0 ? "مسدس البداية" : (i === 49 ? "المدمر الكمومي 🌌" : `سلاح ليزر ${i + 1}`),
-            cost: cost,
-            damage: damage,
-            coinMultiplier: coinMultiplier,
-            tierName: tierName,
-            cardClass: tierClass
+            id: i, name: i === 0 ? "مسدس البداية" : (i === 49 ? "المدمر الكمومي 🌌" : `سلاح ليزر ${i + 1}`),
+            cost: cost, damage: damage, coinMultiplier: coinMultiplier, tierName: tierName, cardClass: tierClass
         });
     }
 
@@ -431,13 +452,10 @@ skinsData.push({
     const maxLevels = 100;
     let totalCoins = parseInt(localStorage.getItem('superdrix_coins')) || 0;
     let unlockedLevels = parseInt(localStorage.getItem('superdrix_unlocked_levels')) || 1;
-    
     let unlockedSkins = JSON.parse(localStorage.getItem('superdrix_skins')) || [0];
     let currentSkinId = parseInt(localStorage.getItem('superdrix_current_skin')) || 0;
-
     let unlockedWeapons = JSON.parse(localStorage.getItem('superdrix_weapons')) || [0];
     let currentWeaponId = parseInt(localStorage.getItem('superdrix_current_weapon')) || 0;
-
     let purchasedBoosters = JSON.parse(localStorage.getItem('superdrix_boosters')) || [];
 
     const validPromoCodes = {
@@ -447,7 +465,40 @@ skinsData.push({
     };
     let usedPromoCodes = JSON.parse(localStorage.getItem('superdrix_used_codes')) || [];
 
+    // World & Environment Selection State
+    let selectedWorld = {
+        time: 'day',     // 'day' أو 'night'
+        terrain: 'grass' // 'grass', 'mud', 'snow'
+    };
+    let pendingLevel = 1;
     let currentLevel = 1;
+
+    function selectTime(timeVal) {
+        selectedWorld.time = timeVal;
+        document.getElementById('time-day').style.border = timeVal === 'day' ? '4px solid #ffcc00' : '3px solid #fff';
+        document.getElementById('time-night').style.border = timeVal === 'night' ? '4px solid #00ffff' : '3px solid #fff';
+    }
+
+    function selectTerrain(terrainVal) {
+        selectedWorld.terrain = terrainVal;
+        document.getElementById('terrain-grass').style.border = terrainVal === 'grass' ? '4px solid #00e676' : '3px solid #fff';
+        document.getElementById('terrain-mud').style.border = terrainVal === 'mud' ? '4px solid #ff9800' : '3px solid #fff';
+        document.getElementById('terrain-snow').style.border = terrainVal === 'snow' ? '4px solid #00ffff' : '3px solid #fff';
+    }
+
+    function triggerLevelStart(lvl) {
+        pendingLevel = lvl;
+        // إظهار نافذة اختيار العالم والتضاريس
+        document.getElementById('world-modal').style.display = 'flex';
+        selectTime(selectedWorld.time);
+        selectTerrain(selectedWorld.terrain);
+    }
+
+    function confirmWorldAndStart() {
+        document.getElementById('world-modal').style.display = 'none';
+        startLevel(pendingLevel);
+    }
+
     let score = 0, lives = 3, gameActive = false;
     let isLooping = false;
     let skillCooldown = 0;
@@ -495,22 +546,16 @@ skinsData.push({
     function redeemCode() {
         const inputVal = document.getElementById('promo-input').value.trim().toUpperCase();
         const msgEl = document.getElementById('promo-msg');
-        
-        if (!inputVal) {
-            msgEl.style.color = '#f44336'; msgEl.innerText = "الرجاء إدخال الكود أولاً!"; playSound('hit'); return;
-        }
-        if (usedPromoCodes.includes(inputVal)) {
-            msgEl.style.color = '#f44336'; msgEl.innerText = "لقد استخدمت هذا الكود مسبقاً!"; playSound('hit'); return;
-        }
-
+        if (!inputVal) { msgEl.style.color = '#f44336'; msgEl.innerText = "الرجاء إدخال الكود أولاً!"; playSound('hit'); return; }
+        if (usedPromoCodes.includes(inputVal)) { msgEl.style.color = '#f44336'; msgEl.innerText = "لقد استخدمت هذا الكود مسبقاً!"; playSound('hit'); return; }
         if (validPromoCodes[inputVal]) {
             let reward = validPromoCodes[inputVal];
             totalCoins += reward.coins;
             usedPromoCodes.push(inputVal);
             localStorage.setItem('superdrix_used_codes', JSON.stringify(usedPromoCodes));
             updateDisplayData();
-            
-            msgEl.style.color = '#00e676'; msgEl.innerText = reward.message; playSound('coin');
+            msgEl.style.color = '#00e676'; msgEl.innerText = reward.message;
+            playSound('coin');
             document.getElementById('promo-input').value = '';
         } else {
             msgEl.style.color = '#f44336'; msgEl.innerText = "الكود غير صحيح أو منتهي الصلاحية!"; playSound('hit');
@@ -519,60 +564,65 @@ skinsData.push({
 
     function openShop() {
         showScreen('shop-screen');
-        const grid = document.getElementById('shop-grid'); grid.innerHTML = '';
+        const grid = document.getElementById('shop-grid');
+        grid.innerHTML = '';
         skinsData.forEach(skin => {
             const isUnlocked = unlockedSkins.includes(skin.id);
             const isEquipped = currentSkinId === skin.id;
-            let btnHtml = isEquipped ? `<button class="buy-btn equipped" disabled>مُجهز ✔️</button>` : 
-                          isUnlocked ? `<button class="buy-btn" onclick="equipSkin(${skin.id})">استخدام</button>` : 
+            let btnHtml = isEquipped ? `<button class="buy-btn equipped" disabled>مُجهز ✔️</button>` :
+                          isUnlocked ? `<button class="buy-btn" onclick="equipSkin(${skin.id})">استخدام</button>` :
                           `<button class="buy-btn" ${totalCoins < skin.cost ? 'disabled' : ''} onclick="buySkin(${skin.id}, ${skin.cost})">شراء 🪙 ${skin.cost}</button>`;
             
             grid.innerHTML += `
-                <div class="card ${skin.cardClass}">
-                    <div style="font-size:11px; color:#ffcc00; margin-bottom:3px;">#${skin.id + 1} (${skin.tierName})</div>
-                    <div style="width: 40px; height: 40px; background:${skin.isRainbow ? 'linear-gradient(45deg, red, yellow, green, cyan, magenta)' : skin.color}; margin: 0 auto 8px; border: 3px solid #000; border-radius: 8px; position:relative;">
-                        ${skin.crown ? '<div style="position:absolute; top:-16px; left:8px; font-size:16px;">👑</div>' : ''}
-                    </div>
-                    <div class="card-title">${skin.name}</div>
+                <div class="card ${skin.cardClass}" style="width: 170px;">
+                    <div style="width: 45px; height: 45px; background: ${skin.color}; border-radius: 50%; margin: 0 auto 8px; border: 2px solid #fff; box-shadow: 0 0 10px ${skin.color};"></div>
+                    <div class="card-title" style="color:#fff;">${skin.name}</div>
+                    <div style="font-size:11px; color:#ffcc00; margin-bottom:6px;">${skin.tierName}</div>
                     ${btnHtml}
                 </div>`;
         });
     }
 
-    function buySkin(id, cost) { if (totalCoins >= cost) { totalCoins -= cost; unlockedSkins.push(id); equipSkin(id); } }
+    function buySkin(id, cost) {
+        if (totalCoins >= cost) { totalCoins -= cost; unlockedSkins.push(id); equipSkin(id); }
+    }
+
     function equipSkin(id) { currentSkinId = id; updateDisplayData(); openShop(); }
 
     function openWeaponsShop() {
         showScreen('weapons-shop-screen');
-        const grid = document.getElementById('weapons-grid'); grid.innerHTML = '';
+        const grid = document.getElementById('weapons-grid');
+        grid.innerHTML = '';
         weaponsData.forEach(wep => {
             const isUnlocked = unlockedWeapons.includes(wep.id);
             const isEquipped = currentWeaponId === wep.id;
-            let btnHtml = isEquipped ? `<button class="buy-btn equipped" disabled>مُجهز ✔️</button>` : 
-                          isUnlocked ? `<button class="buy-btn" onclick="equipWeapon(${wep.id})">استخدام</button>` : 
+            let btnHtml = isEquipped ? `<button class="buy-btn equipped" disabled>مُجهز ✔️</button>` :
+                          isUnlocked ? `<button class="buy-btn" onclick="equipWeapon(${wep.id})">استخدام</button>` :
                           `<button class="buy-btn" ${totalCoins < wep.cost ? 'disabled' : ''} onclick="buyWeapon(${wep.id}, ${wep.cost})">شراء 🪙 ${wep.cost}</button>`;
             
             grid.innerHTML += `
-                <div class="card ${wep.cardClass}">
-                    <div style="font-size:11px; color:#ffcc00; margin-bottom:3px;">سلاح #${wep.id + 1}</div>
-                    <div class="card-title" style="font-size:13px; color:#ff4081;">${wep.name}</div>
+                <div class="card ${wep.cardClass}" style="width: 170px;">
+                    <div class="card-title" style="color:#ff4081;">${wep.name}</div>
                     <div style="font-size:11px; color:#ccc; margin-bottom:6px;">الضرر: ${wep.damage}<br>مضاعف العملات: x${wep.coinMultiplier}</div>
                     ${btnHtml}
                 </div>`;
         });
     }
 
-    function buyWeapon(id, cost) { if (totalCoins >= cost) { totalCoins -= cost; unlockedWeapons.push(id); equipWeapon(id); } }
+    function buyWeapon(id, cost) {
+        if (totalCoins >= cost) { totalCoins -= cost; unlockedWeapons.push(id); equipWeapon(id); }
+    }
+
     function equipWeapon(id) { currentWeaponId = id; updateDisplayData(); openWeaponsShop(); }
 
     function openBoostersScreen() {
         showScreen('boosters-screen');
-        const grid = document.getElementById('boosters-grid'); grid.innerHTML = '';
+        const grid = document.getElementById('boosters-grid');
+        grid.innerHTML = '';
         boostersData.forEach(b => {
             const isOwned = purchasedBoosters.includes(b.id);
-            let btnHtml = isOwned ? `<button class="buy-btn equipped" disabled>تم التفعيل ✔️</button>` : 
+            let btnHtml = isOwned ? `<button class="buy-btn equipped" disabled>تم التفعيل ✔️</button>` :
                           `<button class="buy-btn" ${totalCoins < b.cost ? 'disabled' : ''} onclick="buyBooster('${b.id}', ${b.cost})">شراء 🪙 ${b.cost}</button>`;
-            
             grid.innerHTML += `
                 <div class="card tier-epic" style="width: 220px;">
                     <div class="card-title" style="color:#00e676;">${b.name}</div>
@@ -584,126 +634,71 @@ skinsData.push({
 
     function buyBooster(id, cost) {
         if (totalCoins >= cost && !purchasedBoosters.includes(id)) {
-            totalCoins -= cost;
-            purchasedBoosters.push(id);
-            updateDisplayData();
-            openBoostersScreen();
+            totalCoins -= cost; purchasedBoosters.push(id); updateDisplayData(); openBoostersScreen();
         }
     }
 
     function openLevelsScreen() {
         showScreen('levels-screen');
-        const grid = document.getElementById('levels-grid'); grid.innerHTML = '';
+        const grid = document.getElementById('levels-grid');
+        grid.innerHTML = '';
         for (let i = 1; i <= maxLevels; i++) {
             let isUnlocked = i <= unlockedLevels;
             let isBossLevel = i % 10 === 0;
             grid.innerHTML += `
-                <div class="card ${isUnlocked ? '' : 'locked'} ${isBossLevel ? 'tier-legendary' : ''}" style="width: 70px; height: 70px; justify-content: center; align-items: center; display: flex; flex-direction: column;">
-                    <div style="font-size: 16px; font-weight: bold; text-shadow: 2px 2px #000;">${isUnlocked ? (isBossLevel ? '🦇 ' + i : i) : '🔒'}</div>
-                    ${isUnlocked ? `<button class="level-btn" style="padding: 2px; font-size: 11px;" onclick="startLevel(${i})">العب</button>` : ''}
+                <div class="card ${isUnlocked ? '' : 'locked'} ${isBossLevel ? 'tier-legendary' : ''}" style="width: 105px; padding: 10px;">
+                    <div class="card-title" style="font-size:16px; color:${isBossLevel ? '#ff4500' : '#ffcc00'}">مرحلة ${i}</div>
+                    <div style="font-size:10px; color:#aaa; margin-bottom:6px;">${isBossLevel ? '⚔️ زعيم مرعب' : 'عادية'}</div>
+                    <button class="level-btn" ${isUnlocked ? '' : 'disabled'} onclick="triggerLevelStart(${i})">${isUnlocked ? 'دخول ▶' : '🔒'}</button>
                 </div>`;
         }
     }
 
-    function triggerGameOver(isBossDeath) {
-        gameActive = false; totalCoins += score;
-        if (isBossDeath) {
-            document.getElementById('boss-game-over-coins').innerText = score;
-            showScreen('boss-game-over-screen');
-        } else {
-            document.getElementById('game-over-coins').innerText = score;
-            showScreen('game-over-screen');
-        }
-    }
-
-    function startLevel(lvl) {
-        initAudio(); currentLevel = lvl; score = 0;
-        lives = purchasedBoosters.includes('extralife') ? 4 : 3;
-        skillCooldown = 0;
-        tempSpeedTimer = 0;
-        
-        document.getElementById('current-level-text').innerText = currentLevel;
-        document.getElementById('score-val').innerText = score; 
-        document.getElementById('lives-val').innerText = lives;
-        
-        showScreen(''); document.getElementById('ui-layer').style.display = 'flex';
-        initLevel(currentLevel);
-        gameActive = true; 
-        if (!isLooping) { isLooping = true; requestAnimationFrame(loop); }
-    }
-
-    function winLevel() {
-        gameActive = false; totalCoins += score;
-        if (currentLevel === unlockedLevels && unlockedLevels < maxLevels) unlockedLevels++;
-        document.getElementById('win-coins').innerText = score; showScreen('win-screen');
-    }
-    function nextLevel() {
-        if (currentLevel < maxLevels) startLevel(currentLevel + 1);
-        else { alert("مبروك! لقد ختمت جميع المراحل الـ 100 الأسطورية بنجاح تام!"); goHome(); }
-    }
-
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
     function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.addEventListener('resize', resizeCanvas); resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
 
-    let player, blocks = [], hazards = [], coins = [], speedBoosts = [], enemies = [], clouds = [], particles = [], floatingTexts = [], bullets = [], bossBullets = [], finishLine = null;
+    let player = null;
+    let blocks = [], hazards = [], coins = [], speedBoosts = [], enemies = [], clouds = [], particles = [], floatingTexts = [], bullets = [], bossBullets = [], finishLine = null;
     let boss = null;
     let cameraX = 0, shakeTime = 0, backgroundY = 0;
-    let weatherType = 'normal';
 
     function initLevel(lvl) {
         blocks = []; hazards = []; coins = []; speedBoosts = []; enemies = []; clouds = []; particles = []; floatingTexts = []; bullets = []; bossBullets = []; boss = null;
         let activeSkin = skinsData[currentSkinId] || skinsData[0];
         
-        if (lvl <= 25) weatherType = 'normal';
-        else if (lvl <= 50) weatherType = 'rain'; // Lava World feel or Rain
-        else if (lvl <= 75) weatherType = 'sunset';
-        else weatherType = 'snow'; // Space / Night feel
-
+        // تطبيق تأثيرات التضاريس والسرعة المختارة بناءً على العالم
         let baseSpeed = purchasedBoosters.includes('speedboost') ? 9.5 : 6.5;
+        if (selectedWorld.terrain === 'mud') baseSpeed *= 0.72; // الطين يبطئ الحركة
+        if (selectedWorld.terrain === 'snow') baseSpeed *= 1.15; // الشتاء يزيد السرعة والانزلاق
 
-        player = { 
-            x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0, speed: baseSpeed, jumpForce: -13.5, grounded: false, canDoubleJump: true, dir: 1, trail: [], 
-            color: activeSkin.color, eyesColor: activeSkin.eyes, trailColors: activeSkin.trail, crown: activeSkin.crown, isRainbow: activeSkin.isRainbow, scaleX: 1, scaleY: 1 
+        player = {
+            x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0,
+            speed: baseSpeed, jumpForce: selectedWorld.terrain === 'mud' ? -11.5 : -13.5,
+            grounded: false, canDoubleJump: true, dir: 1, trail: [],
+            color: activeSkin.color, eyesColor: activeSkin.eyes, trailColors: activeSkin.trail,
+            crown: activeSkin.crown, isRainbow: activeSkin.isRainbow, scaleX: 1, scaleY: 1
         };
-        
+
         let levelLength = 3000 + (lvl * 250);
         let isBossLevel = lvl % 10 === 0;
-
-        finishLine = { x: levelLength - 300, y: canvas.height - 350, width: 80, height: 270 };
-
-        if (isBossLevel) {
-            let bossMaxHp = 800 + (lvl * 150);
-            boss = {
-                x: finishLine.x - 200, y: 150, width: 110, height: 110,
-                hp: bossMaxHp, maxHp: bossMaxHp, vx: 3, vy: 2, minX: finishLine.x - 600, maxX: finishLine.x - 100, 
-                minY: 80, maxY: canvas.height - 320, shootTimer: 0, alive: true
-            };
-            document.getElementById('boss-hud').style.display = 'block';
-        } else {
-            document.getElementById('boss-hud').style.display = 'none';
-        }
+        finishLine = { x: levelLength - 300, y: canvas.height - 350, width: 60, height: 280 };
 
         let cursorX = 0;
         while (cursorX < levelLength) {
-            let groundWidth = 300 + Math.random() * 250;
-            let baseHeightY = canvas.height - 120;
+            let groundWidth = 300 + Math.random() * 350;
+            blocks.push({ x: cursorX, y: canvas.height - 80, width: groundWidth, height: 120, type: 'ground' });
             
-            blocks.push({ x: cursorX, y: baseHeightY, width: groundWidth, height: 200, type: 'ground' });
-
-            if (Math.random() > 0.4 && cursorX > 400) {
-                let stairX = cursorX + 50; let stairY = baseHeightY - 80;
-                blocks.push({ x: stairX, y: stairY, width: 140, height: 30, type: 'stone' });
-                coins.push({ x: stairX + 55, y: stairY - 50, width: 28, height: 28, collected: false, float: 0 });
+            for (let i = 0; i < 3; i++) {
+                let coinX = cursorX + 80 + (i * 70);
+                coins.push({ x: coinX, y: canvas.height - 180 - Math.random() * 60, width: 28, height: 28, collected: false, float: Math.random() * Math.PI });
             }
             cursorX += groundWidth;
-
             if (cursorX < finishLine.x - 300) {
                 let gapWidth = 110 + Math.min(lvl * 1.5, 70);
-                let hazardType = (lvl >= 26 && lvl <= 50) ? 'lava' : (Math.random() > 0.5 ? 'lava' : 'water');
-                hazards.push({ x: cursorX, y: canvas.height - 60, width: gapWidth, height: 60, type: hazardType });
+                hazards.push({ x: cursorX, y: canvas.height - 60, width: gapWidth, height: 60, type: 'lava' });
                 cursorX += gapWidth;
             }
         }
@@ -711,70 +706,117 @@ skinsData.push({
         for (let i = 500; i < finishLine.x - 200; i += 320) {
             const blockTypes = ['wood', 'pipe', 'stone', 'metal'];
             let chosenType = blockTypes[Math.floor(Math.random() * blockTypes.length)];
-            
             blocks.push({ x: i, y: canvas.height - 280 - Math.random() * 100, width: 140, height: 35, type: chosenType });
             coins.push({ x: i + 55, y: canvas.height - 380, width: 28, height: 28, collected: false, float: Math.random() * Math.PI });
-            
-            if (Math.random() > 0.6) {
-                speedBoosts.push({ x: i + 90, y: canvas.height - 330, width: 30, height: 30, collected: false });
-            }
-
+            if (Math.random() > 0.6) speedBoosts.push({ x: i + 90, y: canvas.height - 330, width: 30, height: 30, collected: false });
             if (Math.random() > 0.2) {
                 enemies.push({ x: i + 80, y: canvas.height - 170, width: 45, height: 45, vx: 2 + (lvl * 0.04), minX: i, maxX: i + 220, hp: 40 + (lvl * 8), maxHp: 40 + (lvl * 8), alive: true });
             }
         }
 
-        for (let i = 0; i < 70; i++) clouds.push({ x: i * 250 + Math.random() * 100, y: 10 + Math.random() * 200, size: 40 + Math.random() * 50 });
-        cameraX = 0;
-    }
+        for (let i = 0; i < 15; i++) {
+            clouds.push({ x: Math.random() * levelLength, y: Math.random() * (canvas.height / 2), size: 40 + Math.random() * 60 });
+        }
 
-    function createParticles(x, y, color, count = 15) {
-        for(let i = 0; i < count; i++) {
-            particles.push({ x: x, y: y, vx: (Math.random() - 0.5) * 12, vy: (Math.random() - 1) * 10, life: 1, color: color, size: Math.random() * 7 + 2 });
+        if (isBossLevel) {
+            boss = {
+                x: finishLine.x - 200, y: canvas.height - 320, width: 110, height: 110,
+                hp: 500 + (lvl * 120), maxHp: 500 + (lvl * 120), vx: 2.5, alive: true, shootTimer: 0
+            };
+            document.getElementById('boss-hud').style.display = 'block';
+        } else {
+            document.getElementById('boss-hud').style.display = 'none';
         }
     }
-    
-    function createFloatingText(x, y, text, color) {
-        floatingTexts.push({ x: x, y: y, text: text, color: color, life: 1, vy: -2 });
+
+    function startLevel(lvl) {
+        currentLevel = lvl;
+        score = 0;
+        lives = purchasedBoosters.includes('extralife') ? 4 : 3;
+        initLevel(lvl);
+        gameActive = true;
+        document.getElementById('current-level-text').innerText = lvl;
+        document.getElementById('lives-val').innerText = lives;
+        document.getElementById('score-val').innerText = score;
+        showScreen(null);
+        document.getElementById('ui-layer').style.display = 'flex';
+        if (!isLooping) { isLooping = true; requestAnimationFrame(gameLoop); }
     }
 
-    function fireWeapon() {
-        if (!player || !gameActive) return;
+    function nextLevel() {
+        if (currentLevel < maxLevels) {
+            unlockedLevels = Math.max(unlockedLevels, currentLevel + 1);
+            triggerLevelStart(currentLevel + 1);
+        } else {
+            goHome();
+        }
+    }
+
+    function applyDamage(color, pushX, isBossDmg = false) {
+        if (purchasedBoosters.includes('shield')) {
+            purchasedBoosters = purchasedBoosters.filter(b => b !== 'shield');
+            createFloatingText(player.x, player.y - 40, "الدرع السحري حماك! 🛡️", "#00bcd4");
+            playSound('skill');
+            player.vx = -8; player.vy = -6;
+            return;
+        }
+        lives--;
+        document.getElementById('lives-val').innerText = lives;
+        playSound('hit');
+        shakeTime = 20;
+        createParticles(player.x, player.y, color, 25);
+        if (lives <= 0) {
+            gameActive = false;
+            document.getElementById('ui-layer').style.display = 'none';
+            if (isBossDmg) {
+                document.getElementById('boss-game-over-coins').innerText = score;
+                showScreen('boss-game-over-screen');
+            } else {
+                document.getElementById('game-over-coins').innerText = score;
+                showScreen('game-over-screen');
+            }
+        } else {
+            player.x = pushX - 100;
+            player.y = 100;
+            player.vx = 0; player.vy = 0;
+        }
+    }
+
+    function winLevel() {
+        gameActive = false;
+        document.getElementById('ui-layer').style.display = 'none';
+        totalCoins += score;
+        unlockedLevels = Math.max(unlockedLevels, currentLevel + 1);
+        updateDisplayData();
+        document.getElementById('win-coins').innerText = score;
+        showScreen('win-screen');
+    }
+
+    function shootBullet() {
         playSound('shoot');
-        let activeWeapon = weaponsData[currentWeaponId] || weaponsData[0];
+        let curWep = weaponsData[currentWeaponId] || weaponsData[0];
         bullets.push({
-            x: player.x + (player.dir === 1 ? player.width : -10),
-            y: player.y + player.height / 2,
-            vx: player.dir * 15,
-            damage: activeWeapon.damage,
-            coinMultiplier: activeWeapon.coinMultiplier,
-            width: 16,
-            height: 8,
-            isSkill: false
+            x: player.x + (player.dir === 1 ? player.width : -20),
+            y: player.y + player.height / 2 - 6,
+            vx: player.dir * 16, width: 24, height: 10,
+            damage: curWep.damage, coinMultiplier: curWep.coinMultiplier
         });
-        player.scaleX = 1.2; player.scaleY = 0.8;
     }
 
-    function triggerSkill() {
-        if (!player || !gameActive || skillCooldown > 0) return;
+    function useSkill() {
+        if (skillCooldown > 0) return;
         playSound('skill');
         skillCooldown = 300;
         document.getElementById('btn-skill').classList.add('cooldown');
-        
         createParticles(player.x, player.y, '#9c27b0', 40);
         createFloatingText(player.x, player.y - 30, "موجة الطاقة المدمرة! ⚡", "#9c27b0");
-
         enemies.forEach(en => {
             if (en.alive && Math.abs(en.x - player.x) < 800) {
-                en.alive = false;
-                score += 100;
-                createParticles(en.x, en.y, '#ffea00', 20);
+                en.alive = false; score += 100; createParticles(en.x, en.y, '#ffea00', 20);
             }
         });
-
         if (boss && boss.alive && Math.abs(boss.x - player.x) < 900) {
-            boss.hp -= 250;
-            createParticles(boss.x, boss.y, '#ff4500', 30);
+            boss.hp -= 250; createParticles(boss.x, boss.y, '#ff4500', 30);
         }
     }
 
@@ -794,78 +836,79 @@ skinsData.push({
         const jumpBtn = document.getElementById('btn-jump');
         if(jumpBtn) {
             const triggerJump = (e) => {
-                if(e) e.preventDefault();
-                initAudio(); 
-                if (player) { 
+                if(e) e.preventDefault(); initAudio();
+                if (player) {
                     if (player.grounded) {
-                        player.vy = player.jumpForce; 
-                        player.grounded = false; 
-                        player.canDoubleJump = true;
-                        player.scaleX = 0.7; player.scaleY = 1.3;
-                        playSound('jump'); 
-                        let pColor = player.isRainbow ? `hsl(${Date.now() % 360}, 100%, 50%)` : '#ffffff';
-                        createParticles(player.x + player.width/2, player.y + player.height, pColor, 10); 
+                        player.vy = player.jumpForce; player.grounded = false; player.canDoubleJump = true;
+                        player.scaleX = 0.7; player.scaleY = 1.3; playSound('jump');
+                        createParticles(player.x, player.y + player.height, '#fff', 10);
                     } else if (player.canDoubleJump) {
-                        player.vy = player.jumpForce * 0.9;
-                        player.canDoubleJump = false;
-                        player.scaleX = 0.6; player.scaleY = 1.4;
-                        playSound('jump');
-                        createParticles(player.x + player.width/2, player.y + player.height/2, '#00e676', 15);
-                        createFloatingText(player.x, player.y - 20, "قفزة مزدوجة! ✨", "#00e676");
+                        player.vy = player.jumpForce * 0.9; player.canDoubleJump = false;
+                        player.scaleX = 0.6; player.scaleY = 1.4; playSound('jump');
+                        createParticles(player.x, player.y + player.height, '#ffcc00', 15);
+                        createFloatingText(player.x, player.y, "قفزة مزدوجة! ✨", "#ffcc00");
                     }
                 }
             };
             jumpBtn.addEventListener('touchstart', triggerJump);
-            jumpBtn.addEventListener('click', triggerJump);
+            jumpBtn.addEventListener('mousedown', triggerJump);
         }
 
         const shootBtn = document.getElementById('btn-shoot');
         if(shootBtn) {
-            const triggerShoot = (e) => { if(e) e.preventDefault(); fireWeapon(); };
+            const triggerShoot = (e) => { if(e) e.preventDefault(); initAudio(); if(player) shootBullet(); };
             shootBtn.addEventListener('touchstart', triggerShoot);
-            shootBtn.addEventListener('click', triggerShoot);
+            shootBtn.addEventListener('mousedown', triggerShoot);
         }
 
         const skillBtn = document.getElementById('btn-skill');
         if(skillBtn) {
-            const triggerSkillBtn = (e) => { if(e) e.preventDefault(); triggerSkill(); };
-            skillBtn.addEventListener('touchstart', triggerSkillBtn);
-            skillBtn.addEventListener('click', triggerSkillBtn);
+            const triggerSkill = (e) => { if(e) e.preventDefault(); initAudio(); if(player) useSkill(); };
+            skillBtn.addEventListener('touchstart', triggerSkill);
+            skillBtn.addEventListener('mousedown', triggerSkill);
+        }
+    }
+    setupControls();
+
+    function createParticles(x, y, color, count) {
+        for(let i=0; i<count; i++) {
+            particles.push({
+                x: x, y: y, vx: (Math.random() - 0.5) * 9, vy: (Math.random() - 0.5) * 9,
+                color: color, size: 4 + Math.random() * 5, life: 1.0
+            });
         }
     }
 
+    function createFloatingText(x, y, text, color) {
+        floatingTexts.push({ x: x, y: y, text: text, color: color, life: 1.0, vy: -1.5 });
+    }
+
     function update() {
-        if (!gameActive) return;
+        if (!gameActive || !player) return;
 
         if (skillCooldown > 0) {
             skillCooldown--;
             if (skillCooldown === 0) document.getElementById('btn-skill').classList.remove('cooldown');
         }
 
-        if (tempSpeedTimer > 0) {
-            tempSpeedTimer--;
-            player.speed = 10.5;
+        let currentAcc = moveRight ? player.speed : (moveLeft ? -player.speed : 0);
+        if (selectedWorld.terrain === 'snow') {
+            player.vx = player.vx * 0.92 + currentAcc * 0.08; // انزلاق جليدي
         } else {
-            player.speed = purchasedBoosters.includes('speedboost') ? 9.5 : 6.5;
+            player.vx = currentAcc;
         }
 
-        player.scaleX += (1 - player.scaleX) * 0.15;
-        player.scaleY += (1 - player.scaleY) * 0.15;
+        if (moveRight) player.dir = 1;
+        if (moveLeft) player.dir = -1;
 
-        player.vx = 0;
-        if (moveLeft) { player.vx = -player.speed; player.dir = -1; }
-        if (moveRight) { player.vx = player.speed; player.dir = 1; }
+        player.scaleX += (1 - player.scaleX) * 0.1;
+        player.scaleY += (1 - player.scaleY) * 0.1;
+
+        player.vy += 0.55; // الجاذبية
         player.x += player.vx;
-        player.vy += 0.65;
         player.y += player.vy;
-        
         let wasGrounded = player.grounded;
         player.grounded = false;
-
-        if (Math.abs(player.vx) > 0 || player.vy !== 0) {
-            player.trail.push({ x: player.x, y: player.y, rainbowHue: Date.now() % 360 });
-            if (player.trail.length > 10) player.trail.shift();
-        } else if (player.trail.length > 0) player.trail.shift();
 
         bullets.forEach(b => { b.x += b.vx; });
         bullets = bullets.filter(b => Math.abs(b.x - player.x) < 1200);
@@ -882,45 +925,43 @@ skinsData.push({
         blocks.forEach(b => {
             if (player.x + player.width > b.x && player.x < b.x + b.width && player.y + player.height > b.y && player.y < b.y + b.height) {
                 if (player.vy > 0 && player.y + player.height - player.vy <= b.y + 20) {
-                    player.y = b.y - player.height; player.vy = 0; player.grounded = true; player.canDoubleJump = true;
-                    if(!wasGrounded) { player.scaleX = 1.3; player.scaleY = 0.7; createParticles(player.x + 20, player.y + 40, '#ddd', 8); }
-                } else if (player.vy < 0 && player.y - player.vy >= b.y + b.height - 15) {
-                    player.y = b.y + b.height; player.vy = 0;
+                    player.y = b.y - player.height;
+                    player.vy = 0; player.grounded = true; player.canDoubleJump = true;
                 }
             }
         });
 
         hazards.forEach(hz => {
-            if (player.x + player.width > hz.x + 15 && player.x < hz.x + hz.width - 15 && player.y + player.height >= hz.y + 15) {
-                applyDamage(hz.type === 'lava' ? '#ff3d00' : '#03a9f4', hz.x - 120, false);
+            if (player.x + player.width > hz.x && player.x < hz.x + hz.width && player.y + player.height > hz.y && player.y < hz.y + hz.height) {
+                applyDamage('#ff3d00', cameraX + 150, false);
+            }
+        });
+
+        enemies.forEach(en => {
+            if (!en.alive) return;
+            en.x += en.vx;
+            if (en.x < en.minX || en.x > en.maxX) en.vx *= -1;
+            if (player.x + player.width > en.x && player.x < en.x + en.width && player.y + player.height > en.y && player.y < en.y + en.height) {
+                if (player.vy > 0 && player.y + player.height - player.vy <= en.y + 20) {
+                    en.hp -= 50; player.vy = -10; playSound('jump');
+                    createParticles(en.x, en.y, '#ff3d00', 12);
+                    if (en.hp <= 0) { en.alive = false; score += 150; createFloatingText(en.x, en.y, "+150", "#ffcc00"); }
+                } else {
+                    applyDamage('#ff3d00', en.x, false);
+                }
             }
         });
 
         if (boss && boss.alive) {
             boss.x += boss.vx;
-            boss.y += boss.vy + Math.sin(Date.now() * 0.005) * 1.5;
-            
-            if (boss.x < boss.minX || boss.x > boss.maxX) boss.vx *= -1;
-            if (boss.y < boss.minY || boss.y > boss.maxY) boss.vy *= -1;
-
+            if (boss.x < finishLine.x - 400 || boss.x > finishLine.x + 100) boss.vx *= -1;
             boss.shootTimer++;
-            if (boss.shootTimer > 60) {
-                boss.shootTimer = 0;
+            if (boss.shootTimer % 110 === 0) {
                 playSound('bossShoot');
-                let angle = Math.atan2((player.y + player.height/2) - (boss.y + boss.height/2), (player.x + player.width/2) - (boss.x + boss.width/2));
-                bossBullets.push({
-                    x: boss.x + boss.width / 2,
-                    y: boss.y + boss.height / 2,
-                    vx: Math.cos(angle) * 7,
-                    vy: Math.sin(angle) * 7,
-                    width: 18,
-                    height: 18
-                });
+                bossBullets.push({ x: boss.x, y: boss.y + 45, vx: -5, vy: (player.y - boss.y) * 0.02, width: 22, height: 22 });
             }
-
             let hpPercent = Math.max(0, (boss.hp / boss.maxHp) * 100);
             document.getElementById('boss-hp-bar').style.width = hpPercent + '%';
-
             if (player.x + player.width > boss.x && player.x < boss.x + boss.width && player.y + player.height > boss.y && player.y < boss.y + boss.height) {
                 applyDamage('#ff3d00', boss.x - 120, true);
             }
@@ -935,309 +976,210 @@ skinsData.push({
 
         bullets.forEach((b, bIdx) => {
             if (boss && boss.alive && b.x > boss.x && b.x < boss.x + boss.width && b.y > boss.y && b.y < boss.y + boss.height) {
-                boss.hp -= b.damage;
-                createParticles(b.x, b.y, '#ffea00', 8);
-                bullets.splice(bIdx, 1);
+                boss.hp -= b.damage; createParticles(b.x, b.y, '#ffea00', 8); bullets.splice(bIdx, 1);
                 if (boss.hp <= 0) {
-                    boss.alive = false;
-                    document.getElementById('boss-hud').style.display = 'none';
-                    let earnedCoins = 2500 * b.coinMultiplier;
-                    score += earnedCoins;
+                    boss.alive = false; document.getElementById('boss-hud').style.display = 'none';
+                    let earnedCoins = 2500 * b.coinMultiplier; score += earnedCoins;
                     document.getElementById('score-val').innerText = score;
-                    playSound('coin');
-                    createParticles(boss.x + 55, boss.y + 55, '#00e676', 60);
+                    playSound('coin'); createParticles(boss.x + 55, boss.y + 55, '#00e676', 60);
                     createFloatingText(boss.x, boss.y, `هزمت الزعيم الطائر! +${earnedCoins} 🪙`, "#ffcc00");
                 }
                 return;
             }
-
             enemies.forEach(en => {
                 if (en.alive && b.x > en.x && b.x < en.x + en.width && b.y > en.y && b.y < en.y + en.height) {
-                    en.hp -= b.damage;
-                    createParticles(b.x, b.y, '#ffea00', 6);
-                    bullets.splice(bIdx, 1);
-
-                    if (en.hp <= 0) {
-                        en.alive = false;
-                        let earnedCoins = 50 * b.coinMultiplier;
-                        score += earnedCoins;
-                        document.getElementById('score-val').innerText = score;
-                        playSound('coin');
-                        createParticles(en.x + 20, en.y + 20, '#00e676', 20);
-                        createFloatingText(en.x, en.y, `+${earnedCoins} 🪙`, "#ffcc00");
-                    }
+                    en.hp -= b.damage; createParticles(b.x, b.y, '#ffea00', 6); bullets.splice(bIdx, 1);
+                    if (en.hp <= 0) { en.alive = false; score += 200; createFloatingText(en.x, en.y, "+200", "#ffcc00"); }
                 }
             });
         });
 
-        enemies.forEach(en => {
-            if (!en.alive) return;
-            en.x += en.vx; if (en.x < en.minX || en.x > en.maxX) en.vx *= -1;
-            if (player.x + player.width > en.x && player.x < en.x + en.width && player.y + player.height > en.y && player.y < en.y + en.height) {
-                applyDamage(player.color, player.x + (player.x < en.x ? -60 : 60), false);
-            }
-        });
-
-        speedBoosts.forEach(sb => {
-            if (!sb.collected && player.x + player.width > sb.x && player.x < sb.x + sb.width && player.y + player.height > sb.y && player.y < sb.y + sb.height) {
-                sb.collected = true;
-                tempSpeedTimer = 350; // Speed boost duration
-                playSound('coin');
-                createParticles(sb.x + 15, sb.y + 15, '#00bcd4', 20);
-                createFloatingText(sb.x, sb.y, "سرعة خارقة! ⚡", "#00bcd4");
-            }
-        });
-
         coins.forEach(c => {
-            c.float += 0.08; c.y += Math.sin(c.float) * 0.8;
-            
+            c.float += 0.05;
             if (purchasedBoosters.includes('magnet')) {
                 let dist = Math.hypot((player.x + player.width/2) - (c.x + c.width/2), (player.y + player.height/2) - (c.y + c.height/2));
-                if (dist < 220) {
-                    c.x += ((player.x - c.x) * 0.1);
-                    c.y += ((player.y - c.y) * 0.1);
-                }
+                if (dist < 220) { c.x += ((player.x - c.x) * 0.1); c.y += ((player.y - c.y) * 0.1); }
             }
-
             if (!c.collected && player.x + player.width > c.x && player.x < c.x + c.width && player.y + player.height > c.y && player.y < c.y + c.height) {
-                c.collected = true; score += 10; document.getElementById('score-val').innerText = score;
+                c.collected = true; score += 10;
+                document.getElementById('score-val').innerText = score;
                 playSound('coin'); createParticles(c.x + 14, c.y + 14, '#ffea00', 12);
                 createFloatingText(c.x, c.y, "+10", "#ffcc00");
             }
         });
 
-        if (player.y > canvas.height) {
-            applyDamage('#ff3d00', cameraX + 150, false);
-        }
+        if (player.y > canvas.height) { applyDamage('#ff3d00', cameraX + 150, false); }
 
         if (finishLine && player.x + player.width > finishLine.x && player.x < finishLine.x + finishLine.width) {
             if (!boss || !boss.alive) {
                 playSound('coin'); createParticles(player.x, player.y, '#00e676', 40);
-                createFloatingText(player.x, player.y - 40, "فوز!", "#00e676");
-                winLevel();
+                createFloatingText(player.x, player.y - 40, "فوز!", "#00e676"); winLevel();
             } else {
                 createFloatingText(player.x, player.y - 40, "قضِ على الزعيم الطائر أولاً! ⚠️", "#ff3d00");
             }
         }
 
-        cameraX += ((player.x - canvas.width / 2.5) - cameraX) * 0.08; 
+        cameraX += ((player.x - canvas.width / 2.5) - cameraX) * 0.08;
         if (cameraX < 0) cameraX = 0;
+        if (shakeTime > 0) shakeTime--;
         backgroundY = Math.sin(Date.now() * 0.0005) * 10;
     }
 
-    function applyDamage(particleColor, respawnX, isBossDamage) {
-        playSound('hit');
-        if (purchasedBoosters.includes('shield')) {
-            purchasedBoosters = purchasedBoosters.filter(b => b !== 'shield');
-            createParticles(player.x, player.y, '#00bcd4', 30);
-            createFloatingText(player.x, player.y - 30, "تم امتصاص الضربة بواسطة الدرع! 🛡️", "#00bcd4");
-            player.x = respawnX; player.vy = -6;
-            return;
-        }
-
-        lives--; document.getElementById('lives-val').innerText = lives;
-        shakeTime = 30; player.x = respawnX; player.y = 50; player.vy = 0;
-        createParticles(player.x, player.y, particleColor, 25);
-        if (lives <= 0) { 
-            triggerGameOver(isBossDamage); 
-        }
-    }
-
-    function draw() {
+    function render() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.save();
-        
-        let shakeX = 0, shakeY = 0;
-        if (shakeTime > 0) { shakeX = (Math.random() - 0.5) * 15; shakeY = (Math.random() - 0.5) * 15; shakeTime--; }
-        ctx.translate(-cameraX + shakeX, shakeY);
+        if (shakeTime > 0) { ctx.translate((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10); }
 
-        let skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        if (weatherType === 'sunset') {
-            skyGradient.addColorStop(0, "#d32f2f"); skyGradient.addColorStop(1, "#fbc02d");
-        } else if (weatherType === 'rain') {
-            skyGradient.addColorStop(0, "#3e2723"); skyGradient.addColorStop(1, "#bf360c"); // Lava World Background Theme
-        } else if (weatherType === 'snow') {
-            skyGradient.addColorStop(0, "#0b0b16"); skyGradient.addColorStop(1, "#1a0033"); // Space / Night World Theme
+        // تلوين الخلفية ديناميكياً حسب اختيار العالم (ليل / نهار)
+        let bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        if (selectedWorld.time === 'night') {
+            bgGradient.addColorStop(0, '#0a0f24');
+            bgGradient.addColorStop(1, '#020208');
         } else {
-            skyGradient.addColorStop(0, "#1976d2"); skyGradient.addColorStop(1, "#64b5f6");
+            bgGradient.addColorStop(0, '#1a2a6c');
+            bgGradient.addColorStop(0.5, '#b21f1f');
+            bgGradient.addColorStop(1, '#fdbb2d');
         }
-        ctx.fillStyle = skyGradient;
-        ctx.fillRect(cameraX, 0, canvas.width, canvas.height);
+        ctx.fillStyle = bgGradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = "rgba(0,0,0,0.2)";
-        for(let i = -1; i < 10; i++) {
-            ctx.beginPath();
-            let pX = (cameraX * 0.8) + (i * 400);
-            ctx.moveTo(pX, canvas.height);
-            ctx.lineTo(pX + 200, canvas.height - 300 + backgroundY);
-            ctx.lineTo(pX + 400, canvas.height);
-            ctx.fill();
-        }
-
-        ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
-        clouds.forEach(cl => {
-            let cx = cl.x + (cameraX * 0.5);
-            ctx.beginPath(); ctx.arc(cx, cl.y, cl.size * 0.5, 0, Math.PI * 2);
-            ctx.arc(cx + cl.size * 0.4, cl.y - cl.size * 0.2, cl.size * 0.4, 0, Math.PI * 2);
-            ctx.arc(cx + cl.size * 0.8, cl.y, cl.size * 0.45, 0, Math.PI * 2); ctx.fill();
-        });
-
-        if (weatherType === 'snow') { // Starry Space Effect
+        // رسم النجوم إذا كان العالم ليلياً
+        if (selectedWorld.time === 'night') {
             ctx.fillStyle = "#ffffff";
-            for(let i = 0; i < 60; i++) {
-                let sX = (cameraX + (i * 130)) % (canvas.width + cameraX + 500);
-                let sY = (i * 45) % canvas.height;
-                ctx.beginPath(); ctx.arc(sX, sY, 2 + (i % 2), 0, Math.PI*2); ctx.fill();
+            for (let i = 0; i < 70; i++) {
+                let sX = (cameraX * 0.3 + (i * 120)) % (canvas.width + 500);
+                let sY = (i * 65) % (canvas.height / 1.5);
+                ctx.beginPath();
+                ctx.arc(sX, sY, 1.5 + (i % 2), 0, Math.PI * 2);
+                ctx.fill();
             }
         }
 
+        // رسم الغيوم والجبال في الخلفية
+        ctx.fillStyle = selectedWorld.time === 'night' ? "rgba(255, 255, 255, 0.08)" : "rgba(255, 255, 255, 0.25)";
+        clouds.forEach(cl => {
+            let cx = cl.x - (cameraX * 0.4);
+            ctx.beginPath();
+            ctx.arc(cx, cl.y, cl.size * 0.5, 0, Math.PI * 2);
+            ctx.arc(cx + cl.size * 0.4, cl.y - cl.size * 0.2, cl.size * 0.4, 0, Math.PI * 2);
+            ctx.arc(cx + cl.size * 0.8, cl.y, cl.size * 0.45, 0, Math.PI * 2);
+            ctx.fill();
+        });
+
+        // رسم حواجز الحمم (Lava Hazards)
         hazards.forEach(hz => {
-            if (hz.type === 'lava') {
-                ctx.shadowBlur = 20; ctx.shadowColor = "#ff3d00";
-                ctx.fillStyle = "#ff3d00"; ctx.fillRect(hz.x, hz.y + 20, hz.width, hz.height - 20);
-                ctx.shadowBlur = 0;
-                ctx.fillStyle = "#ffea00";
-                for(let i=0; i<hz.width; i+=40) { ctx.fillRect(hz.x + i + (Date.now()/50 % 20), hz.y + 10, 20, 20); }
-            } else {
-                ctx.shadowBlur = 15; ctx.shadowColor = "#00bcd4";
-                ctx.fillStyle = "#03a9f4"; ctx.fillRect(hz.x, hz.y + 15, hz.width, hz.height - 15);
-                ctx.shadowBlur = 0;
-                ctx.fillStyle = "#e0f7fa"; ctx.fillRect(hz.x, hz.y + 10, hz.width, 10);
+            ctx.shadowBlur = 20; ctx.shadowColor = "#ff3d00";
+            ctx.fillStyle = "#ff3d00"; ctx.fillRect(hz.x - cameraX, hz.y + 20, hz.width, hz.height - 20);
+            ctx.shadowBlur = 0; ctx.fillStyle = "#ffea00";
+            for(let i = 0; i < hz.width; i += 30) {
+                ctx.beginPath(); ctx.arc(hz.x - cameraX + i + 15, hz.y + 25, 8 + Math.sin(Date.now()*0.01 + i)*4, 0, Math.PI, true); ctx.fill();
             }
         });
 
+        // رسم خط النهاية
         if (finishLine) {
-            ctx.fillStyle = "#fff"; ctx.fillRect(finishLine.x, finishLine.y, 12, finishLine.height);
-            ctx.shadowBlur = 20; ctx.shadowColor = "#00e676";
-            ctx.fillStyle = "#00e676"; ctx.fillRect(finishLine.x + 12, finishLine.y, finishLine.width, 45);
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = "#000"; ctx.font = "24px Changa"; ctx.fillText("النهاية", finishLine.x + 18, finishLine.y + 32);
+            ctx.fillStyle = "#00e676"; ctx.fillRect(finishLine.x - cameraX, finishLine.y, 10, finishLine.height);
+            ctx.fillStyle = "#ffcc00"; ctx.fillRect(finishLine.x - cameraX + 10, finishLine.y, 50, 40);
+            ctx.fillStyle = "#000"; ctx.font = "bold 18px Changa"; ctx.fillText("🏁 النهاية", finishLine.x - cameraX + 15, finishLine.y + 26);
         }
 
+        // رسم منصات الكتل (Ground & Blocks بتصميمات التضاريس المختارة: عشب، طين، ثلج)
+        blocks.forEach(b => {
+            let bx = b.x - cameraX;
+            if (b.type === 'ground') {
+                if (selectedWorld.terrain === 'mud') {
+                    ctx.fillStyle = "#3e2723"; ctx.fillRect(bx, b.y + 20, b.width, canvas.height - b.y);
+                    ctx.fillStyle = "#795548"; ctx.fillRect(bx, b.y, b.width, 20);
+                } else if (selectedWorld.terrain === 'snow') {
+                    ctx.fillStyle = "#006064"; ctx.fillRect(bx, b.y + 25, b.width, canvas.height - b.y);
+                    ctx.fillStyle = "#ffffff"; ctx.fillRect(bx, b.y, b.width, 25);
+                } else {
+                    ctx.fillStyle = "#5D4037"; ctx.fillRect(bx, b.y + 25, b.width, (canvas.height - b.y) - 25);
+                    ctx.fillStyle = "#43A047"; ctx.fillRect(bx, b.y, b.width, 25);
+                    ctx.strokeStyle = "#1B5E20"; ctx.lineWidth = 4; ctx.strokeRect(bx, b.y, b.width, 25);
+                }
+            } else {
+                ctx.fillStyle = b.type === 'wood' ? '#8d6e63' : (b.type === 'metal' ? '#78909c' : '#b0bec5');
+                ctx.fillRect(bx, b.y, b.width, b.height);
+                ctx.strokeStyle = "#000"; ctx.lineWidth = 3; ctx.strokeRect(bx, b.y, b.width, b.height);
+            }
+        });
+
+        // رسم العملات الذهبية
+        coins.forEach(c => {
+            if (!c.collected) {
+                let cx = c.x - cameraX;
+                let floatY = Math.sin(c.float) * 6;
+                ctx.shadowBlur = 12; ctx.shadowColor = "#ffea00";
+                ctx.fillStyle = "#ffcc00";
+                ctx.beginPath(); ctx.arc(cx + c.width/2, c.y + c.height/2 + floatY, c.width/2, 0, Math.PI*2); ctx.fill();
+                ctx.fillStyle = "#ffee58";
+                ctx.beginPath(); ctx.arc(cx + c.width/2, c.y + c.height/2 + floatY, c.width/3, 0, Math.PI*2); ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        });
+
+        // رسم الأعداء
+        enemies.forEach(en => {
+            if (en.alive) {
+                let ex = en.x - cameraX;
+                ctx.fillStyle = "#d32f2f";
+                ctx.fillRect(ex, en.y, en.width, en.height);
+                ctx.fillStyle = "#fff";
+                ctx.fillRect(ex + 8, en.y + 10, 10, 12);
+                ctx.fillRect(ex + 27, en.y + 10, 10, 12);
+                ctx.fillStyle = "#000";
+                ctx.fillRect(ex + 12 + (en.vx > 0 ? 2 : -2), en.y + 14, 4, 6);
+                ctx.fillRect(ex + 31 + (en.vx > 0 ? 2 : -2), en.y + 14, 4, 6);
+            }
+        });
+
+        // رسم الزعيم
         if (boss && boss.alive) {
-            ctx.save();
-            ctx.translate(boss.x + boss.width/2, boss.y + boss.height/2);
-            
-            ctx.shadowBlur = 30; ctx.shadowColor = "#ff3d00";
-            let wingOffset = Math.sin(Date.now() * 0.02) * 30;
+            let bx = boss.x - cameraX;
+            ctx.shadowBlur = 20; ctx.shadowColor = "#ff3d00";
             ctx.fillStyle = "#b71c1c";
-            ctx.beginPath();
-            ctx.moveTo(-20, 0); ctx.lineTo(-80 - wingOffset, -50); ctx.lineTo(-40, 30); ctx.closePath();
-            ctx.moveTo(20, 0); ctx.lineTo(80 + wingOffset, -50); ctx.lineTo(40, 30); ctx.closePath();
-            ctx.fill();
-
-            ctx.fillStyle = "#212121";
-            ctx.beginPath(); ctx.arc(0, 0, boss.width/2, 0, Math.PI*2); ctx.fill();
-            ctx.strokeStyle = "#ff3d00"; ctx.lineWidth = 4; ctx.stroke();
-
-            ctx.fillStyle = "#ffcc00";
-            ctx.beginPath();
-            ctx.moveTo(-35, -25); ctx.lineTo(-50, -60); ctx.lineTo(-15, -40); ctx.closePath();
-            ctx.moveTo(35, -25); ctx.lineTo(50, -60); ctx.lineTo(15, -40); ctx.closePath();
-            ctx.fill();
-
-            ctx.fillStyle = "#ff1744";
-            ctx.fillRect(-22, -12, 14, 14);
-            ctx.fillRect(8, -12, 14, 14);
-
-            ctx.fillStyle = `hsl(${Date.now() * 0.5 % 360}, 100%, 50%)`;
-            ctx.beginPath(); ctx.arc(0, 10, 10 + Math.sin(Date.now()*0.01)*4, 0, Math.PI*2); ctx.fill();
-
+            ctx.fillRect(bx, boss.y, boss.width, boss.height);
+            ctx.fillStyle = "#ffea00";
+            ctx.fillRect(bx + 15, boss.y + 25, 25, 20);
+            ctx.fillRect(bx + 70, boss.y + 25, 25, 20);
             ctx.shadowBlur = 0;
-            ctx.restore();
         }
+
+        // رسم رصاصات اللاعب والزعيم
+        bullets.forEach(b => {
+            ctx.shadowBlur = 12; ctx.shadowColor = "#00ffff";
+            ctx.fillStyle = "#00ffff"; ctx.fillRect(b.x - cameraX, b.y, b.width, b.height);
+            ctx.shadowBlur = 0;
+        });
 
         bossBullets.forEach(bb => {
             ctx.shadowBlur = 15; ctx.shadowColor = "#ff3d00";
             ctx.fillStyle = "#ff3d00";
-            ctx.beginPath(); ctx.arc(bb.x + bb.width/2, bb.y + bb.height/2, bb.width/2, 0, Math.PI*2); ctx.fill();
-            ctx.fillStyle = "#ffea00";
-            ctx.beginPath(); ctx.arc(bb.x + bb.width/2, bb.y + bb.height/2, bb.width/4, 0, Math.PI*2); ctx.fill();
+            ctx.beginPath(); ctx.arc(bb.x - cameraX + bb.width/2, bb.y + bb.height/2, bb.width/2, 0, Math.PI*2); ctx.fill();
             ctx.shadowBlur = 0;
         });
 
-        blocks.forEach(b => {
-            if (b.type === 'ground') {
-                ctx.fillStyle = "#5D4037"; ctx.fillRect(b.x, b.y + 25, b.width, (canvas.height - b.y) - 25);
-                ctx.fillStyle = "#43A047"; ctx.fillRect(b.x, b.y, b.width, 25);
-                ctx.strokeStyle = "#1B5E20"; ctx.lineWidth = 4; ctx.strokeRect(b.x, b.y, b.width, 25);
-            } else {
-                let pColor = "#34495e", bColor = "#2c3e50";
-                if (b.type === 'wood') { pColor = "#8d6e63"; bColor = "#4e342e"; } 
-                else if (b.type === 'pipe') { pColor = "#4caf50"; bColor = "#1b5e20"; }
-                else if (b.type === 'stone') { pColor = "#90a4ae"; bColor = "#455a64"; }
-                
-                ctx.fillStyle = pColor; ctx.fillRect(b.x, b.y, b.width, b.height);
-                ctx.strokeStyle = bColor; ctx.lineWidth = 4; ctx.strokeRect(b.x, b.y, b.width, b.height);
-            }
-        });
-
-        speedBoosts.forEach(sb => {
-            if (!sb.collected) {
-                ctx.shadowBlur = 15; ctx.shadowColor = "#00bcd4";
-                ctx.fillStyle = "#00bcd4"; ctx.fillRect(sb.x, sb.y, sb.width, sb.height);
-                ctx.fillStyle = "#fff"; ctx.font = "16px Changa"; ctx.fillText("⚡", sb.x + 5, sb.y + 22);
-                ctx.shadowBlur = 0;
-            }
-        });
-
-        coins.forEach(c => {
-            if (!c.collected) {
-                ctx.shadowBlur = 10; ctx.shadowColor = "#ffcc00";
-                ctx.fillStyle = "#ffcc00"; ctx.beginPath(); ctx.arc(c.x + c.width/2, c.y + c.height/2, c.width/2, 0, Math.PI*2); ctx.fill();
-                ctx.strokeStyle = "#fff"; ctx.lineWidth = 4; ctx.stroke();
-                ctx.shadowBlur = 0;
-            }
-        });
-
-        enemies.forEach(en => {
-            if (en.alive) {
-                ctx.shadowBlur = 15; ctx.shadowColor = "#d50000";
-                ctx.fillStyle = "#212121"; ctx.fillRect(en.x, en.y, en.width, en.height);
-                ctx.fillStyle = "#ff1744"; ctx.fillRect(en.x + 8, en.y + 12, 12, 12); ctx.fillRect(en.x + 25, en.y + 12, 12, 12);
-                
-                ctx.fillStyle = "#555"; ctx.fillRect(en.x, en.y - 10, en.width, 6);
-                ctx.fillStyle = "#00e676"; ctx.fillRect(en.x, en.y - 10, en.width * (en.hp / en.maxHp), 6);
-                ctx.shadowBlur = 0;
-            }
-        });
-
-        bullets.forEach(b => {
-            ctx.shadowBlur = 10; ctx.shadowColor = "#ff4081";
-            ctx.fillStyle = "#ff4081"; ctx.fillRect(b.x, b.y, b.width, b.height);
-            ctx.shadowBlur = 0;
-        });
-
-        if(player && player.trail) {
-            player.trail.forEach((t, i) => {
-                ctx.globalAlpha = (i / player.trail.length) * 0.6;
-                ctx.fillStyle = player.isRainbow ? `hsl(${t.rainbowHue}, 100%, 50%)` : player.trailColors[i % 3];
-                ctx.fillRect(t.x + 4, t.y + 4, player.width - 8, player.height - 8);
-            });
-            ctx.globalAlpha = 1.0;
-        }
-
-        if(player) {
+        // رسم الشخصية (Player)
+        if (player) {
             ctx.save();
-            ctx.translate(player.x + player.width/2, player.y + player.height);
+            ctx.translate(player.x - cameraX + player.width/2, player.y + player.height);
             ctx.scale(player.scaleX, player.scaleY);
-            
             let activeColor = player.isRainbow ? `hsl(${Date.now() * 0.3 % 360}, 100%, 55%)` : player.color;
-
-            if(player.crown) { 
-                ctx.shadowBlur = player.isRainbow ? 35 : 20; 
-                ctx.shadowColor = player.isRainbow ? `hsl(${Date.now() * 0.3 % 360}, 100%, 50%)` : "#ffea00"; 
-            }
             
-            ctx.fillStyle = "#000000"; ctx.fillRect(-player.width/2 - 4, -player.height - 4, player.width + 8, player.height + 8);
-            ctx.fillStyle = activeColor; ctx.fillRect(-player.width/2, -player.height, player.width, player.height);
-            ctx.shadowBlur = 0;
+            ctx.shadowBlur = 15; ctx.shadowColor = activeColor;
+            ctx.fillStyle = activeColor;
+            ctx.fillRect(-player.width/2, -player.height, player.width, player.height);
+            ctx.strokeStyle = "#000"; ctx.lineWidth = 3;
+            ctx.strokeRect(-player.width/2, -player.height, player.width, player.height);
 
+            // العيون
             ctx.fillStyle = player.eyesColor;
-            let eyeOffset = player.dir === 1 ? 5 : -5;
-            ctx.fillRect(-player.width/2 + 10 + eyeOffset, -player.height + 12, 10, 12);
+            let eyeOffset = player.dir === 1 ? 6 : -6;
+            ctx.fillRect(-player.width/2 + 8 + eyeOffset, -player.height + 12, 10, 12);
             ctx.fillRect(-player.width/2 + 25 + eyeOffset, -player.height + 12, 10, 12);
 
+            // التاج للشخصيات الملكية
             if(player.crown) {
                 ctx.fillStyle = "#ffcc00";
                 ctx.beginPath();
@@ -1253,9 +1195,10 @@ skinsData.push({
             ctx.restore();
         }
 
+        // جسيمات التأثيرات والنصوص العائمة
         particles.forEach(p => {
             ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
-            ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(p.x - cameraX, p.y, p.size, 0, Math.PI * 2); ctx.fill();
         });
         ctx.globalAlpha = 1.0;
 
@@ -1263,7 +1206,7 @@ skinsData.push({
             ctx.globalAlpha = ft.life; ctx.fillStyle = ft.color;
             ctx.font = "bold 22px Changa";
             ctx.shadowBlur = 4; ctx.shadowColor = "#000";
-            ctx.fillText(ft.text, ft.x, ft.y);
+            ctx.fillText(ft.text, ft.x - cameraX, ft.y);
             ctx.shadowBlur = 0;
         });
         ctx.globalAlpha = 1.0;
@@ -1271,13 +1214,12 @@ skinsData.push({
         ctx.restore();
     }
 
-    function loop() { 
-        if(!gameActive) { isLooping = false; return; }
-        update(); draw(); 
-        requestAnimationFrame(loop); 
+    function gameLoop() {
+        if (!gameActive) { isLooping = false; return; }
+        update();
+        render();
+        requestAnimationFrame(gameLoop);
     }
-    
-    setupControls();
 </script>
 </body>
 </html>
