@@ -26,7 +26,7 @@
         }
         #home-screen { justify-content: center; background: radial-gradient(circle, #201a30, #0b0b16); }
         
-        h1.title { font-size: 42px; color: #ff3d00; text-shadow: 0 0 20px rgba(255,61,0,0.8), 4px 4px #000; font-weight: 900; letter-spacing: 2px; margin-bottom: 5px; }
+        h1.title { font-size: 42px; color: #ff3d00; text-shadow: 0 0 25px rgba(255,61,0,0.9), 4px 4px #000; font-weight: 900; letter-spacing: 2px; margin-bottom: 5px; }
         h2.subtitle { font-size: 26px; color: #ffcc00; text-shadow: 2px 2px #000; margin-bottom: 15px; }
 
         .btn-main { background: #ff3d00; color: #fff; font-size: 17px; font-weight: 800; padding: 10px 25px; margin: 5px; border-radius: 40px; border: 4px solid #fff; cursor: pointer; box-shadow: 0 5px 0px #b71c1c; transition: all 0.1s; width: 280px; }
@@ -55,6 +55,35 @@
         .buy-btn, .level-btn { background: #ffcc00; color: #000; font-weight: 800; border: 2px solid #000; padding: 6px 8px; border-radius: 10px; width: 100%; cursor: pointer; margin-top: 6px; font-size: 13px; }
         .buy-btn:disabled { background: #444; color: #888; cursor: not-allowed; border-color: #222; }
         .buy-btn.equipped { background: #00e676; border-color: #fff; color: #fff; }
+
+        /* Onboarding Screen Styles (Glassmorphism) */
+        #onboarding-screen {
+            background: rgba(10, 12, 20, 0.95);
+            backdrop-filter: blur(12px);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        .onboarding-card {
+            background: rgba(255, 255, 255, 0.07);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 30px 20px;
+            max-width: 420px;
+            width: 90%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .onboarding-card h2 { color: #ff3d00; font-size: 28px; margin-bottom: 15px; text-shadow: 2px 2px #000; }
+        .onboarding-card p { color: #ddd; font-size: 16px; line-height: 1.6; margin-bottom: 20px; }
+        .dots-container { display: flex; gap: 8px; justify-content: center; margin-bottom: 20px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.3); transition: 0.3s; }
+        .dot.active { background: #ff3d00; width: 30px; border-radius: 6px; }
+        .onboarding-buttons { display: flex; gap: 10px; justify-content: center; width: 100%; max-width: 420px; }
 
         #ui-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none;
@@ -91,6 +120,24 @@
     </style>
 </head>
 <body>
+
+    <!-- Onboarding Screen (Glassmorphism) -->
+    <div id="onboarding-screen" class="screen">
+        <div class="onboarding-card">
+            <h2 id="onboarding-title">مرحباً بك في عالم المغامرة!</h2>
+            <p id="onboarding-desc">انطلق في تحديات مذهلة، واجه أعتى الزعماء، واجمع العملات والترقيات لتصبح الأسطورة الأقوى.</p>
+            <div class="dots-container">
+                <div class="dot active" id="dot-0"></div>
+                <div class="dot" id="dot-1"></div>
+                <div class="dot" id="dot-2"></div>
+            </div>
+        </div>
+        <div class="onboarding-buttons">
+            <button class="btn-main" id="onboarding-prev-btn" onclick="prevOnboardingStep()" style="background:#555; width: 100px; display:none;">السابق</button>
+            <button class="btn-main" id="onboarding-next-btn" onclick="nextOnboardingStep()" style="background:#ff3d00; width: 170px;">التالي ⏩</button>
+            <button class="btn-main" onclick="skipOnboarding()" style="background:transparent; border-color:#888; color:#aaa; width: 100px;">تخطي</button>
+        </div>
+    </div>
 
     <div id="home-screen" class="screen">
         <h1 class="title">NIGHTMARE BOSS</h1>
@@ -146,10 +193,21 @@
         <button class="btn-main btn-back" onclick="goHome()" style="margin: 8px;">العودة للبيت 🏠</button>
     </div>
 
+    <!-- شاشة الموت العادية -->
     <div id="game-over-screen" class="screen" style="justify-content: center;">
-        <h1 class="title" style="color: #f44336; text-shadow: 0 0 15px rgba(244,67,54,0.6), 4px 4px #000;">قضى عليك الزعيم!</h1>
-        <p style="font-size: 22px; margin-bottom: 15px;">النقاط المحفوظة: <span id="game-over-coins">0</span> 🪙</p>
+        <h1 class="title" style="color: #f44336; text-shadow: 0 0 15px rgba(244,67,54,0.6), 4px 4px #000;">انتهت اللعبة!</h1>
+        <p style="font-size: 22px; margin-bottom: 15px; color: #ffcc00;" id="normal-death-msg">لقد خسرت المحاولة!</p>
+        <p style="font-size: 18px; margin-bottom: 15px;">النقاط المحفوظة: <span id="game-over-coins">0</span> 🪙</p>
         <button class="btn-main btn-retry" onclick="startLevel(currentLevel)">إعادة المحاولة 🔄</button>
+        <button class="btn-main btn-back" onclick="goHome()" style="margin: 8px;">العودة للبيت 🏠</button>
+    </div>
+
+    <!-- شاشة موت الزعيم المستقلة -->
+    <div id="boss-game-over-screen" class="screen" style="justify-content: center;">
+        <h1 class="title" style="color: #d32f2f; text-shadow: 0 0 25px rgba(211,47,47,0.9), 4px 4px #000;">قضى عليك الزعيم!</h1>
+        <p style="font-size: 20px; margin-bottom: 15px; color: #ff5722;">أظهر لك الزعيم قوته المرعبة، لكن يمكنك محاربته مجدداً والانتصار عليه!</p>
+        <p style="font-size: 18px; margin-bottom: 15px;">النقاط المحفوظة: <span id="boss-game-over-coins">0</span> 🪙</p>
+        <button class="btn-main btn-retry" onclick="startLevel(currentLevel)">إعادة مواجهة الزعيم 🔄</button>
         <button class="btn-main btn-back" onclick="goHome()" style="margin: 8px;">العودة للبيت 🏠</button>
     </div>
 
@@ -184,6 +242,59 @@
     <canvas id="gameCanvas"></canvas>
 
 <script>
+    // Onboarding Steps Logic
+    let currentOnboardingStep = 0;
+    const onboardingSteps = [
+        { title: "مرحباً بك في NIGHTMARE BOSS", desc: "انطلق في مغامرة ملحمية عبر 100 مرحلة متنوعة وعوالم فخمة مليئة بالتحديات والمخاطر." },
+        { title: "القفز المزدوج والسرعة الخارقة", desc: "استخدم القفز المزدوج للوصول للمنصات العالية، واجمع معززات السرعة الخارقة لتجتاز أصعب المقاطع بثقة." },
+        { title: "واجه الزعماء الأساطير", desc: "جهز أقوى الأسلحة والشخصيات، وواجه الزعماء الضخام في معارك فاصلة تحبس الأنفاس!" }
+    ];
+
+    function updateOnboardingUI() {
+        document.getElementById('onboarding-title').innerText = onboardingSteps[currentOnboardingStep].title;
+        document.getElementById('onboarding-desc').innerText = onboardingSteps[currentOnboardingStep].desc;
+        for(let i=0; i<3; i++) {
+            document.getElementById(`dot-${i}`).classList.toggle('active', i === currentOnboardingStep);
+        }
+        document.getElementById('onboarding-prev-btn').style.display = currentOnboardingStep === 0 ? 'none' : 'block';
+        document.getElementById('onboarding-next-btn').innerText = currentOnboardingStep === 2 ? 'ابدأ اللعبة 🚀' : 'التالي ⏩';
+    }
+
+    function nextOnboardingStep() {
+        if (currentOnboardingStep < 2) {
+            currentOnboardingStep++;
+            updateOnboardingUI();
+        } else {
+            finishOnboarding();
+        }
+    }
+
+    function prevOnboardingStep() {
+        if (currentOnboardingStep > 0) {
+            currentOnboardingStep--;
+            updateOnboardingUI();
+        }
+    }
+
+    function skipOnboarding() {
+        finishOnboarding();
+    }
+
+    function finishOnboarding() {
+        localStorage.setItem('superdrix_onboarding_done', 'true');
+        document.getElementById('onboarding-screen').style.display = 'none';
+        showScreen('home-screen');
+    }
+
+    window.addEventListener('load', () => {
+        if (!localStorage.getItem('superdrix_onboarding_done')) {
+            document.getElementById('onboarding-screen').style.display = 'flex';
+            updateOnboardingUI();
+        } else {
+            showScreen('home-screen');
+        }
+    });
+
     let audioCtx;
     function initAudio() {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -286,6 +397,7 @@
     const boostersData = [
         { id: 'shield', name: 'درع الحماية السحري 🛡️', desc: 'يحميك من ضربة مميتة واحدة لكل مرحلة', cost: 5000 },
         { id: 'magnet', name: 'مغناطيس العملات 🧲', desc: 'يجذب العملات تلقائياً من مسافة قريبة', cost: 8000 },
+        { id: 'speedboost', name: 'السرعة الخارقة الدائمة ⚡', desc: 'يضاعف سرعة الحركة والركض طوال المرحلة', cost: 7000 },
         { id: 'extralife', name: 'قلب إضافي دائم ❤️', desc: 'يبدأ كل مرحلة بـ 4 قلوب بدلاً من 3', cost: 15000 }
     ];
 
@@ -312,6 +424,7 @@
     let score = 0, lives = 3, gameActive = false;
     let isLooping = false;
     let skillCooldown = 0;
+    let tempSpeedTimer = 0;
 
     function updateDisplayData() {
         document.getElementById('home-coins').innerText = totalCoins;
@@ -331,7 +444,9 @@
     }
 
     function showScreen(id) {
-        initAudio(); document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+        initAudio(); document.querySelectorAll('.screen').forEach(s => {
+            if (s.id !== 'onboarding-screen' || id === 'onboarding-screen') s.style.display = 'none';
+        });
         document.getElementById('ui-layer').style.display = 'none';
         if (id) {
             const targetScreen = document.getElementById(id);
@@ -463,15 +578,22 @@
         }
     }
 
-    function triggerGameOver() {
+    function triggerGameOver(isBossDeath) {
         gameActive = false; totalCoins += score;
-        document.getElementById('game-over-coins').innerText = score; showScreen('game-over-screen');
+        if (isBossDeath) {
+            document.getElementById('boss-game-over-coins').innerText = score;
+            showScreen('boss-game-over-screen');
+        } else {
+            document.getElementById('game-over-coins').innerText = score;
+            showScreen('game-over-screen');
+        }
     }
 
     function startLevel(lvl) {
         initAudio(); currentLevel = lvl; score = 0;
         lives = purchasedBoosters.includes('extralife') ? 4 : 3;
         skillCooldown = 0;
+        tempSpeedTimer = 0;
         
         document.getElementById('current-level-text').innerText = currentLevel;
         document.getElementById('score-val').innerText = score; 
@@ -499,22 +621,24 @@
     function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
-    let player, blocks = [], hazards = [], coins = [], enemies = [], clouds = [], particles = [], floatingTexts = [], bullets = [], bossBullets = [], finishLine = null;
+    let player, blocks = [], hazards = [], coins = [], speedBoosts = [], enemies = [], clouds = [], particles = [], floatingTexts = [], bullets = [], bossBullets = [], finishLine = null;
     let boss = null;
     let cameraX = 0, shakeTime = 0, backgroundY = 0;
     let weatherType = 'normal';
 
     function initLevel(lvl) {
-        blocks = []; hazards = []; coins = []; enemies = []; clouds = []; particles = []; floatingTexts = []; bullets = []; bossBullets = []; boss = null;
+        blocks = []; hazards = []; coins = []; speedBoosts = []; enemies = []; clouds = []; particles = []; floatingTexts = []; bullets = []; bossBullets = []; boss = null;
         let activeSkin = skinsData[currentSkinId] || skinsData[0];
         
         if (lvl <= 25) weatherType = 'normal';
-        else if (lvl <= 50) weatherType = 'rain';
+        else if (lvl <= 50) weatherType = 'rain'; // Lava World feel or Rain
         else if (lvl <= 75) weatherType = 'sunset';
-        else weatherType = 'snow';
+        else weatherType = 'snow'; // Space / Night feel
+
+        let baseSpeed = purchasedBoosters.includes('speedboost') ? 9.5 : 6.5;
 
         player = { 
-            x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0, speed: 6.5, jumpForce: -13.5, grounded: false, canDoubleJump: true, dir: 1, trail: [], 
+            x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0, speed: baseSpeed, jumpForce: -13.5, grounded: false, canDoubleJump: true, dir: 1, trail: [], 
             color: activeSkin.color, eyesColor: activeSkin.eyes, trailColors: activeSkin.trail, crown: activeSkin.crown, isRainbow: activeSkin.isRainbow, scaleX: 1, scaleY: 1 
         };
         
@@ -551,7 +675,7 @@
 
             if (cursorX < finishLine.x - 300) {
                 let gapWidth = 110 + Math.min(lvl * 1.5, 70);
-                let hazardType = Math.random() > 0.5 ? 'lava' : 'water';
+                let hazardType = (lvl >= 26 && lvl <= 50) ? 'lava' : (Math.random() > 0.5 ? 'lava' : 'water');
                 hazards.push({ x: cursorX, y: canvas.height - 60, width: gapWidth, height: 60, type: hazardType });
                 cursorX += gapWidth;
             }
@@ -564,6 +688,10 @@
             blocks.push({ x: i, y: canvas.height - 280 - Math.random() * 100, width: 140, height: 35, type: chosenType });
             coins.push({ x: i + 55, y: canvas.height - 380, width: 28, height: 28, collected: false, float: Math.random() * Math.PI });
             
+            if (Math.random() > 0.6) {
+                speedBoosts.push({ x: i + 90, y: canvas.height - 330, width: 30, height: 30, collected: false });
+            }
+
             if (Math.random() > 0.2) {
                 enemies.push({ x: i + 80, y: canvas.height - 170, width: 45, height: 45, vx: 2 + (lvl * 0.04), minX: i, maxX: i + 220, hp: 40 + (lvl * 8), maxHp: 40 + (lvl * 8), alive: true });
             }
@@ -687,6 +815,13 @@
             if (skillCooldown === 0) document.getElementById('btn-skill').classList.remove('cooldown');
         }
 
+        if (tempSpeedTimer > 0) {
+            tempSpeedTimer--;
+            player.speed = 10.5;
+        } else {
+            player.speed = purchasedBoosters.includes('speedboost') ? 9.5 : 6.5;
+        }
+
         player.scaleX += (1 - player.scaleX) * 0.15;
         player.scaleY += (1 - player.scaleY) * 0.15;
 
@@ -730,7 +865,7 @@
 
         hazards.forEach(hz => {
             if (player.x + player.width > hz.x + 15 && player.x < hz.x + hz.width - 15 && player.y + player.height >= hz.y + 15) {
-                applyDamage(hz.type === 'lava' ? '#ff3d00' : '#03a9f4', hz.x - 120);
+                applyDamage(hz.type === 'lava' ? '#ff3d00' : '#03a9f4', hz.x - 120, false);
             }
         });
 
@@ -760,14 +895,14 @@
             document.getElementById('boss-hp-bar').style.width = hpPercent + '%';
 
             if (player.x + player.width > boss.x && player.x < boss.x + boss.width && player.y + player.height > boss.y && player.y < boss.y + boss.height) {
-                applyDamage('#ff3d00', boss.x - 120);
+                applyDamage('#ff3d00', boss.x - 120, true);
             }
         }
 
         bossBullets.forEach((bb, idx) => {
             if (player.x + player.width > bb.x && player.x < bb.x + bb.width && player.y + player.height > bb.y && player.y < bb.y + bb.height) {
                 bossBullets.splice(idx, 1);
-                applyDamage('#ff3d00', player.x - 80);
+                applyDamage('#ff3d00', player.x - 80, true);
             }
         });
 
@@ -812,7 +947,17 @@
             if (!en.alive) return;
             en.x += en.vx; if (en.x < en.minX || en.x > en.maxX) en.vx *= -1;
             if (player.x + player.width > en.x && player.x < en.x + en.width && player.y + player.height > en.y && player.y < en.y + en.height) {
-                applyDamage(player.color, player.x + (player.x < en.x ? -60 : 60));
+                applyDamage(player.color, player.x + (player.x < en.x ? -60 : 60), false);
+            }
+        });
+
+        speedBoosts.forEach(sb => {
+            if (!sb.collected && player.x + player.width > sb.x && player.x < sb.x + sb.width && player.y + player.height > sb.y && player.y < sb.y + sb.height) {
+                sb.collected = true;
+                tempSpeedTimer = 350; // Speed boost duration
+                playSound('coin');
+                createParticles(sb.x + 15, sb.y + 15, '#00bcd4', 20);
+                createFloatingText(sb.x, sb.y, "سرعة خارقة! ⚡", "#00bcd4");
             }
         });
 
@@ -835,7 +980,7 @@
         });
 
         if (player.y > canvas.height) {
-            applyDamage('#ff3d00', cameraX + 150);
+            applyDamage('#ff3d00', cameraX + 150, false);
         }
 
         if (finishLine && player.x + player.width > finishLine.x && player.x < finishLine.x + finishLine.width) {
@@ -853,7 +998,7 @@
         backgroundY = Math.sin(Date.now() * 0.0005) * 10;
     }
 
-    function applyDamage(particleColor, respawnX) {
+    function applyDamage(particleColor, respawnX, isBossDamage) {
         playSound('hit');
         if (purchasedBoosters.includes('shield')) {
             purchasedBoosters = purchasedBoosters.filter(b => b !== 'shield');
@@ -866,7 +1011,9 @@
         lives--; document.getElementById('lives-val').innerText = lives;
         shakeTime = 30; player.x = respawnX; player.y = 50; player.vy = 0;
         createParticles(player.x, player.y, particleColor, 25);
-        if (lives <= 0) { triggerGameOver(); }
+        if (lives <= 0) { 
+            triggerGameOver(isBossDamage); 
+        }
     }
 
     function draw() {
@@ -881,9 +1028,9 @@
         if (weatherType === 'sunset') {
             skyGradient.addColorStop(0, "#d32f2f"); skyGradient.addColorStop(1, "#fbc02d");
         } else if (weatherType === 'rain') {
-            skyGradient.addColorStop(0, "#263238"); skyGradient.addColorStop(1, "#455a64");
+            skyGradient.addColorStop(0, "#3e2723"); skyGradient.addColorStop(1, "#bf360c"); // Lava World Background Theme
         } else if (weatherType === 'snow') {
-            skyGradient.addColorStop(0, "#37474f"); skyGradient.addColorStop(1, "#cfd8dc");
+            skyGradient.addColorStop(0, "#0b0b16"); skyGradient.addColorStop(1, "#1a0033"); // Space / Night World Theme
         } else {
             skyGradient.addColorStop(0, "#1976d2"); skyGradient.addColorStop(1, "#64b5f6");
         }
@@ -908,19 +1055,12 @@
             ctx.arc(cx + cl.size * 0.8, cl.y, cl.size * 0.45, 0, Math.PI * 2); ctx.fill();
         });
 
-        if (weatherType === 'rain') {
-            ctx.strokeStyle = "rgba(255,255,255,0.6)"; ctx.lineWidth = 2;
+        if (weatherType === 'snow') { // Starry Space Effect
+            ctx.fillStyle = "#ffffff";
             for(let i = 0; i < 60; i++) {
-                let rX = (cameraX + (i * 150) + (Date.now() * 0.5) % canvas.width);
-                let rY = (i * 70 + (Date.now() * 1.5)) % canvas.height;
-                ctx.beginPath(); ctx.moveTo(rX, rY); ctx.lineTo(rX - 5, rY + 15); ctx.stroke();
-            }
-        } else if (weatherType === 'snow') {
-            ctx.fillStyle = "rgba(255,255,255,0.8)";
-            for(let i = 0; i < 50; i++) {
-                let sX = (cameraX + (i * 120) + Math.sin(Date.now()*0.002 + i)*30) % (canvas.width + cameraX + 500);
-                let sY = ((i * 50) + (Date.now() * 0.2)) % canvas.height;
-                ctx.beginPath(); ctx.arc(sX, sY, 3 + (i % 3), 0, Math.PI*2); ctx.fill();
+                let sX = (cameraX + (i * 130)) % (canvas.width + cameraX + 500);
+                let sY = (i * 45) % canvas.height;
+                ctx.beginPath(); ctx.arc(sX, sY, 2 + (i % 2), 0, Math.PI*2); ctx.fill();
             }
         }
 
@@ -1002,6 +1142,15 @@
                 
                 ctx.fillStyle = pColor; ctx.fillRect(b.x, b.y, b.width, b.height);
                 ctx.strokeStyle = bColor; ctx.lineWidth = 4; ctx.strokeRect(b.x, b.y, b.width, b.height);
+            }
+        });
+
+        speedBoosts.forEach(sb => {
+            if (!sb.collected) {
+                ctx.shadowBlur = 15; ctx.shadowColor = "#00bcd4";
+                ctx.fillStyle = "#00bcd4"; ctx.fillRect(sb.x, sb.y, sb.width, sb.height);
+                ctx.fillStyle = "#fff"; ctx.font = "16px Changa"; ctx.fillText("⚡", sb.x + 5, sb.y + 22);
+                ctx.shadowBlur = 0;
             }
         });
 
@@ -1102,7 +1251,6 @@
     }
     
     setupControls();
-    goHome();
 </script>
 </body>
 </html>
