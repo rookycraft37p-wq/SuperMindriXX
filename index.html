@@ -19,41 +19,38 @@
         body, html { width: 100%; height: 100%; overflow: hidden; background: #1a1a2e; font-family: 'Changa', sans-serif; }
         canvas { display: block; }
 
+        /* تم تعديل الشاشات لتسمح بالتمرير الطبيعي على الموبايل من الأعلى للأسفل */
         .screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 20, 30, 0.96);
-            z-index: 30; display: none; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center;
-            overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 20, 30, 0.98);
+            z-index: 30; display: none; flex-direction: column; justify-content: flex-start; align-items: center; color: white; text-align: center;
+            overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 30px 15px;
         }
-        #home-screen { display: flex; background: radial-gradient(circle, #2b2b4e, #1a1a2e); }
+        #home-screen { justify-content: center; background: radial-gradient(circle, #2b2b4e, #1a1a2e); }
         
         h1.title { font-size: 50px; color: #00e676; text-shadow: 0 0 15px rgba(0,230,118,0.6), 4px 4px #000; font-weight: 900; letter-spacing: 2px; margin-bottom: 5px; }
-        h2.subtitle { font-size: 32px; color: #ffcc00; text-shadow: 2px 2px #000; margin-bottom: 15px; }
+        h2.subtitle { font-size: 32px; color: #ffcc00; text-shadow: 2px 2px #000; margin-bottom: 20px; }
 
         .btn-main { background: #00e676; color: #000; font-size: 20px; font-weight: 800; padding: 12px 30px; margin: 8px; border-radius: 40px; border: 4px solid #fff; cursor: pointer; box-shadow: 0 6px 0px #00793c; transition: all 0.1s; width: 280px; }
         .btn-main:active { transform: translateY(6px); box-shadow: 0 0px 0px #00793c; }
         .btn-shop { background: #ff9800; box-shadow: 0 6px 0px #e65100; color: #fff; text-shadow: 1px 1px 2px #000;}
         .btn-levels { background: #03a9f4; box-shadow: 0 6px 0px #01579b; color: #fff; }
-        .btn-back { background: #f44336; box-shadow: 0 6px 0px #b71c1c; margin-top: 20px; color: #fff; }
+        .btn-back { background: #f44336; box-shadow: 0 6px 0px #b71c1c; margin: 30px 0; color: #fff; }
         .btn-retry { background: #ffcc00; box-shadow: 0 6px 0px #f57f17; }
 
-        .grid-container { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; max-width: 850px; padding: 10px; }
+        .grid-container { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; max-width: 850px; padding: 10px; margin-bottom: 20px; }
         
         .card { background: rgba(255,255,255,0.08); border: 3px solid #555; border-radius: 15px; padding: 12px; width: 150px; text-align: center; backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); position: relative; transition: 0.2s; }
         .card.locked { opacity: 0.4; filter: grayscale(100%); pointer-events: none; }
         .card-title { font-size: 15px; margin-bottom: 5px; font-weight: bold; text-shadow: 1px 1px #000; }
         
         .card.tier-rare { border-color: #00bcd4; box-shadow: 0 0 10px rgba(0,188,212,0.5); }
-        .card.tier-epic { border-color: #9c27b0; box-shadow: 0 0 15px rgba(156,39,176,0.6); animation: pulseCard 2s infinite alternate; }
-        .card.tier-legendary { border-color: #ff4500; box-shadow: 0 0 25px rgba(255,69,0,0.8), 0 0 40px #ffea00; animation: fireCard 1.5s infinite alternate; }
-        
-        /* تأثير خاص للشخصية رقم 100 (قوس قزح متوهج) */
+        .card.tier-epic { border-color: #9c27b0; box-shadow: 0 0 15px rgba(156,39,176,0.6); }
+        .card.tier-legendary { border-color: #ff4500; box-shadow: 0 0 25px rgba(255,69,0,0.8), 0 0 40px #ffea00; }
         .card.tier-rainbow { border-color: #ff00ff; box-shadow: 0 0 30px #00ffff, 0 0 50px #ff00ff; animation: rainbowGlow 2s infinite linear; }
 
-        @keyframes pulseCard { 0% { transform: scale(1); } 100% { transform: scale(1.03); } }
-        @keyframes fireCard { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(45deg); } }
         @keyframes rainbowGlow { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
 
-        .buy-btn, .level-btn { background: #ffcc00; color: #000; font-weight: 800; border: 2px solid #000; padding: 6px 8px; border-radius: 10px; width: 100%; cursor: pointer; margin-top: 6px; font-size: 14px; transition: 0.1s;}
+        .buy-btn, .level-btn { background: #ffcc00; color: #000; font-weight: 800; border: 2px solid #000; padding: 6px 8px; border-radius: 10px; width: 100%; cursor: pointer; margin-top: 6px; font-size: 14px; }
         .buy-btn:disabled { background: #444; color: #888; cursor: not-allowed; border-color: #222; }
         .buy-btn.equipped { background: #00e676; border-color: #fff; color: #fff; }
 
@@ -66,22 +63,22 @@
         .hud-group { display: flex; gap: 10px; align-items: center; }
         
         .score-box { background: rgba(0, 0, 0, 0.75); color: #ffcc00; padding: 5px 15px; border-radius: 20px; font-size: 18px; font-weight: 900; border: 2px solid #fff; display: flex; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
-        .home-icon-btn { font-size: 18px; background: #fff; border: 2px solid #111; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 0px #111; transition: 0.1s;}
+        .home-icon-btn { font-size: 18px; background: #fff; border: 2px solid #111; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 0px #111; }
         .home-icon-btn:active { transform: translateY(4px); box-shadow: 0 0px 0px #111; }
 
-        .level-indicator { background: rgba(0,0,0,0.8); color: #fff; padding: 3px 20px; border-radius: 20px; font-size: 16px; font-weight: bold; border: 2px solid #00e676; margin: 10px auto 0; width: fit-content; box-shadow: 0 0 10px rgba(0,230,118,0.4); text-shadow: 1px 1px #000; }
+        .level-indicator { background: rgba(0,0,0,0.8); color: #fff; padding: 3px 20px; border-radius: 20px; font-size: 16px; font-weight: bold; border: 2px solid #00e676; margin: 10px auto 0; width: fit-content; text-shadow: 1px 1px #000; }
 
         .controls-bar {
             position: absolute; bottom: 25px; width: 100%; left: 0; display: flex; justify-content: space-between; padding: 0 25px; z-index: 20; pointer-events: auto; direction: ltr;
         }
         .control-group { display: flex; gap: 15px; }
         .control-btn {
-            width: 75px; height: 75px; background: rgba(255, 255, 255, 0.85); border: 4px solid #111; border-radius: 50%; font-size: 30px; font-weight: bold; color: #111; display: flex; justify-content: center; align-items: center; box-shadow: 0 6px 0px rgba(0,0,0,0.6); cursor: pointer; backdrop-filter: blur(5px);
+            width: 75px; height: 75px; background: rgba(255, 255, 255, 0.85); border: 4px solid #111; border-radius: 50%; font-size: 30px; font-weight: bold; color: #111; display: flex; justify-content: center; align-items: center; box-shadow: 0 6px 0px rgba(0,0,0,0.6); cursor: pointer;
         }
         .control-btn:active { transform: translateY(6px); box-shadow: 0 0px 0px rgba(0,0,0,0.6); background: #ccc; }
         #btn-jump { background: #ffcc00; color: #111; }
 
-        #total-coins-display { font-size: 22px; color: #ffcc00; font-weight: bold; margin-bottom: 15px; background: rgba(0,0,0,0.6); padding: 8px 20px; border-radius: 25px; border: 2px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        #total-coins-display { font-size: 20px; color: #ffcc00; font-weight: bold; margin-bottom: 15px; background: rgba(0,0,0,0.6); padding: 6px 15px; border-radius: 20px; border: 2px solid #fff; }
     </style>
 </head>
 <body>
@@ -106,18 +103,18 @@
         <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
     </div>
 
-    <div id="win-screen" class="screen">
+    <div id="win-screen" class="screen" style="justify-content: center;">
         <h1 class="title" style="color: #00e676;">اكتملت المرحلة!</h1>
         <p style="font-size: 24px; margin-bottom: 15px;">جمعت: <span id="win-coins">0</span> 🪙</p>
         <button class="btn-main" onclick="nextLevel()">المرحلة التالية ⏩</button>
-        <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
+        <button class="btn-main btn-back" onclick="goHome()" style="margin: 8px;">العودة للبيت 🏠</button>
     </div>
 
-    <div id="game-over-screen" class="screen">
+    <div id="game-over-screen" class="screen" style="justify-content: center;">
         <h1 class="title" style="color: #f44336; text-shadow: 0 0 15px rgba(244,67,54,0.6), 4px 4px #000;">انتهت المحاولات!</h1>
         <p style="font-size: 22px; margin-bottom: 15px;">النقاط المحفوظة: <span id="game-over-coins">0</span> 🪙</p>
         <button class="btn-main btn-retry" onclick="startLevel(currentLevel)">إعادة المحاولة 🔄</button>
-        <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
+        <button class="btn-main btn-back" onclick="goHome()" style="margin: 8px;">العودة للبيت 🏠</button>
     </div>
 
     <div id="ui-layer">
@@ -181,10 +178,9 @@
         }
     });
 
-    // توليد 100 شخصية (الشخصية رقم 100 مخصصة بقوس قزح وتأثيرات أسطورية خارقة)
     const skinsData = [];
     for (let i = 0; i < 100; i++) {
-        let cost = i === 0 ? 0 : (i === 99 ? 20000 : i * 150);
+        let cost = i === 0 ? 0 : (i === 99 ? 15000 : i * 150);
         let tierClass = "tier-common";
         let tierName = "عادي";
         let crown = false;
@@ -217,7 +213,7 @@
     }
 
     const maxLevels = 100;
-    let totalCoins = parseInt(localStorage.getItem('superdrix_coins')) || 50000; // رصيد كافي لتجربة السكن
+    let totalCoins = parseInt(localStorage.getItem('superdrix_coins')) || 50000;
     let unlockedLevels = parseInt(localStorage.getItem('superdrix_unlocked_levels')) || 1;
     let unlockedSkins = JSON.parse(localStorage.getItem('superdrix_skins')) || [0];
     let currentSkinId = parseInt(localStorage.getItem('superdrix_current_skin')) || 0;
@@ -238,7 +234,11 @@
     function showScreen(id) {
         initAudio(); document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
         document.getElementById('ui-layer').style.display = 'none';
-        if (id) document.getElementById(id).style.display = 'flex';
+        if (id) {
+            const targetScreen = document.getElementById(id);
+            targetScreen.style.display = 'flex';
+            targetScreen.scrollTop = 0; // إعادة التمرير للأعلى عند فتح الشاشة
+        }
         updateDisplayData();
     }
 
@@ -586,7 +586,6 @@
             }
         });
 
-        // رسم أثر الحركة (ألوان قوس قزح تتطاير خلف الشخصية الأسطورية)
         if(player && player.trail) {
             player.trail.forEach((t, i) => {
                 ctx.globalAlpha = (i / player.trail.length) * 0.6;
@@ -596,7 +595,6 @@
             ctx.globalAlpha = 1.0;
         }
 
-        // رسم الشخصية نفسها مع تأثير الألوان المتغيرة لقوس قزح
         if(player) {
             ctx.save();
             ctx.translate(player.x + player.width/2, player.y + player.height);
@@ -613,13 +611,11 @@
             ctx.fillStyle = activeColor; ctx.fillRect(-player.width/2, -player.height, player.width, player.height);
             ctx.shadowBlur = 0;
 
-            // العيون
             ctx.fillStyle = player.eyesColor;
             let eyeOffset = player.dir === 1 ? 5 : -5;
             ctx.fillRect(-player.width/2 + 10 + eyeOffset, -player.height + 12, 10, 12);
             ctx.fillRect(-player.width/2 + 25 + eyeOffset, -player.height + 12, 10, 12);
 
-            // التاج الملكي الأسطوري
             if(player.crown) {
                 ctx.fillStyle = "#ffcc00";
                 ctx.beginPath();
