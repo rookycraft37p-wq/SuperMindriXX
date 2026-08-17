@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Super Mindrix Pro - 100 Levels & 50 Weapons</title>
+    <title>Super Mindrix Pro - Hardcore Progress</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Changa:wght@700;800&display=swap');
         
@@ -94,18 +94,16 @@
         <button class="btn-main btn-promo" onclick="openPromoScreen()">🎁 استرداد الأكواد</button>
     </div>
 
-    <!-- شاشة استرداد الأكواد -->
     <div id="promo-screen" class="screen" style="justify-content: center;">
         <h2 class="subtitle">استرداد الأكواد والجوائز</h2>
-        <p style="margin-bottom: 20px; color: #ddd; font-size: 16px;">أدخل الكود الخاص هنا للحصول على مكافآت ضخمة:</p>
-        <input type="text" id="promo-input" placeholder="مثال: SUPER100K" style="padding: 12px 20px; font-size: 20px; border-radius: 20px; border: 3px solid #00e676; background: rgba(0,0,0,0.5); color: #fff; text-align: center; width: 280px; margin-bottom: 15px; font-family: 'Changa', sans-serif; outline: none; text-transform: uppercase;">
+        <p style="margin-bottom: 20px; color: #ddd; font-size: 16px;">أدخل الكود الخاص هنا للحصول على مكافآت:</p>
+        <input type="text" id="promo-input" placeholder="ادخل الكود هنا" style="padding: 12px 20px; font-size: 20px; border-radius: 20px; border: 3px solid #00e676; background: rgba(0,0,0,0.5); color: #fff; text-align: center; width: 280px; margin-bottom: 15px; font-family: 'Changa', sans-serif; outline: none; text-transform: uppercase;">
         <br>
         <button class="btn-main" onclick="redeemCode()" style="background: #00e676; width: 280px; margin-bottom: 10px;">تفعيل الكود 🎯</button>
         <p id="promo-msg" style="font-size: 18px; margin-top: 15px; font-weight: bold; min-height: 30px;"></p>
         <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
     </div>
 
-    <!-- شاشة متجر الأسلحة -->
     <div id="weapons-shop-screen" class="screen">
         <h2 class="subtitle">متجر الأسلحة المتطورة (50 سلاحاً)</h2>
         <div id="total-coins-display">رصيدك: 🪙 <span id="weapons-coins">0</span></div>
@@ -211,7 +209,7 @@
     // بيانات الـ 100 شخصية
     const skinsData = [];
     for (let i = 0; i < 100; i++) {
-        let cost = i === 0 ? 0 : (i === 99 ? 0 : i * 150);
+        let cost = i === 0 ? 0 : (i * 200);
         let tierClass = "tier-common";
         let tierName = "عادي";
         let crown = false;
@@ -221,7 +219,7 @@
             tierClass = "tier-rainbow"; tierName = "ملك الألوان 🌈👑"; crown = true; isRainbow = true;
         } else if (i >= 85) { tierClass = "tier-legendary"; tierName = "أسطوري 🔥"; crown = true; }
         else if (i >= 50) { tierClass = "tier-epic"; tierName = "ملحمي 💎"; }
-        else if (i >= 25) { tierClass, tierName = "نادر ✨"; }
+        else if (i >= 25) { tierName = "نادر ✨"; }
 
         let name = i === 0 ? "رُوكْ فِيكْس" : (i === 99 ? "الملك قوس قزح 👑" : `شخصية ${i + 1}`);
         let color = isRainbow ? '#ff0000' : `hsl(${i * 3.6}, 85%, 55%)`;
@@ -233,11 +231,11 @@
         });
     }
 
-    // بيانات الـ 50 سلاحاً لإطلاق النار ومضاعفة العملات
+    // بيانات الـ 50 سلاحاً
     const weaponsData = [];
     for (let i = 0; i < 50; i++) {
-        let cost = i === 0 ? 0 : (i === 49 ? 0 : i * 1000);
-        let coinMultiplier = i + 1; // كلما كان السلاح أعلى، زادت مضاعفة العملات عند القضاء على الوحش
+        let cost = i === 0 ? 0 : (i * 1000);
+        let coinMultiplier = i + 1; 
         let damage = (i + 1) * 15;
         let tierName = "عادي";
         let tierClass = "tier-common";
@@ -260,15 +258,13 @@
     }
 
     const maxLevels = 100;
-    let totalCoins = parseInt(localStorage.getItem('superdrix_coins')) || 500;
+    let totalCoins = parseInt(localStorage.getItem('superdrix_coins')) || 0;
     let unlockedLevels = parseInt(localStorage.getItem('superdrix_unlocked_levels')) || 1;
     
-    let unlockedSkins = JSON.parse(localStorage.getItem('superdrix_skins')) || [0, 99];
-    if(!unlockedSkins.includes(99)) unlockedSkins.push(99);
+    let unlockedSkins = JSON.parse(localStorage.getItem('superdrix_skins')) || [0];
     let currentSkinId = parseInt(localStorage.getItem('superdrix_current_skin')) || 0;
 
-    let unlockedWeapons = JSON.parse(localStorage.getItem('superdrix_weapons')) || [0, 49];
-    if(!unlockedWeapons.includes(49)) unlockedWeapons.push(49);
+    let unlockedWeapons = JSON.parse(localStorage.getItem('superdrix_weapons')) || [0];
     let currentWeaponId = parseInt(localStorage.getItem('superdrix_current_weapon')) || 0;
 
     const validPromoCodes = {
@@ -480,7 +476,6 @@
             coins.push({ x: i + 55, y: canvas.height - 380, width: 28, height: 28, collected: false, float: Math.random() * Math.PI });
             
             if (Math.random() > 0.2) {
-                // الوحوش بصحة تعتمد على مستواها
                 enemies.push({ x: i + 80, y: canvas.height - 170, width: 45, height: 45, vx: 2 + (lvl * 0.05), minX: i, maxX: i + 250, hp: 50 + (lvl * 10), maxHp: 50 + (lvl * 10), alive: true });
             }
         }
@@ -574,7 +569,6 @@
             if (player.trail.length > 10) player.trail.shift();
         } else if (player.trail.length > 0) player.trail.shift();
 
-        // تحديث الرصاص
         bullets.forEach(b => { b.x += b.vx; });
         bullets = bullets.filter(b => Math.abs(b.x - player.x) < 1200);
 
@@ -604,7 +598,6 @@
             }
         });
 
-        // تصادم الرصاص مع الوحوش وإعطاء عملات بناءً على قوة السلاح
         bullets.forEach((b, bIdx) => {
             enemies.forEach(en => {
                 if (en.alive && b.x > en.x && b.x < en.x + en.width && b.y > en.y && b.y < en.y + en.height) {
@@ -614,7 +607,7 @@
 
                     if (en.hp <= 0) {
                         en.alive = false;
-                        let earnedCoins = 50 * b.coinMultiplier; // السلاح الأقوى يعطي كمية عملات مضاعفة بكثير
+                        let earnedCoins = 50 * b.coinMultiplier;
                         score += earnedCoins;
                         document.getElementById('score-val').innerText = score;
                         playSound('coin');
@@ -746,14 +739,12 @@
                 ctx.fillStyle = "#212121"; ctx.fillRect(en.x, en.y, en.width, en.height);
                 ctx.fillStyle = "#ff1744"; ctx.fillRect(en.x + 8, en.y + 12, 12, 12); ctx.fillRect(en.x + 25, en.y + 12, 12, 12);
                 
-                // شريط صحة الوحش
                 ctx.fillStyle = "#555"; ctx.fillRect(en.x, en.y - 10, en.width, 6);
                 ctx.fillStyle = "#00e676"; ctx.fillRect(en.x, en.y - 10, en.width * (en.hp / en.maxHp), 6);
                 ctx.shadowBlur = 0;
             }
         });
 
-        // رسم الرصاص
         bullets.forEach(b => {
             ctx.shadowBlur = 10; ctx.shadowColor = "#ff4081";
             ctx.fillStyle = "#ff4081"; ctx.fillRect(b.x, b.y, b.width, b.height);
