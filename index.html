@@ -38,18 +38,20 @@
 
         .grid-container { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; max-width: 850px; padding: 10px; }
         
-        /* تصميم كارد الشخصيات والمراحل مع دعم التأثيرات الفخمة */
         .card { background: rgba(255,255,255,0.08); border: 3px solid #555; border-radius: 15px; padding: 12px; width: 150px; text-align: center; backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); position: relative; transition: 0.2s; }
         .card.locked { opacity: 0.4; filter: grayscale(100%); pointer-events: none; }
         .card-title { font-size: 15px; margin-bottom: 5px; font-weight: bold; text-shadow: 1px 1px #000; }
         
-        /* تأثيرات الفئات الفخمة للشخصيات بناءً على السعر */
         .card.tier-rare { border-color: #00bcd4; box-shadow: 0 0 10px rgba(0,188,212,0.5); }
         .card.tier-epic { border-color: #9c27b0; box-shadow: 0 0 15px rgba(156,39,176,0.6); animation: pulseCard 2s infinite alternate; }
         .card.tier-legendary { border-color: #ff4500; box-shadow: 0 0 25px rgba(255,69,0,0.8), 0 0 40px #ffea00; animation: fireCard 1.5s infinite alternate; }
+        
+        /* تأثير خاص للشخصية رقم 100 (قوس قزح متوهج) */
+        .card.tier-rainbow { border-color: #ff00ff; box-shadow: 0 0 30px #00ffff, 0 0 50px #ff00ff; animation: rainbowGlow 2s infinite linear; }
 
         @keyframes pulseCard { 0% { transform: scale(1); } 100% { transform: scale(1.03); } }
         @keyframes fireCard { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(45deg); } }
+        @keyframes rainbowGlow { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
 
         .buy-btn, .level-btn { background: #ffcc00; color: #000; font-weight: 800; border: 2px solid #000; padding: 6px 8px; border-radius: 10px; width: 100%; cursor: pointer; margin-top: 6px; font-size: 14px; transition: 0.1s;}
         .buy-btn:disabled { background: #444; color: #888; cursor: not-allowed; border-color: #222; }
@@ -179,36 +181,43 @@
         }
     });
 
-    // توليد 100 شخصية ديناميكياً بأسعار تصاعدية وتأثيرات فخمة تزيد كلما ارتفع السعر
+    // توليد 100 شخصية (الشخصية رقم 100 مخصصة بقوس قزح وتأثيرات أسطورية خارقة)
     const skinsData = [];
     for (let i = 0; i < 100; i++) {
-        let cost = i === 0 ? 0 : i * 150;
+        let cost = i === 0 ? 0 : (i === 99 ? 20000 : i * 150);
         let tierClass = "tier-common";
         let tierName = "عادي";
         let crown = false;
+        let isRainbow = false;
         
-        if (i >= 25 && i < 50) { tierClass = "tier-rare"; tierName = "نادر ✨"; }
-        else if (i >= 50 && i < 85) { tierClass = "tier-epic"; tierName = "ملحمي 💎"; }
-        else if (i >= 85) { tierClass = "tier-legendary"; tierName = "أسطوري 🔥"; crown = true; }
+        if (i === 99) {
+            tierClass = "tier-rainbow";
+            tierName = "ملك الألوان 🌈👑";
+            crown = true;
+            isRainbow = true;
+        } else if (i >= 85) { tierClass = "tier-legendary"; tierName = "أسطوري 🔥"; crown = true; }
+        else if (i >= 50) { tierClass = "tier-epic"; tierName = "ملحمي 💎"; }
+        else if (i >= 25) { tierClass = "tier-rare"; tierName = "نادر ✨"; }
 
-        let name = i === 0 ? "رُوكْ فِيكْس" : (i === 6 ? "Banan_FF" : (i === 7 ? "أم الدويس" : `شخصية ${i + 1}`));
-        let color = `hsl(${i * 3.6}, 85%, 55%)`;
+        let name = i === 0 ? "رُوكْ فِيكْس" : (i === 99 ? "الملك قوس قزح 👑" : `شخصية ${i + 1}`);
+        let color = isRainbow ? '#ff0000' : `hsl(${i * 3.6}, 85%, 55%)`;
 
         skinsData.push({
             id: i,
             name: name,
             cost: cost,
             color: color,
-            eyes: i % 2 === 0 ? '#ffffff' : '#ffeb3b',
+            eyes: '#ffeb3b',
             trail: [color, '#ffffff', '#ff9999'],
             crown: crown,
+            isRainbow: isRainbow,
             tierName: tierName,
             cardClass: tierClass
         });
     }
 
     const maxLevels = 100;
-    let totalCoins = parseInt(localStorage.getItem('superdrix_coins')) || 5000;
+    let totalCoins = parseInt(localStorage.getItem('superdrix_coins')) || 50000; // رصيد كافي لتجربة السكن
     let unlockedLevels = parseInt(localStorage.getItem('superdrix_unlocked_levels')) || 1;
     let unlockedSkins = JSON.parse(localStorage.getItem('superdrix_skins')) || [0];
     let currentSkinId = parseInt(localStorage.getItem('superdrix_current_skin')) || 0;
@@ -249,7 +258,7 @@
             grid.innerHTML += `
                 <div class="card ${skin.cardClass}">
                     <div style="font-size:11px; color:#ffcc00; margin-bottom:3px;">#${skin.id + 1} (${skin.tierName})</div>
-                    <div style="width: 45px; height: 45px; background:${skin.color}; margin: 0 auto 8px; border: 3px solid #000; border-radius: 8px; position:relative; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">
+                    <div style="width: 45px; height: 45px; background:${skin.isRainbow ? 'linear-gradient(45deg, red, yellow, green, cyan, magenta)' : skin.color}; margin: 0 auto 8px; border: 3px solid #000; border-radius: 8px; position:relative; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">
                         ${skin.crown ? '<div style="position:absolute; top:-16px; left:10px; font-size:18px; text-shadow: 1px 1px 0 #000;">👑</div>' : ''}
                     </div>
                     <div class="card-title">${skin.name}</div>
@@ -313,7 +322,10 @@
         blocks = []; hazards = []; coins = []; enemies = []; clouds = []; particles = []; floatingTexts = [];
         let activeSkin = skinsData[currentSkinId] || skinsData[0];
         
-        player = { x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0, speed: 6.5, jumpForce: -14.5, grounded: false, dir: 1, trail: [], color: activeSkin.color, eyesColor: activeSkin.eyes, trailColors: activeSkin.trail, crown: activeSkin.crown, scaleX: 1, scaleY: 1 };
+        player = { 
+            x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0, speed: 6.5, jumpForce: -14.5, grounded: false, dir: 1, trail: [], 
+            color: activeSkin.color, eyesColor: activeSkin.eyes, trailColors: activeSkin.trail, crown: activeSkin.crown, isRainbow: activeSkin.isRainbow, scaleX: 1, scaleY: 1 
+        };
         
         let levelLength = 3000 + (lvl * 300);
         finishLine = { x: levelLength - 300, y: canvas.height - 350, width: 80, height: 270 };
@@ -388,7 +400,8 @@
                     player.vy = player.jumpForce; player.grounded = false; 
                     player.scaleX = 0.7; player.scaleY = 1.3;
                     playSound('jump'); 
-                    createParticles(player.x + player.width/2, player.y + player.height, '#ffffff', 10); 
+                    let pColor = player.isRainbow ? `hsl(${Date.now() % 360}, 100%, 50%)` : '#ffffff';
+                    createParticles(player.x + player.width/2, player.y + player.height, pColor, 12); 
                 }
             };
             jumpBtn.addEventListener('touchstart', triggerJump);
@@ -413,8 +426,8 @@
         player.grounded = false;
 
         if (Math.abs(player.vx) > 0 || player.vy !== 0) {
-            player.trail.push({ x: player.x, y: player.y });
-            if (player.trail.length > 8) player.trail.shift();
+            player.trail.push({ x: player.x, y: player.y, rainbowHue: Date.now() % 360 });
+            if (player.trail.length > 10) player.trail.shift();
         } else if (player.trail.length > 0) player.trail.shift();
 
         particles.forEach(p => { p.vy += 0.3; p.x += p.vx; p.y += p.vy; p.life -= 0.03; p.size *= 0.95; });
@@ -573,30 +586,40 @@
             }
         });
 
-        if(player && player.trailColors) {
+        // رسم أثر الحركة (ألوان قوس قزح تتطاير خلف الشخصية الأسطورية)
+        if(player && player.trail) {
             player.trail.forEach((t, i) => {
-                ctx.globalAlpha = (i / player.trail.length) * 0.5;
-                ctx.fillStyle = player.trailColors[i % 3];
+                ctx.globalAlpha = (i / player.trail.length) * 0.6;
+                ctx.fillStyle = player.isRainbow ? `hsl(${t.rainbowHue}, 100%, 50%)` : player.trailColors[i % 3];
                 ctx.fillRect(t.x + 4, t.y + 4, player.width - 8, player.height - 8);
             });
             ctx.globalAlpha = 1.0;
         }
 
+        // رسم الشخصية نفسها مع تأثير الألوان المتغيرة لقوس قزح
         if(player) {
             ctx.save();
             ctx.translate(player.x + player.width/2, player.y + player.height);
             ctx.scale(player.scaleX, player.scaleY);
             
-            if(player.crown) { ctx.shadowBlur = 20; ctx.shadowColor = "#ffea00"; }
+            let activeColor = player.isRainbow ? `hsl(${Date.now() * 0.3 % 360}, 100%, 55%)` : player.color;
+
+            if(player.crown) { 
+                ctx.shadowBlur = player.isRainbow ? 35 : 20; 
+                ctx.shadowColor = player.isRainbow ? `hsl(${Date.now() * 0.3 % 360}, 100%, 50%)` : "#ffea00"; 
+            }
+            
             ctx.fillStyle = "#000000"; ctx.fillRect(-player.width/2 - 4, -player.height - 4, player.width + 8, player.height + 8);
-            ctx.fillStyle = player.color; ctx.fillRect(-player.width/2, -player.height, player.width, player.height);
+            ctx.fillStyle = activeColor; ctx.fillRect(-player.width/2, -player.height, player.width, player.height);
             ctx.shadowBlur = 0;
 
+            // العيون
             ctx.fillStyle = player.eyesColor;
             let eyeOffset = player.dir === 1 ? 5 : -5;
             ctx.fillRect(-player.width/2 + 10 + eyeOffset, -player.height + 12, 10, 12);
             ctx.fillRect(-player.width/2 + 25 + eyeOffset, -player.height + 12, 10, 12);
 
+            // التاج الملكي الأسطوري
             if(player.crown) {
                 ctx.fillStyle = "#ffcc00";
                 ctx.beginPath();
