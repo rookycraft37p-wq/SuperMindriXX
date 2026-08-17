@@ -58,28 +58,29 @@
         .buy-btn:disabled { background: #444; color: #888; cursor: not-allowed; border-color: #222; }
         .buy-btn.equipped { background: #00e676; border-color: #fff; color: #fff; }
 
-        /* شاشة اختيار العوالم والبيئات الجديدة (صور وبطاقات بصرية) */
+        /* نافذة اختيار العوالم محسنة ومقاومة للتقطيع وقابلة للتمرير بالموبايل */
         #world-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(5, 7, 15, 0.95); backdrop-filter: blur(10px); z-index: 100;
-            justify-content: center; align-items: center; flex-direction: column; padding: 20px;
+            justify-content: flex-start; align-items: center; flex-direction: column; padding: 20px 10px;
+            overflow-y: auto; -webkit-overflow-scrolling: touch;
         }
         .world-selection-box {
             background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255,255,255,0.2);
-            border-radius: 25px; padding: 30px; max-width: 600px; width: 100%; text-align: center;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+            border-radius: 25px; padding: 25px 15px; max-width: 600px; width: 100%; text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.7); margin: auto 0;
         }
         .world-cards-container {
-            display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 20px;
+            display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-top: 15px;
         }
         .world-card {
-            width: 160px; height: 180px; border-radius: 18px; border: 3px solid #fff;
+            width: 150px; height: 170px; border-radius: 18px; border: 3px solid #fff;
             cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;
             box-shadow: 0 8px 20px rgba(0,0,0,0.5); transition: 0.3s; padding: 10px; position: relative;
         }
         .world-card:hover { transform: translateY(-8px) scale(1.05); }
-        .world-card h3 { font-size: 16px; color: #fff; text-shadow: 1px 1px #000; margin-top: 8px; }
-        .world-card p { font-size: 11px; color: #ddd; text-shadow: 1px 1px #000; margin-top: 4px; }
+        .world-card h3 { font-size: 15px; color: #fff; text-shadow: 1px 1px #000; margin-top: 8px; }
+        .world-card p { font-size: 10px; color: #ddd; text-shadow: 1px 1px #000; margin-top: 4px; }
 
         /* Onboarding Screen Styles */
         #onboarding-screen {
@@ -134,6 +135,7 @@
 </head>
 <body>
 
+    <!-- Onboarding Screen -->
     <div id="onboarding-screen" class="screen">
         <div class="onboarding-card">
             <h2 id="onboarding-title">مرحباً بك في عالم المغامرة!</h2>
@@ -151,52 +153,54 @@
         </div>
     </div>
 
+    <!-- نافذة اختيار العوالم والتضاريس المحسنة للموبايل -->
     <div id="world-modal">
         <div class="world-selection-box">
-            <h2 style="color: #ffcc00; font-size: 26px; margin-bottom: 10px;">اختر بيئة وعالم المغامرة 🌍✨</h2>
-            <p style="color: #ddd; font-size: 14px; margin-bottom: 15px;">حدد وقت اليوم وطبيعة التضاريس قبل دخول المرحلة:</p>
+            <h2 style="color: #ffcc00; font-size: 24px; margin-bottom: 8px;">اختر بيئة وعالم المغامرة 🌍✨</h2>
+            <p style="color: #ddd; font-size: 13px; margin-bottom: 12px;">حدد وقت اليوم وطبيعة التضاريس قبل دخول المرحلة:</p>
             
-            <div style="margin-bottom: 15px;">
-                <p style="color: #ff3d00; font-weight: bold; margin-bottom: 8px;">1. وقت اليوم (إضاءة وسماء):</p>
+            <div style="margin-bottom: 12px;">
+                <p style="color: #ff3d00; font-weight: bold; margin-bottom: 6px; font-size: 14px;">1. وقت اليوم (إضاءة وسماء):</p>
                 <div class="world-cards-container" style="margin-top:0;">
                     <div class="world-card" id="time-day" onclick="selectTime('day')" style="background: linear-gradient(to bottom, #4a90e2, #7ed321); border-color: #ffcc00;">
-                        <span style="font-size: 40px;">☀️</span>
+                        <span style="font-size: 35px;">☀️</span>
                         <h3>نهار مشمس</h3>
                         <p>سماء صافية وإضاءة واضحة</p>
                     </div>
                     <div class="world-card" id="time-night" onclick="selectTime('night')" style="background: linear-gradient(to bottom, #0f2027, #203a43, #2c5364); border-color: #00ffff;">
-                        <span style="font-size: 40px;">🌙</span>
+                        <span style="font-size: 35px;">🌙</span>
                         <h3>ليل ومجرة</h3>
                         <p>نجوم متلألئة وإضاءة ليلية</p>
                     </div>
                 </div>
             </div>
 
-            <div style="margin-bottom: 20px;">
-                <p style="color: #ff3d00; font-weight: bold; margin-bottom: 8px;">2. طبيعة التضاريس والفيزياء:</p>
+            <div style="margin-bottom: 15px;">
+                <p style="color: #ff3d00; font-weight: bold; margin-bottom: 6px; font-size: 14px;">2. طبيعة التضاريس والفيزياء:</p>
                 <div class="world-cards-container" style="margin-top:0;">
                     <div class="world-card" id="terrain-grass" onclick="selectTerrain('grass')" style="background: linear-gradient(to bottom, #2e7d32, #1b5e20); border-color: #00e676;">
-                        <span style="font-size: 40px;">🌿</span>
+                        <span style="font-size: 35px;">🌿</span>
                         <h3>عشب أخضر</h3>
                         <p>سرعة وثبات طبيعي ممتاز</p>
                     </div>
                     <div class="world-card" id="terrain-mud" onclick="selectTerrain('mud')" style="background: linear-gradient(to bottom, #795548, #3e2723); border-color: #ff9800;">
-                        <span style="font-size: 40px;">🧱</span>
+                        <span style="font-size: 35px;">🧱</span>
                         <h3>طين ثقيل</h3>
                         <p>حركة أبطأ وتحدي مضاعف</p>
                     </div>
                     <div class="world-card" id="terrain-snow" onclick="selectTerrain('snow')" style="background: linear-gradient(to bottom, #00acc1, #006064); border-color: #00ffff;">
-                        <span style="font-size: 40px;">❄️</span>
+                        <span style="font-size: 35px;">❄️</span>
                         <h3>شتاء منزلق</h3>
                         <p>انزلاق جليدي وسرعة مذهلة</p>
                     </div>
                 </div>
             </div>
 
-            <button class="btn-main" onclick="confirmWorldAndStart()" style="background: #00e676; color: #000; width: 100%; max-width: 320px; font-size: 18px;">ابدأ المغامرة الآن 🚀</button>
+            <button class="btn-main" onclick="confirmWorldAndStart()" style="background: #00e676; color: #000; width: 100%; max-width: 300px; font-size: 17px; padding: 8px;">ابدأ المغامرة الآن 🚀</button>
         </div>
     </div>
 
+    <!-- Home Screen -->
     <div id="home-screen" class="screen">
         <h1 class="title">SuperDrix</h1>
         <div id="total-coins-display">🪙 <span id="home-coins">0</span></div>
@@ -488,7 +492,6 @@
 
     function triggerLevelStart(lvl) {
         pendingLevel = lvl;
-        // إظهار نافذة اختيار العالم والتضاريس
         document.getElementById('world-modal').style.display = 'flex';
         selectTime(selectedWorld.time);
         selectTerrain(selectedWorld.terrain);
@@ -502,7 +505,7 @@
     let score = 0, lives = 3, gameActive = false;
     let isLooping = false;
     let skillCooldown = 0;
-    let tempSpeedTimer = 0;
+    let nightStars = [];
 
     function updateDisplayData() {
         document.getElementById('home-coins').innerText = totalCoins;
@@ -663,16 +666,15 @@
     let player = null;
     let blocks = [], hazards = [], coins = [], speedBoosts = [], enemies = [], clouds = [], particles = [], floatingTexts = [], bullets = [], bossBullets = [], finishLine = null;
     let boss = null;
-    let cameraX = 0, shakeTime = 0, backgroundY = 0;
+    let cameraX = 0, shakeTime = 0;
 
     function initLevel(lvl) {
         blocks = []; hazards = []; coins = []; speedBoosts = []; enemies = []; clouds = []; particles = []; floatingTexts = []; bullets = []; bossBullets = []; boss = null;
         let activeSkin = skinsData[currentSkinId] || skinsData[0];
         
-        // تطبيق تأثيرات التضاريس والسرعة المختارة بناءً على العالم
         let baseSpeed = purchasedBoosters.includes('speedboost') ? 9.5 : 6.5;
-        if (selectedWorld.terrain === 'mud') baseSpeed *= 0.72; // الطين يبطئ الحركة
-        if (selectedWorld.terrain === 'snow') baseSpeed *= 1.15; // الشتاء يزيد السرعة والانزلاق
+        if (selectedWorld.terrain === 'mud') baseSpeed *= 0.72;
+        if (selectedWorld.terrain === 'snow') baseSpeed *= 1.15;
 
         player = {
             x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0,
@@ -714,8 +716,22 @@
             }
         }
 
+        // غيوم الخلفية المتحركة
         for (let i = 0; i < 15; i++) {
-            clouds.push({ x: Math.random() * levelLength, y: Math.random() * (canvas.height / 2), size: 40 + Math.random() * 60 });
+            clouds.push({ x: Math.random() * levelLength, y: Math.random() * (canvas.height / 2), size: 40 + Math.random() * 60, speed: 0.2 + Math.random() * 0.4 });
+        }
+
+        // إنشاء نجوم متحركة ومتلألئة لكل نجمة خصائصها المنظمة
+        nightStars = [];
+        for (let i = 0; i < 90; i++) {
+            nightStars.push({
+                x: Math.random() * (levelLength + 1000),
+                y: Math.random() * (canvas.height * 0.7),
+                size: 1 + Math.random() * 2.5,
+                twinkleSpeed: 0.003 + Math.random() * 0.008,
+                twinkleOffset: Math.random() * Math.PI * 2,
+                driftSpeed: 0.15 + Math.random() * 0.35
+            });
         }
 
         if (isBossLevel) {
@@ -893,7 +909,7 @@
 
         let currentAcc = moveRight ? player.speed : (moveLeft ? -player.speed : 0);
         if (selectedWorld.terrain === 'snow') {
-            player.vx = player.vx * 0.92 + currentAcc * 0.08; // انزلاق جليدي
+            player.vx = player.vx * 0.92 + currentAcc * 0.08;
         } else {
             player.vx = currentAcc;
         }
@@ -904,10 +920,9 @@
         player.scaleX += (1 - player.scaleX) * 0.1;
         player.scaleY += (1 - player.scaleY) * 0.1;
 
-        player.vy += 0.55; // الجاذبية
+        player.vy += 0.55;
         player.x += player.vx;
         player.y += player.vy;
-        let wasGrounded = player.grounded;
         player.grounded = false;
 
         bullets.forEach(b => { b.x += b.vx; });
@@ -1022,7 +1037,6 @@
         cameraX += ((player.x - canvas.width / 2.5) - cameraX) * 0.08;
         if (cameraX < 0) cameraX = 0;
         if (shakeTime > 0) shakeTime--;
-        backgroundY = Math.sin(Date.now() * 0.0005) * 10;
     }
 
     function render() {
@@ -1030,7 +1044,7 @@
         ctx.save();
         if (shakeTime > 0) { ctx.translate((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10); }
 
-        // تلوين الخلفية ديناميكياً حسب اختيار العالم (ليل / نهار)
+        // تدرج الخلفية مع أنميشن بسيط للحركة
         let bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         if (selectedWorld.time === 'night') {
             bgGradient.addColorStop(0, '#0a0f24');
@@ -1043,22 +1057,25 @@
         ctx.fillStyle = bgGradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // رسم النجوم إذا كان العالم ليلياً
+        // رسم النجوم المتحركة والمتلألئة (تظهر وتختفي بانتظام لكل نجمة)
         if (selectedWorld.time === 'night') {
-            ctx.fillStyle = "#ffffff";
-            for (let i = 0; i < 70; i++) {
-                let sX = (cameraX * 0.3 + (i * 120)) % (canvas.width + 500);
-                let sY = (i * 65) % (canvas.height / 1.5);
+            nightStars.forEach(star => {
+                let alpha = (Math.sin(Date.now() * star.twinkleSpeed + star.twinkleOffset) + 1) / 2; // تتراوح بين 0 و 1 للإضاءة والاختفاء
+                ctx.fillStyle = `rgba(255, 255, 255, ${0.15 + alpha * 0.85})`;
+                let sX = (star.x - cameraX * star.driftSpeed) % (canvas.width + 400);
+                if (sX < -50) sX += canvas.width + 500;
                 ctx.beginPath();
-                ctx.arc(sX, sY, 1.5 + (i % 2), 0, Math.PI * 2);
+                ctx.arc(sX, star.y, star.size * (0.7 + alpha * 0.5), 0, Math.PI * 2);
                 ctx.fill();
-            }
+            });
         }
 
-        // رسم الغيوم والجبال في الخلفية
-        ctx.fillStyle = selectedWorld.time === 'night' ? "rgba(255, 255, 255, 0.08)" : "rgba(255, 255, 255, 0.25)";
+        // رسم الغيوم الخلفية المتحركة بانميشن مستمر
+        ctx.fillStyle = selectedWorld.time === 'night' ? "rgba(255, 255, 255, 0.06)" : "rgba(255, 255, 255, 0.22)";
         clouds.forEach(cl => {
-            let cx = cl.x - (cameraX * 0.4);
+            cl.x -= cl.speed; // حركة أوتوماتيكية للخلفية
+            let cx = (cl.x - cameraX * 0.4) % (canvas.width + 600);
+            if (cx < -200) cx += canvas.width + 800;
             ctx.beginPath();
             ctx.arc(cx, cl.y, cl.size * 0.5, 0, Math.PI * 2);
             ctx.arc(cx + cl.size * 0.4, cl.y - cl.size * 0.2, cl.size * 0.4, 0, Math.PI * 2);
@@ -1083,7 +1100,7 @@
             ctx.fillStyle = "#000"; ctx.font = "bold 18px Changa"; ctx.fillText("🏁 النهاية", finishLine.x - cameraX + 15, finishLine.y + 26);
         }
 
-        // رسم منصات الكتل (Ground & Blocks بتصميمات التضاريس المختارة: عشب، طين، ثلج)
+        // رسم المنصات حسب البيئة (عشب، طين، ثلج)
         blocks.forEach(b => {
             let bx = b.x - cameraX;
             if (b.type === 'ground') {
@@ -1119,18 +1136,18 @@
             }
         });
 
-        // رسم الأعداء
+        // رسم الوحوش الصغار باللون الأسود وعيون حمراء كما طلبت
         enemies.forEach(en => {
             if (en.alive) {
                 let ex = en.x - cameraX;
-                ctx.fillStyle = "#d32f2f";
+                ctx.fillStyle = "#141414"; // اللون الأسود الأصلي
                 ctx.fillRect(ex, en.y, en.width, en.height);
-                ctx.fillStyle = "#fff";
-                ctx.fillRect(ex + 8, en.y + 10, 10, 12);
-                ctx.fillRect(ex + 27, en.y + 10, 10, 12);
-                ctx.fillStyle = "#000";
-                ctx.fillRect(ex + 12 + (en.vx > 0 ? 2 : -2), en.y + 14, 4, 6);
-                ctx.fillRect(ex + 31 + (en.vx > 0 ? 2 : -2), en.y + 14, 4, 6);
+                ctx.strokeStyle = "#ff3d00"; ctx.lineWidth = 2;
+                ctx.strokeRect(ex, en.y, en.width, en.height);
+                // عيون حمراء مرعبة
+                ctx.fillStyle = "#ff3d00";
+                ctx.fillRect(ex + 8, en.y + 10, 10, 10);
+                ctx.fillRect(ex + 27, en.y + 10, 10, 10);
             }
         });
 
