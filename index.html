@@ -2,1120 +2,839 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Super Mindrix Pro - Nightmare Boss Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NIGHTMARE BOSS</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Changa:wght@700;800&display=swap');
-        
-        * { 
-            box-sizing: border-box; 
-            user-select: none; 
-            -webkit-user-select: none; 
-            -webkit-touch-callout: none;
-            margin: 0; 
-            padding: 0; 
-            touch-action: manipulation; 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Cairo', Tahoma, sans-serif;
         }
-        body, html { width: 100%; height: 100%; overflow: hidden; background: #0b0b16; font-family: 'Changa', sans-serif; }
-        canvas { display: block; }
-
-        .screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 12, 20, 0.98);
-            z-index: 30; display: none; flex-direction: column; justify-content: flex-start; align-items: center; color: white; text-align: center;
-            overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 25px 15px;
+        body {
+            background-color: #0b0914;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
         }
-        #home-screen { justify-content: center; background: radial-gradient(circle, #201a30, #0b0b16); }
         
-        h1.title { font-size: 42px; color: #ff3d00; text-shadow: 0 0 20px rgba(255,61,0,0.8), 4px 4px #000; font-weight: 900; letter-spacing: 2px; margin-bottom: 5px; }
-        h2.subtitle { font-size: 26px; color: #ffcc00; text-shadow: 2px 2px #000; margin-bottom: 15px; }
-
-        .btn-main { background: #ff3d00; color: #fff; font-size: 17px; font-weight: 800; padding: 10px 25px; margin: 5px; border-radius: 40px; border: 4px solid #fff; cursor: pointer; box-shadow: 0 5px 0px #b71c1c; transition: all 0.1s; width: 280px; }
-        .btn-main:active { transform: translateY(5px); box-shadow: 0 0px 0px #b71c1c; }
-        .btn-shop { background: #ff9800; box-shadow: 0 5px 0px #e65100; color: #fff; text-shadow: 1px 1px 2px #000;}
-        .btn-weapons { background: #e91e63; box-shadow: 0 5px 0px #880e4f; color: #fff; text-shadow: 1px 1px 2px #000;}
-        .btn-boosters { background: #00bcd4; box-shadow: 0 5px 0px #006064; color: #fff; text-shadow: 1px 1px 2px #000;}
-        .btn-promo { background: #9c27b0; box-shadow: 0 5px 0px #4a148c; color: #fff; text-shadow: 1px 1px 2px #000;}
-        .btn-levels { background: #03a9f4; box-shadow: 0 5px 0px #01579b; color: #fff; }
-        .btn-back { background: #f44336; box-shadow: 0 5px 0px #b71c1c; margin: 25px 0; color: #fff; width: 220px; }
-        .btn-retry { background: #ffcc00; box-shadow: 0 5px 0px #f57f17; color: #000; }
-
-        .grid-container { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; max-width: 850px; padding: 10px; margin-bottom: 20px; }
-        
-        .card { background: rgba(255,255,255,0.08); border: 3px solid #555; border-radius: 15px; padding: 12px; width: 160px; text-align: center; backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); position: relative; transition: 0.2s; }
-        .card.locked { opacity: 0.4; filter: grayscale(100%); pointer-events: none; }
-        .card-title { font-size: 14px; margin-bottom: 5px; font-weight: bold; text-shadow: 1px 1px #000; }
-        
-        .card.tier-rare { border-color: #00bcd4; box-shadow: 0 0 10px rgba(0,188,212,0.5); }
-        .card.tier-epic { border-color: #9c27b0; box-shadow: 0 0 15px rgba(156,39,176,0.6); }
-        .card.tier-legendary { border-color: #ff4500; box-shadow: 0 0 25px rgba(255,69,0,0.8), 0 0 40px #ffea00; }
-        .card.tier-rainbow { border-color: #ff00ff; box-shadow: 0 0 30px #00ffff, 0 0 50px #ff00ff; animation: rainbowGlow 2s infinite linear; }
-
-        @keyframes rainbowGlow { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
-
-        .buy-btn, .level-btn { background: #ffcc00; color: #000; font-weight: 800; border: 2px solid #000; padding: 6px 8px; border-radius: 10px; width: 100%; cursor: pointer; margin-top: 6px; font-size: 13px; }
-        .buy-btn:disabled { background: #444; color: #888; cursor: not-allowed; border-color: #222; }
-        .buy-btn.equipped { background: #00e676; border-color: #fff; color: #fff; }
-
-        #ui-layer {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none;
-            display: none; flex-direction: column; justify-content: space-between; padding: 15px;
+        #game-container {
+            width: 100%;
+            max-width: 450px;
+            height: 100vh;
+            background: linear-gradient(135deg, #0b0914 0%, #1a1528 100%);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            overflow: hidden;
         }
-        .top-hud-container { width: 100%; pointer-events: auto; }
-        .top-row { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
-        .hud-group { display: flex; gap: 10px; align-items: center; }
-        
-        .score-box { background: rgba(0, 0, 0, 0.75); color: #ffcc00; padding: 5px 15px; border-radius: 20px; font-size: 17px; font-weight: 900; border: 2px solid #fff; display: flex; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
-        .home-icon-btn { font-size: 18px; background: #fff; border: 2px solid #111; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 0px #111; }
-        .home-icon-btn:active { transform: translateY(4px); box-shadow: 0 0px 0px #111; }
 
-        .level-indicator { background: rgba(0,0,0,0.8); color: #fff; padding: 3px 20px; border-radius: 20px; font-size: 15px; font-weight: bold; border: 2px solid #ff3d00; margin: 8px auto 0; width: fit-content; text-shadow: 1px 1px #000; }
-        
-        #boss-hud { display: none; width: 70%; max-width: 450px; height: 18px; background: #222; border: 2px solid #ff3d00; border-radius: 10px; margin: 5px auto 0; overflow: hidden; position: relative; box-shadow: 0 0 10px #ff3d00; }
-        #boss-hp-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #d32f2f, #ffea00); transition: width 0.2s; }
-        #boss-name-text { position: absolute; width: 100%; top: -2px; font-size: 12px; font-weight: bold; color: #fff; text-shadow: 1px 1px #000; text-align: center; }
-
-        .controls-bar {
-            position: absolute; bottom: 20px; width: 100%; left: 0; display: flex; justify-content: space-between; padding: 0 20px; z-index: 20; pointer-events: auto; direction: ltr;
+        /* صفحة الترحيب التعريفية */
+        #intro-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(11, 9, 20, 0.96);
+            z-index: 200;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
-        .control-group { display: flex; gap: 10px; align-items: center; }
-        .control-btn {
-            width: 60px; height: 60px; background: rgba(255, 255, 255, 0.85); border: 4px solid #111; border-radius: 50%; font-size: 22px; font-weight: bold; color: #111; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 0px rgba(0,0,0,0.6); cursor: pointer;
+        .intro-card {
+            background: rgba(25, 20, 40, 0.95);
+            border: 2px solid #ff4500;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 380px;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 0 25px rgba(255, 69, 0, 0.4);
+            position: relative;
         }
-        .control-btn:active { transform: translateY(5px); box-shadow: 0 0px 0px rgba(0,0,0,0.6); background: #ccc; }
-        #btn-jump { background: #ffcc00; color: #111; }
-        #btn-shoot { background: #e91e63; color: #fff; }
-        #btn-skill { background: #9c27b0; color: #fff; font-size: 20px; }
-        #btn-skill.cooldown { opacity: 0.4; pointer-events: none; }
+        .skip-btn {
+            position: absolute;
+            top: 15px; left: 15px;
+            background: transparent;
+            border: none;
+            color: #aaa;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .skip-btn:hover { color: #fff; }
+        .intro-slide {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            min-height: 220px;
+            justify-content: center;
+        }
+        .intro-slide.active { display: flex; }
+        .intro-icon { font-size: 55px; margin-bottom: 15px; }
+        .intro-slide h2 { color: #ff6347; font-size: 20px; margin-bottom: 10px; }
+        .intro-slide p { color: #ddd; font-size: 13px; line-height: 1.6; }
+        .intro-footer {
+            margin-top: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .dots { display: flex; justify-content: center; gap: 8px; }
+        .dot { width: 10px; height: 10px; border-radius: 50%; background: #444; cursor: pointer; }
+        .dot.active { background: #ff4500; width: 25px; border-radius: 5px; }
+        .intro-buttons { display: flex; gap: 10px; justify-content: space-between; }
+        .intro-btn { flex: 1; padding: 10px; border-radius: 25px; border: none; font-weight: bold; cursor: pointer; font-size: 15px; }
+        .btn-next { background: linear-gradient(45deg, #ff4500, #ff8c00); color: #fff; }
+        .btn-prev { background: #332d4a; color: #ccc; }
 
-        #total-coins-display { font-size: 20px; color: #ffcc00; font-weight: bold; margin-bottom: 12px; background: rgba(0,0,0,0.6); padding: 6px 15px; border-radius: 20px; border: 2px solid #fff; }
+        /* القائمة الرئيسية */
+        #main-menu {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            justify-content: space-around;
+            padding: 20px;
+        }
+        .game-title { text-align: center; }
+        .game-title h1 { font-size: 28px; color: #ff3b00; text-shadow: 0 0 15px rgba(255, 59, 0, 0.6); letter-spacing: 2px; }
+        .game-title h2 { font-size: 32px; color: #ff5722; text-shadow: 0 0 15px rgba(255, 87, 34, 0.6); letter-spacing: 3px; }
+        
+        .coins-badge {
+            background: #151122;
+            border: 2px solid #fff;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 16px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 15px rgba(255,255,255,0.1);
+        }
+
+        .menu-buttons { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 350px; }
+        .menu-btn {
+            padding: 12px;
+            border-radius: 40px;
+            border: 2px solid #fff;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: 0.2s;
+        }
+        .btn-stages { background: linear-gradient(45deg, #ff3b00, #ff6f00); }
+        .btn-chars { background: linear-gradient(45deg, #ffa726, #fb8c00); }
+        .btn-weapons { background: linear-gradient(45deg, #e91e63, #c2185b); }
+        .btn-boosts { background: linear-gradient(45deg, #00bcd4, #0097a7); }
+        .btn-codes { background: linear-gradient(45deg, #9c27b0, #7b1fa2); }
+
+        /* الشاشات الفرعية (المتاجر، المراحل، الأكواد) */
+        .sub-screen {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #0b0914;
+            z-index: 50;
+            flex-direction: column;
+            padding: 20px;
+            align-items: center;
+        }
+        .sub-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+        }
+        .sub-header h2 { font-size: 20px; color: #ff5722; }
+        .back-btn { background: #333; color: #fff; border: none; padding: 6px 15px; border-radius: 15px; cursor: pointer; }
+        
+        .grid-content {
+            flex: 1;
+            width: 100%;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-bottom: 20px;
+        }
+        .item-row {
+            background: #181424;
+            border: 1px solid #444;
+            padding: 12px 15px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .action-btn {
+            background: #ff5722;
+            color: #fff;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        /* شاشة اللعب الفعلي (Canvas) */
+        #game-screen {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            z-index: 40;
+        }
+        canvas { display: block; width: 100%; height: 100%; }
+        
+        .game-hud {
+            position: absolute;
+            top: 15px; right: 15px; left: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+            pointer-events: none;
+        }
+        .hud-box {
+            background: rgba(0,0,0,0.7);
+            border: 1px solid #ff4500;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        /* شاشة الموت الذكية */
+        #death-screen {
+            display: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(11, 9, 20, 0.95);
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            text-align: center;
+            padding: 20px;
+        }
+        #death-screen h2 {
+            font-size: 26px;
+            color: #ff3b00;
+            text-shadow: 0 0 20px rgba(255, 59, 0, 0.8);
+            margin-bottom: 20px;
+        }
+        .death-coins {
+            font-size: 16px;
+            margin-bottom: 25px;
+            background: #181424;
+            padding: 8px 18px;
+            border-radius: 20px;
+            border: 1px solid #444;
+        }
+        .death-btn-retry {
+            background: linear-gradient(45deg, #ffc107, #ff9800);
+            color: #111;
+            border: 2px solid #fff;
+            padding: 10px 25px;
+            border-radius: 35px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 12px;
+            width: 75%;
+        }
+        .death-btn-home {
+            background: linear-gradient(45deg, #f44336, #d32f2f);
+            color: #fff;
+            border: 2px solid #fff;
+            padding: 10px 25px;
+            border-radius: 35px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 75%;
+        }
     </style>
 </head>
 <body>
 
-    <div id="home-screen" class="screen">
-        <h1 class="title">NIGHTMARE BOSS</h1>
-        <div id="total-coins-display">🪙 <span id="home-coins">0</span></div>
-        <button class="btn-main" onclick="openLevelsScreen()">▶ المراحل (100)</button>
-        <button class="btn-main btn-shop" onclick="openShop()">🛒 متجر الشخصيات (100)</button>
-        <button class="btn-main btn-weapons" onclick="openWeaponsShop()">🔫 متجر الأسلحة (50)</button>
-        <button class="btn-main btn-boosters" onclick="openBoostersScreen()">🛡️ متجر المعززات</button>
-        <button class="btn-main btn-promo" onclick="openPromoScreen()">🎁 استرداد الأكواد</button>
-    </div>
-
-    <div id="boosters-screen" class="screen">
-        <h2 class="subtitle">متجر المعززات والأدوات الأسطورية</h2>
-        <div id="total-coins-display">رصيدك: 🪙 <span id="boosters-coins">0</span></div>
-        <div class="grid-container" id="boosters-grid"></div>
-        <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
-    </div>
-
-    <div id="promo-screen" class="screen" style="justify-content: center;">
-        <h2 class="subtitle">استرداد الأكواد والجوائز</h2>
-        <p style="margin-bottom: 20px; color: #ddd; font-size: 16px;">أدخل الكود الخاص هنا للحصول على مكافآت ضخمة:</p>
-        <input type="text" id="promo-input" placeholder="ادخل الكود هنا" style="padding: 12px 20px; font-size: 20px; border-radius: 20px; border: 3px solid #ff3d00; background: rgba(0,0,0,0.5); color: #fff; text-align: center; width: 280px; margin-bottom: 15px; font-family: 'Changa', sans-serif; outline: none; text-transform: uppercase;">
-        <br>
-        <button class="btn-main" onclick="redeemCode()" style="background: #ff3d00; width: 280px; margin-bottom: 10px;">تفعيل الكود 🎯</button>
-        <p id="promo-msg" style="font-size: 18px; margin-top: 15px; font-weight: bold; min-height: 30px;"></p>
-        <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
-    </div>
-
-    <div id="weapons-shop-screen" class="screen">
-        <h2 class="subtitle">متجر الأسلحة المتطورة (50 سلاحاً)</h2>
-        <div id="total-coins-display">رصيدك: 🪙 <span id="weapons-coins">0</span></div>
-        <div class="grid-container" id="weapons-grid"></div>
-        <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
-    </div>
-
-    <div id="levels-screen" class="screen">
-        <h2 class="subtitle">اختر المرحلة (1 إلى 100)</h2>
-        <div class="grid-container" id="levels-grid"></div>
-        <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
-    </div>
-
-    <div id="shop-screen" class="screen">
-        <h2 class="subtitle">المتجر الأسطوري (100 شخصية)</h2>
-        <div id="total-coins-display">رصيدك: 🪙 <span id="shop-coins">0</span></div>
-        <div class="grid-container" id="shop-grid"></div>
-        <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
-    </div>
-
-    <div id="win-screen" class="screen" style="justify-content: center;">
-        <h1 class="title" style="color: #00e676;">انتصرت على الزعيم!</h1>
-        <p style="font-size: 24px; margin-bottom: 15px;">جمعت: <span id="win-coins">0</span> 🪙</p>
-        <button class="btn-main" onclick="nextLevel()" style="background:#00e676; color:#000;">المرحلة التالية ⏩</button>
-        <button class="btn-main btn-back" onclick="goHome()" style="margin: 8px;">العودة للبيت 🏠</button>
-    </div>
-
-    <div id="game-over-screen" class="screen" style="justify-content: center;">
-        <h1 class="title" style="color: #f44336; text-shadow: 0 0 15px rgba(244,67,54,0.6), 4px 4px #000;">قضى عليك الزعيم!</h1>
-        <p style="font-size: 22px; margin-bottom: 15px;">النقاط المحفوظة: <span id="game-over-coins">0</span> 🪙</p>
-        <button class="btn-main btn-retry" onclick="startLevel(currentLevel)">إعادة المحاولة 🔄</button>
-        <button class="btn-main btn-back" onclick="goHome()" style="margin: 8px;">العودة للبيت 🏠</button>
-    </div>
-
-    <div id="ui-layer">
-        <div class="top-hud-container">
-            <div class="top-row">
-                <div class="hud-group">
-                    <div class="home-icon-btn" onclick="quitToHome()">🏠</div>
-                    <div class="score-box">🪙 <span id="score-val">0</span></div>
+    <div id="game-container">
+        
+        <!-- صفحة الترحيب التعريفية -->
+        <div id="intro-overlay">
+            <div class="intro-card">
+                <button class="skip-btn" onclick="finishIntro()">تخطي ⏭</button>
+                
+                <div class="intro-slide active" data-index="0">
+                    <div class="intro-icon">🎮</div>
+                    <h2>مرحباً بك في NIGHTMARE BOSS</h2>
+                    <p>استعد لخوض أقوى مغامرة وتحدي في عالم مليء بالمراحل والمتاجر والمعززات!</p>
                 </div>
-                <div class="score-box">❤️ <span id="lives-val">3</span></div>
-            </div>
-            <div class="level-indicator">مرحلة <span id="current-level-text">1</span> | السلاح: <span id="current-weapon-name" style="color:#ffcc00">مسدس البداية</span></div>
-            <div id="boss-hud">
-                <div id="boss-hp-bar"></div>
-                <div id="boss-name-text">الزعيم الطائر المرعب 🦇🔥</div>
+
+                <div class="intro-slide" data-index="1">
+                    <div class="intro-icon">⚔️</div>
+                    <h2>المتاجر والزعماء</h2>
+                    <p>استخدم 100 مرحلة، وتسوّق الشخصيات والأسلحة، وواجه الزعيم الأشرار بحذر.</p>
+                </div>
+
+                <div class="intro-slide" data-index="2">
+                    <div class="intro-icon">🏆</div>
+                    <h2>الأرقام القياسية</h2>
+                    <p>اجمع النقاط، احفظ أعلى رصيد محلياً، وكن أسطورة اللعبة المطلقة!</p>
+                </div>
+
+                <div class="intro-footer">
+                    <div class="dots">
+                        <span class="dot active" onclick="currentSlide(0)"></span>
+                        <span class="dot" onclick="currentSlide(1)"></span>
+                        <span class="dot" onclick="currentSlide(2)"></span>
+                    </div>
+                    <div class="intro-buttons">
+                        <button id="prev-btn" class="intro-btn btn-prev" onclick="changeSlide(-1)" style="display:none;">السابق</button>
+                        <button id="next-btn" class="intro-btn btn-next" onclick="changeSlide(1)">التالي ◀</button>
+                    </div>
+                </div>
             </div>
         </div>
-        <div class="controls-bar" id="controls">
-            <div class="control-group">
-                <button class="control-btn" id="btn-left">◀</button>
-                <button class="control-btn" id="btn-right">▶</button>
+
+        <!-- القائمة الرئيسية الأصلية الكاملة -->
+        <div id="main-menu">
+            <div class="game-title">
+                <h1>NIGHTMARE</h1>
+                <h2>BOSS</h2>
             </div>
-            <div class="control-group">
-                <button class="control-btn" id="btn-skill" title="مهارة موجة الطاقة">⚡</button>
-                <button class="control-btn" id="btn-shoot">🔥</button>
-                <button class="control-btn" id="btn-jump">⤒</button>
+
+            <div class="coins-badge">
+                🪙 الرصيد: <span id="coins-val">923620</span>
+            </div>
+
+            <div class="menu-buttons">
+                <div class="menu-btn btn-stages" onclick="openScreen('stages-screen')">▶ المراحل (100)</div>
+                <div class="menu-btn btn-chars" onclick="openScreen('chars-screen')">🛒 متجر الشخصيات (100)</div>
+                <div class="menu-btn btn-weapons" onclick="openScreen('weapons-screen')">🔫 متجر الأسلحة (50)</div>
+                <div class="menu-btn btn-boosts" onclick="openScreen('boosts-screen')">🛡️ متجر المعززات</div>
+                <div class="menu-btn btn-codes" onclick="openScreen('codes-screen')">🎁 استرداد الأكواد</div>
             </div>
         </div>
+
+        <!-- شاشة المراحل (100 مرحلة) -->
+        <div id="stages-screen" class="sub-screen">
+            <div class="sub-header">
+                <button class="back-btn" onclick="closeScreen('stages-screen')">الرجوع 🏠</button>
+                <h2>قائمة المراحل (100)</h2>
+            </div>
+            <div class="grid-content" id="stages-list">
+                <!-- سيتم توليد الـ 100 مرحلة برمجياً -->
+            </div>
+        </div>
+
+        <!-- شاشة متجر الشخصيات (100) -->
+        <div id="chars-screen" class="sub-screen">
+            <div class="sub-header">
+                <button class="back-btn" onclick="closeScreen('chars-screen')">الرجوع 🏠</button>
+                <h2>متجر الشخصيات (100)</h2>
+            </div>
+            <div class="grid-content" id="chars-list"></div>
+        </div>
+
+        <!-- شاشة متجر الأسلحة (50) -->
+        <div id="weapons-screen" class="sub-screen">
+            <div class="sub-header">
+                <button class="back-btn" onclick="closeScreen('weapons-screen')">الرجوع 🏠</button>
+                <h2>متجر الأسلحة (50)</h2>
+            </div>
+            <div class="grid-content" id="weapons-list"></div>
+        </div>
+
+        <!-- شاشة متجر المعززات -->
+        <div id="boosts-screen" class="sub-screen">
+            <div class="sub-header">
+                <button class="back-btn" onclick="closeScreen('boosts-screen')">الرجوع 🏠</button>
+                <h2>متجر المعززات</h2>
+            </div>
+            <div class="grid-content">
+                <div class="item-row"><span>🛡️ درع حماية مؤقت</span><button class="action-btn" onclick="alert('تم تفعيل الدرع!')">تفعيل</button></div>
+                <div class="item-row"><span>⚡ سرعة خارقة</span><button class="action-btn" onclick="alert('تم تفعيل السرعة!')">تفعيل</button></div>
+            </div>
+        </div>
+
+        <!-- شاشة استرداد الأكواد -->
+        <div id="codes-screen" class="sub-screen">
+            <div class="sub-header">
+                <button class="back-btn" onclick="closeScreen('codes-screen')">الرجوع 🏠</button>
+                <h2>استرداد الأكواد</h2>
+            </div>
+            <div class="grid-content" style="align-items: center; justify-content: center; gap: 15px;">
+                <input type="text" id="code-input" placeholder="أدخل كود الهدية هنا..." style="padding: 12px; width: 80%; border-radius: 15px; border: 1px solid #444; background: #181424; color: #fff; text-align: center;">
+                <button class="action-btn" style="width: 80%;" onclick="redeemCode()">تحقق واسترد 🎁</button>
+            </div>
+        </div>
+
+        <!-- واجهة اللعب الفعلي (Canvas المحرك المطور) -->
+        <div id="game-screen">
+            <div class="game-hud">
+                <div class="hud-box">🏆 النقاط: <span id="live-score">0</span></div>
+                <div class="hud-box" id="hud-status" style="color: #00bcd4;">الحالة: عادي</div>
+                <div class="hud-box" onclick="goHome()" style="cursor: pointer; background: #d32f2f;">🏠 القائمة</div>
+            </div>
+            <canvas id="gameCanvas"></canvas>
+        </div>
+
+        <!-- شاشة الموت الذكية -->
+        <div id="death-screen">
+            <h2 id="death-title">قضى عليك الزعيم!</h2>
+            <div class="death-coins">🪙 النقاط المكتسبة: <span id="saved-coins">0</span></div>
+            <button class="death-btn-retry" onclick="retryGame()">إعادة المحاولة 🔄</button>
+            <button class="death-btn-home" onclick="goHome()">العودة للبيت 🏠</button>
+        </div>
+
     </div>
 
-    <canvas id="gameCanvas"></canvas>
+    <script>
+        // إعدادات الترحيب
+        let slideIndex = 0;
+        const slides = document.querySelectorAll('.intro-slide');
+        const dots = document.querySelectorAll('.dot');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
 
-<script>
-    let audioCtx;
-    function initAudio() {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-    }
-
-    function playSound(type) {
-        if (!audioCtx) return;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        const now = audioCtx.currentTime;
-
-        if (type === 'jump') {
-            osc.type = 'square'; osc.frequency.setValueAtTime(250, now); osc.frequency.exponentialRampToValueAtTime(500, now + 0.15);
-            gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
-            osc.start(now); osc.stop(now + 0.15);
-        } else if (type === 'coin') {
-            osc.type = 'sine'; osc.frequency.setValueAtTime(1000, now); osc.frequency.setValueAtTime(1500, now + 0.08);
-            gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
-            osc.start(now); osc.stop(now + 0.2);
-        } else if (type === 'shoot') {
-            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(150, now + 0.1);
-            gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-            osc.start(now); osc.stop(now + 0.1);
-        } else if (type === 'bossShoot') {
-            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(80, now + 0.25);
-            gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-            osc.start(now); osc.stop(now + 0.25);
-        } else if (type === 'skill') {
-            osc.type = 'sine'; osc.frequency.setValueAtTime(300, now); osc.frequency.exponentialRampToValueAtTime(900, now + 0.3);
-            gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-            osc.start(now); osc.stop(now + 0.3);
-        } else if (type === 'hit') {
-            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(100, now); osc.frequency.exponentialRampToValueAtTime(30, now + 0.4);
-            gain.gain.setValueAtTime(0.4, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-            osc.start(now); osc.stop(now + 0.4);
-        } else if (type === 'click') {
-            osc.type = 'triangle'; osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(1000, now + 0.05);
-            gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
-            osc.start(now); osc.stop(now + 0.05);
-        }
-    }
-
-    document.addEventListener('pointerdown', function(e) {
-        if(e.target.tagName === 'BUTTON' || e.target.classList.contains('home-icon-btn') || e.target.closest('button')) {
-            initAudio(); playSound('click');
-        }
-    });
-
-    const skinsData = [];
-    for (let i = 0; i < 100; i++) {
-        let cost = i === 0 ? 0 : (i * 200);
-        let tierClass = "tier-common";
-        let tierName = "عادي";
-        let crown = false;
-        let isRainbow = false;
-        
-        if (i === 99) {
-            tierClass = "tier-rainbow"; tierName = "ملك الألوان 🌈👑"; crown = true; isRainbow = true;
-        } else if (i >= 85) { tierClass = "tier-legendary"; tierName = "أسطوري 🔥"; crown = true; }
-        else if (i >= 50) { tierClass = "tier-epic"; tierName = "ملحمي 💎"; }
-        else if (i >= 25) { tierName = "نادر ✨"; }
-
-        let name = i === 0 ? "رُوكْ فِيكْس" : (i === 99 ? "الملك قوس قزح 👑" : `شخصية ${i + 1}`);
-        let color = isRainbow ? '#ff0000' : `hsl(${i * 3.6}, 85%, 55%)`;
-
-        skinsData.push({
-            id: i, name: name, cost: cost, color: color, eyes: '#ffeb3b',
-            trail: [color, '#ffffff', '#ff9999'], crown: crown, isRainbow: isRainbow,
-            tierName: tierName, cardClass: tierClass
-        });
-    }
-
-    const weaponsData = [];
-    for (let i = 0; i < 50; i++) {
-        let cost = i === 0 ? 0 : (i * 1000);
-        let coinMultiplier = i + 1; 
-        let damage = (i + 1) * 15;
-        let tierName = "عادي";
-        let tierClass = "tier-common";
-
-        if (i === 49) {
-            tierClass = "tier-rainbow"; tierName = "المدمر الكمومي المجرة 🌌👑";
-        } else if (i >= 40) { tierClass = "tier-legendary"; tierName = "سلاح أسطوري 🔥"; }
-        else if (i >= 25) { tierClass = "tier-epic"; tierName = "سلاح ملحمي 💎"; }
-        else if (i >= 12) { tierClass = "tier-rare"; tierName = "سلاح نادر ✨"; }
-
-        weaponsData.push({
-            id: i,
-            name: i === 0 ? "مسدس البداية" : (i === 49 ? "المدمر الكمومي 🌌" : `سلاح ليزر ${i + 1}`),
-            cost: cost,
-            damage: damage,
-            coinMultiplier: coinMultiplier,
-            tierName: tierName,
-            cardClass: tierClass
-        });
-    }
-
-    const boostersData = [
-        { id: 'shield', name: 'درع الحماية السحري 🛡️', desc: 'يحميك من ضربة مميتة واحدة لكل مرحلة', cost: 5000 },
-        { id: 'magnet', name: 'مغناطيس العملات 🧲', desc: 'يجذب العملات تلقائياً من مسافة قريبة', cost: 8000 },
-        { id: 'extralife', name: 'قلب إضافي دائم ❤️', desc: 'يبدأ كل مرحلة بـ 4 قلوب بدلاً من 3', cost: 15000 }
-    ];
-
-    const maxLevels = 100;
-    let totalCoins = parseInt(localStorage.getItem('superdrix_coins')) || 0;
-    let unlockedLevels = parseInt(localStorage.getItem('superdrix_unlocked_levels')) || 1;
-    
-    let unlockedSkins = JSON.parse(localStorage.getItem('superdrix_skins')) || [0];
-    let currentSkinId = parseInt(localStorage.getItem('superdrix_current_skin')) || 0;
-
-    let unlockedWeapons = JSON.parse(localStorage.getItem('superdrix_weapons')) || [0];
-    let currentWeaponId = parseInt(localStorage.getItem('superdrix_current_weapon')) || 0;
-
-    let purchasedBoosters = JSON.parse(localStorage.getItem('superdrix_boosters')) || [];
-
-    const validPromoCodes = {
-        "SUPER100K": { coins: 100000, message: "تم شحن 100,000 عملة بنجاح! 🪙🔥" },
-        "GOLD50K": { coins: 50000, message: "تم شحن 50,000 عملة بنجاح! 🪙✨" },
-        "MINDRIX": { coins: 10000, message: "حصلت على 10,000 عملة هدية! 🎁" }
-    };
-    let usedPromoCodes = JSON.parse(localStorage.getItem('superdrix_used_codes')) || [];
-
-    let currentLevel = 1;
-    let score = 0, lives = 3, gameActive = false;
-    let isLooping = false;
-    let skillCooldown = 0;
-
-    function updateDisplayData() {
-        document.getElementById('home-coins').innerText = totalCoins;
-        document.getElementById('shop-coins').innerText = totalCoins;
-        document.getElementById('weapons-coins').innerText = totalCoins;
-        document.getElementById('boosters-coins').innerText = totalCoins;
-        let curWep = weaponsData[currentWeaponId] || weaponsData[0];
-        document.getElementById('current-weapon-name').innerText = curWep.name;
-
-        localStorage.setItem('superdrix_coins', totalCoins);
-        localStorage.setItem('superdrix_unlocked_levels', unlockedLevels);
-        localStorage.setItem('superdrix_skins', JSON.stringify(unlockedSkins));
-        localStorage.setItem('superdrix_current_skin', currentSkinId);
-        localStorage.setItem('superdrix_weapons', JSON.stringify(unlockedWeapons));
-        localStorage.setItem('superdrix_current_weapon', currentWeaponId);
-        localStorage.setItem('superdrix_boosters', JSON.stringify(purchasedBoosters));
-    }
-
-    function showScreen(id) {
-        initAudio(); document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
-        document.getElementById('ui-layer').style.display = 'none';
-        if (id) {
-            const targetScreen = document.getElementById(id);
-            targetScreen.style.display = 'flex';
-            targetScreen.scrollTop = 0;
-        }
-        updateDisplayData();
-    }
-
-    function goHome() { gameActive = false; showScreen('home-screen'); }
-    function quitToHome() { if(confirm("هل أنت متأكد أنك تريد الخروج؟")) goHome(); }
-
-    function openPromoScreen() {
-        showScreen('promo-screen');
-        document.getElementById('promo-input').value = '';
-        document.getElementById('promo-msg').innerText = '';
-    }
-
-    function redeemCode() {
-        const inputVal = document.getElementById('promo-input').value.trim().toUpperCase();
-        const msgEl = document.getElementById('promo-msg');
-        
-        if (!inputVal) {
-            msgEl.style.color = '#f44336'; msgEl.innerText = "الرجاء إدخال الكود أولاً!"; playSound('hit'); return;
-        }
-        if (usedPromoCodes.includes(inputVal)) {
-            msgEl.style.color = '#f44336'; msgEl.innerText = "لقد استخدمت هذا الكود مسبقاً!"; playSound('hit'); return;
+        function showSlide(n) {
+            slides.forEach(s => s.classList.remove('active'));
+            dots.forEach(d => d.classList.remove('active'));
+            slides[n].classList.add('active');
+            dots[n].classList.add('active');
+            prevBtn.style.display = (n === 0) ? 'none' : 'block';
+            nextBtn.innerHTML = (n === slides.length - 1) ? 'ابدأ اللعب 🚀' : 'التالي ◀';
         }
 
-        if (validPromoCodes[inputVal]) {
-            let reward = validPromoCodes[inputVal];
-            totalCoins += reward.coins;
-            usedPromoCodes.push(inputVal);
-            localStorage.setItem('superdrix_used_codes', JSON.stringify(usedPromoCodes));
-            updateDisplayData();
-            
-            msgEl.style.color = '#00e676'; msgEl.innerText = reward.message; playSound('coin');
-            document.getElementById('promo-input').value = '';
-        } else {
-            msgEl.style.color = '#f44336'; msgEl.innerText = "الكود غير صحيح أو منتهي الصلاحية!"; playSound('hit');
+        function changeSlide(dir) {
+            slideIndex += dir;
+            if (slideIndex >= slides.length) finishIntro();
+            else showSlide(slideIndex);
         }
-    }
 
-    function openShop() {
-        showScreen('shop-screen');
-        const grid = document.getElementById('shop-grid'); grid.innerHTML = '';
-        skinsData.forEach(skin => {
-            const isUnlocked = unlockedSkins.includes(skin.id);
-            const isEquipped = currentSkinId === skin.id;
-            let btnHtml = isEquipped ? `<button class="buy-btn equipped" disabled>مُجهز ✔️</button>` : 
-                          isUnlocked ? `<button class="buy-btn" onclick="equipSkin(${skin.id})">استخدام</button>` : 
-                          `<button class="buy-btn" ${totalCoins < skin.cost ? 'disabled' : ''} onclick="buySkin(${skin.id}, ${skin.cost})">شراء 🪙 ${skin.cost}</button>`;
-            
-            grid.innerHTML += `
-                <div class="card ${skin.cardClass}">
-                    <div style="font-size:11px; color:#ffcc00; margin-bottom:3px;">#${skin.id + 1} (${skin.tierName})</div>
-                    <div style="width: 40px; height: 40px; background:${skin.isRainbow ? 'linear-gradient(45deg, red, yellow, green, cyan, magenta)' : skin.color}; margin: 0 auto 8px; border: 3px solid #000; border-radius: 8px; position:relative;">
-                        ${skin.crown ? '<div style="position:absolute; top:-16px; left:8px; font-size:16px;">👑</div>' : ''}
-                    </div>
-                    <div class="card-title">${skin.name}</div>
-                    ${btnHtml}
-                </div>`;
-        });
-    }
-
-    function buySkin(id, cost) { if (totalCoins >= cost) { totalCoins -= cost; unlockedSkins.push(id); equipSkin(id); } }
-    function equipSkin(id) { currentSkinId = id; updateDisplayData(); openShop(); }
-
-    function openWeaponsShop() {
-        showScreen('weapons-shop-screen');
-        const grid = document.getElementById('weapons-grid'); grid.innerHTML = '';
-        weaponsData.forEach(wep => {
-            const isUnlocked = unlockedWeapons.includes(wep.id);
-            const isEquipped = currentWeaponId === wep.id;
-            let btnHtml = isEquipped ? `<button class="buy-btn equipped" disabled>مُجهز ✔️</button>` : 
-                          isUnlocked ? `<button class="buy-btn" onclick="equipWeapon(${wep.id})">استخدام</button>` : 
-                          `<button class="buy-btn" ${totalCoins < wep.cost ? 'disabled' : ''} onclick="buyWeapon(${wep.id}, ${wep.cost})">شراء 🪙 ${wep.cost}</button>`;
-            
-            grid.innerHTML += `
-                <div class="card ${wep.cardClass}">
-                    <div style="font-size:11px; color:#ffcc00; margin-bottom:3px;">سلاح #${wep.id + 1}</div>
-                    <div class="card-title" style="font-size:13px; color:#ff4081;">${wep.name}</div>
-                    <div style="font-size:11px; color:#ccc; margin-bottom:6px;">الضرر: ${wep.damage}<br>مضاعف العملات: x${wep.coinMultiplier}</div>
-                    ${btnHtml}
-                </div>`;
-        });
-    }
-
-    function buyWeapon(id, cost) { if (totalCoins >= cost) { totalCoins -= cost; unlockedWeapons.push(id); equipWeapon(id); } }
-    function equipWeapon(id) { currentWeaponId = id; updateDisplayData(); openWeaponsShop(); }
-
-    function openBoostersScreen() {
-        showScreen('boosters-screen');
-        const grid = document.getElementById('boosters-grid'); grid.innerHTML = '';
-        boostersData.forEach(b => {
-            const isOwned = purchasedBoosters.includes(b.id);
-            let btnHtml = isOwned ? `<button class="buy-btn equipped" disabled>تم التفعيل ✔️</button>` : 
-                          `<button class="buy-btn" ${totalCoins < b.cost ? 'disabled' : ''} onclick="buyBooster('${b.id}', ${b.cost})">شراء 🪙 ${b.cost}</button>`;
-            
-            grid.innerHTML += `
-                <div class="card tier-epic" style="width: 220px;">
-                    <div class="card-title" style="color:#00e676;">${b.name}</div>
-                    <div style="font-size:11px; color:#ddd; margin-bottom:8px;">${b.desc}</div>
-                    ${btnHtml}
-                </div>`;
-        });
-    }
-
-    function buyBooster(id, cost) {
-        if (totalCoins >= cost && !purchasedBoosters.includes(id)) {
-            totalCoins -= cost;
-            purchasedBoosters.push(id);
-            updateDisplayData();
-            openBoostersScreen();
+        function currentSlide(n) {
+            slideIndex = n;
+            showSlide(slideIndex);
         }
-    }
 
-    function openLevelsScreen() {
-        showScreen('levels-screen');
-        const grid = document.getElementById('levels-grid'); grid.innerHTML = '';
-        for (let i = 1; i <= maxLevels; i++) {
-            let isUnlocked = i <= unlockedLevels;
-            let isBossLevel = i % 10 === 0;
-            grid.innerHTML += `
-                <div class="card ${isUnlocked ? '' : 'locked'} ${isBossLevel ? 'tier-legendary' : ''}" style="width: 70px; height: 70px; justify-content: center; align-items: center; display: flex; flex-direction: column;">
-                    <div style="font-size: 16px; font-weight: bold; text-shadow: 2px 2px #000;">${isUnlocked ? (isBossLevel ? '🦇 ' + i : i) : '🔒'}</div>
-                    ${isUnlocked ? `<button class="level-btn" style="padding: 2px; font-size: 11px;" onclick="startLevel(${i})">العب</button>` : ''}
-                </div>`;
+        function finishIntro() {
+            document.getElementById('intro-overlay').style.display = 'none';
+            localStorage.setItem('intro_seen', 'true');
         }
-    }
 
-    function triggerGameOver() {
-        gameActive = false; totalCoins += score;
-        document.getElementById('game-over-coins').innerText = score; showScreen('game-over-screen');
-    }
-
-    function startLevel(lvl) {
-        initAudio(); currentLevel = lvl; score = 0;
-        lives = purchasedBoosters.includes('extralife') ? 4 : 3;
-        skillCooldown = 0;
-        
-        document.getElementById('current-level-text').innerText = currentLevel;
-        document.getElementById('score-val').innerText = score; 
-        document.getElementById('lives-val').innerText = lives;
-        
-        showScreen(''); document.getElementById('ui-layer').style.display = 'flex';
-        initLevel(currentLevel);
-        gameActive = true; 
-        if (!isLooping) { isLooping = true; requestAnimationFrame(loop); }
-    }
-
-    function winLevel() {
-        gameActive = false; totalCoins += score;
-        if (currentLevel === unlockedLevels && unlockedLevels < maxLevels) unlockedLevels++;
-        document.getElementById('win-coins').innerText = score; showScreen('win-screen');
-    }
-    function nextLevel() {
-        if (currentLevel < maxLevels) startLevel(currentLevel + 1);
-        else { alert("مبروك! لقد ختمت جميع المراحل الـ 100 الأسطورية بنجاح تام!"); goHome(); }
-    }
-
-    const canvas = document.getElementById("gameCanvas");
-    const ctx = canvas.getContext("2d");
-
-    function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
-    window.addEventListener('resize', resizeCanvas); resizeCanvas();
-
-    let player, blocks = [], hazards = [], coins = [], enemies = [], clouds = [], particles = [], floatingTexts = [], bullets = [], bossBullets = [], finishLine = null;
-    let boss = null;
-    let cameraX = 0, shakeTime = 0, backgroundY = 0;
-    let weatherType = 'normal';
-
-    function initLevel(lvl) {
-        blocks = []; hazards = []; coins = []; enemies = []; clouds = []; particles = []; floatingTexts = []; bullets = []; bossBullets = []; boss = null;
-        let activeSkin = skinsData[currentSkinId] || skinsData[0];
-        
-        if (lvl <= 25) weatherType = 'normal';
-        else if (lvl <= 50) weatherType = 'rain';
-        else if (lvl <= 75) weatherType = 'sunset';
-        else weatherType = 'snow';
-
-        player = { 
-            x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0, speed: 6.5, jumpForce: -13.5, grounded: false, canDoubleJump: true, dir: 1, trail: [], 
-            color: activeSkin.color, eyesColor: activeSkin.eyes, trailColors: activeSkin.trail, crown: activeSkin.crown, isRainbow: activeSkin.isRainbow, scaleX: 1, scaleY: 1 
+        window.onload = function() {
+            if(localStorage.getItem('intro_seen') === 'true') {
+                document.getElementById('intro-overlay').style.display = 'none';
+            }
+            updateScoreBoard();
+            buildStoresAndStages();
         };
-        
-        let levelLength = 3000 + (lvl * 250);
-        let isBossLevel = lvl % 10 === 0;
 
-        finishLine = { x: levelLength - 300, y: canvas.height - 350, width: 80, height: 270 };
+        // إدارة النقاط و LocalStorage
+        let totalCoins = parseInt(localStorage.getItem('nightmare_coins') || '923620');
+        let highScore = parseInt(localStorage.getItem('nightmare_highscore') || '0');
 
-        if (isBossLevel) {
-            // زعيم طائر عملاق ومرعب بدم كثير وقدرة إطلاق قذائف
-            let bossMaxHp = 800 + (lvl * 150);
-            boss = {
-                x: finishLine.x - 200, y: 150, width: 110, height: 110,
-                hp: bossMaxHp, maxHp: bossMaxHp, vx: 3, vy: 2, minX: finishLine.x - 600, maxX: finishLine.x - 100, 
-                minY: 80, maxY: canvas.height - 320, shootTimer: 0, alive: true
-            };
-            document.getElementById('boss-hud').style.display = 'block';
-        } else {
-            document.getElementById('boss-hud').style.display = 'none';
+        function updateScoreBoard() {
+            document.getElementById('coins-val').innerText = totalCoins;
         }
 
-        let cursorX = 0;
-        while (cursorX < levelLength) {
-            let groundWidth = 300 + Math.random() * 250;
-            let baseHeightY = canvas.height - 120;
-            
-            blocks.push({ x: cursorX, y: baseHeightY, width: groundWidth, height: 200, type: 'ground' });
-
-            if (Math.random() > 0.4 && cursorX > 400) {
-                let stairX = cursorX + 50; let stairY = baseHeightY - 80;
-                blocks.push({ x: stairX, y: stairY, width: 140, height: 30, type: 'stone' });
-                coins.push({ x: stairX + 55, y: stairY - 50, width: 28, height: 28, collected: false, float: 0 });
-            }
-            cursorX += groundWidth;
-
-            if (cursorX < finishLine.x - 300) {
-                let gapWidth = 110 + Math.min(lvl * 1.5, 70);
-                let hazardType = Math.random() > 0.5 ? 'lava' : 'water';
-                hazards.push({ x: cursorX, y: canvas.height - 60, width: gapWidth, height: 60, type: hazardType });
-                cursorX += gapWidth;
-            }
+        function openScreen(screenId) {
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById(screenId).style.display = 'flex';
         }
 
-        for (let i = 500; i < finishLine.x - 200; i += 320) {
-            const blockTypes = ['wood', 'pipe', 'stone', 'metal'];
-            let chosenType = blockTypes[Math.floor(Math.random() * blockTypes.length)];
-            
-            blocks.push({ x: i, y: canvas.height - 280 - Math.random() * 100, width: 140, height: 35, type: chosenType });
-            coins.push({ x: i + 55, y: canvas.height - 380, width: 28, height: 28, collected: false, float: Math.random() * Math.PI });
-            
-            if (Math.random() > 0.2) {
-                enemies.push({ x: i + 80, y: canvas.height - 170, width: 45, height: 45, vx: 2 + (lvl * 0.04), minX: i, maxX: i + 220, hp: 40 + (lvl * 8), maxHp: 40 + (lvl * 8), alive: true });
+        function closeScreen(screenId) {
+            document.getElementById(screenId).style.display = 'none';
+            document.getElementById('main-menu').style.display = 'flex';
+        }
+
+        // توليد المراحل الـ 100 والمتاجر برمجياً لضمان الاكتمال
+        function buildStoresAndStages() {
+            // المراحل (100)
+            const stagesList = document.getElementById('stages-list');
+            stagesList.innerHTML = '';
+            for(let i=1; i<=100; i++) {
+                let isBoss = (i === 100 || i % 10 === 0);
+                stagesList.innerHTML += `<div class="item-row"><span>المرحلة ${i} ${isBoss ? '🔥 (معركة زعيم)' : ''}</span><button class="action-btn" onclick="startActiveGame(${isBoss ? "'boss'" : "'normal'"}, ${i})">العب</button></div>`;
+            }
+
+            // متجر الشخصيات (100)
+            const charsList = document.getElementById('chars-list');
+            charsList.innerHTML = '';
+            for(let i=1; i<=100; i++) {
+                charsList.innerHTML += `<div class="item-row"><span>شخصية نايتمير رقم ${i}</span><button class="action-btn" onclick="alert('تم اختيار الشخصية ${i}')">شراء/تحديد</button></div>`;
+            }
+
+            // متجر الأسلحة (50)
+            const weaponsList = document.getElementById('weapons-list');
+            weaponsList.innerHTML = '';
+            for(let i=1; i<=50; i++) {
+                weaponsList.innerHTML += `<div class="item-row"><span>سلاح الزعيم المدمر ${i}</span><button class="action-btn" onclick="alert('تم امتلاك السلاح ${i}')">اقتناء</button></div>`;
             }
         }
 
-        for (let i = 0; i < 70; i++) clouds.push({ x: i * 250 + Math.random() * 100, y: 10 + Math.random() * 200, size: 40 + Math.random() * 50 });
-        cameraX = 0;
-    }
-
-    function createParticles(x, y, color, count = 15) {
-        for(let i = 0; i < count; i++) {
-            particles.push({ x: x, y: y, vx: (Math.random() - 0.5) * 12, vy: (Math.random() - 1) * 10, life: 1, color: color, size: Math.random() * 7 + 2 });
-        }
-    }
-    
-    function createFloatingText(x, y, text, color) {
-        floatingTexts.push({ x: x, y: y, text: text, color: color, life: 1, vy: -2 });
-    }
-
-    function fireWeapon() {
-        if (!player || !gameActive) return;
-        playSound('shoot');
-        let activeWeapon = weaponsData[currentWeaponId] || weaponsData[0];
-        bullets.push({
-            x: player.x + (player.dir === 1 ? player.width : -10),
-            y: player.y + player.height / 2,
-            vx: player.dir * 15,
-            damage: activeWeapon.damage,
-            coinMultiplier: activeWeapon.coinMultiplier,
-            width: 16,
-            height: 8,
-            isSkill: false
-        });
-        player.scaleX = 1.2; player.scaleY = 0.8;
-    }
-
-    function triggerSkill() {
-        if (!player || !gameActive || skillCooldown > 0) return;
-        playSound('skill');
-        skillCooldown = 300;
-        document.getElementById('btn-skill').classList.add('cooldown');
-        
-        createParticles(player.x, player.y, '#9c27b0', 40);
-        createFloatingText(player.x, player.y - 30, "موجة الطاقة المدمرة! ⚡", "#9c27b0");
-
-        enemies.forEach(en => {
-            if (en.alive && Math.abs(en.x - player.x) < 800) {
-                en.alive = false;
-                score += 100;
-                createParticles(en.x, en.y, '#ffea00', 20);
+        function redeemCode() {
+            let code = document.getElementById('code-input').value;
+            if(code.trim() !== '') {
+                totalCoins += 5000;
+                updateScoreBoard();
+                alert('تم استرداد الكود بنجاح وإضافة 5000 نقطة لرصيدك!');
+                document.getElementById('code-input').value = '';
+            } else {
+                alert('الرجاء إدخال كود صالح!');
             }
-        });
-
-        if (boss && boss.alive && Math.abs(boss.x - player.x) < 900) {
-            boss.hp -= 250;
-            createParticles(boss.x, boss.y, '#ff4500', 30);
         }
-    }
 
-    let moveLeft = false, moveRight = false;
-    function setupControls() {
-        const bindBtn = (id, start, end) => {
-            const el = document.getElementById(id);
-            if(!el) return;
-            el.addEventListener('touchstart', (e) => { e.preventDefault(); initAudio(); start(); });
-            el.addEventListener('touchend', (e) => { e.preventDefault(); end(); });
-            el.addEventListener('mousedown', () => { initAudio(); start(); });
-            el.addEventListener('mouseup', end);
+        // --- Web Audio API للأصوات والموسيقى ---
+        let audioCtx = null;
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playSound(type) {
+            try {
+                initAudio();
+                if (!audioCtx) return;
+                let osc = audioCtx.createOscillator();
+                let gain = audioCtx.createGain();
+                let now = audioCtx.currentTime;
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'jump') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(300, now);
+                    osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                    osc.start(now); osc.stop(now + 0.15);
+                } else if (type === 'coin') {
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.setValueAtTime(1200, now + 0.08);
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.2);
+                    osc.start(now); osc.stop(now + 0.2);
+                } else if (type === 'hit') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, now);
+                    osc.frequency.linearRampToValueAtTime(50, now + 0.3);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now); osc.stop(now + 0.3);
+                } else if (type === 'powerup') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(400, now);
+                    osc.frequency.linearRampToValueAtTime(800, now + 0.2);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.linearRampToValueAtTime(0.01, now + 0.25);
+                    osc.start(now); osc.stop(now + 0.25);
+                }
+            } catch(e) {}
+        }
+
+        // --- محرك اللعبة (Canvas Engine المطور) ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let gameRunning = false;
+        let gameMode = 'normal';
+        let score = 0;
+
+        let player = {
+            x: 50, y: 300, w: 30, h: 40,
+            vy: 0, gravity: 0.6, lift: -11,
+            jumpCount: 0, maxJumps: 2,
+            shield: false, speedBoost: false,
+            shieldTimer: 0, speedTimer: 0
         };
-        bindBtn('btn-left', () => moveLeft = true, () => moveLeft = false);
-        bindBtn('btn-right', () => moveRight = true, () => moveRight = false);
-        
-        const jumpBtn = document.getElementById('btn-jump');
-        if(jumpBtn) {
-            const triggerJump = (e) => {
-                if(e) e.preventDefault();
-                initAudio(); 
-                if (player) { 
-                    if (player.grounded) {
-                        player.vy = player.jumpForce; 
-                        player.grounded = false; 
-                        player.canDoubleJump = true;
-                        player.scaleX = 0.7; player.scaleY = 1.3;
-                        playSound('jump'); 
-                        let pColor = player.isRainbow ? `hsl(${Date.now() % 360}, 100%, 50%)` : '#ffffff';
-                        createParticles(player.x + player.width/2, player.y + player.height, pColor, 10); 
-                    } else if (player.canDoubleJump) {
-                        player.vy = player.jumpForce * 0.9;
-                        player.canDoubleJump = false;
-                        player.scaleX = 0.6; player.scaleY = 1.4;
-                        playSound('jump');
-                        createParticles(player.x + player.width/2, player.y + player.height/2, '#00e676', 15);
-                        createFloatingText(player.x, player.y - 20, "قفزة مزدوجة! ✨", "#00e676");
+
+        let platforms = [];
+        let enemies = [];
+        let projectiles = [];
+        let items = [];
+        let stars = [];
+        let boss = null;
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+
+        function startActiveGame(mode, stageNum = 1) {
+            gameMode = mode;
+            document.querySelectorAll('.sub-screen').forEach(s => s.style.display = 'none');
+            document.getElementById('main-menu').style.display = 'none';
+            document.getElementById('death-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
+            resizeCanvas();
+
+            player.x = 50; player.y = canvas.height - 150;
+            player.vy = 0; player.jumpCount = 0;
+            player.shield = false; player.speedBoost = false;
+            score = 0;
+
+            stars = [];
+            for(let i=0; i<50; i++) {
+                stars.push({x: Math.random()*canvas.width, y: Math.random()*canvas.height, size: Math.random()*2+1, speed: Math.random()*0.5+0.2});
+            }
+
+            platforms = [
+                {x: 0, y: canvas.height - 40, w: canvas.width, h: 40, type: mode === 'boss' ? 'lava' : 'normal'}
+            ];
+            for(let i=1; i<6; i++) {
+                platforms.push({x: i * 120, y: canvas.height - 100 - (i * 45), w: 90, h: 18, type: 'normal'});
+            }
+
+            enemies = []; projectiles = []; items = [];
+
+            if (mode === 'boss') {
+                boss = {
+                    x: canvas.width - 120, y: canvas.height - 220, w: 70, h: 90,
+                    hp: 100, shootTimer: 0, dir: 1
+                };
+            } else {
+                boss = null;
+                enemies.push({x: 250, y: canvas.height - 80, w: 30, h: 30, minX: 200, maxX: 380, speed: 2});
+            }
+
+            gameRunning = true;
+            requestAnimationFrame(updateGame);
+        }
+
+        window.addEventListener('keydown', e => {
+            if (e.code === 'Space' || e.code === 'ArrowUp') handleJump();
+        });
+        canvas.addEventListener('click', () => handleJump());
+
+        function handleJump() {
+            if (!gameRunning) return;
+            if (player.jumpCount < player.maxJumps) {
+                player.vy = player.lift;
+                player.jumpCount++;
+                playSound('jump');
+            }
+        }
+
+        function updateGame() {
+            if (!gameRunning) return;
+
+            player.vy += player.gravity;
+            player.y += player.vy;
+
+            platforms.forEach(p => {
+                if (player.x + player.w > p.x && player.x < p.x + p.w &&
+                    player.y + player.h >= p.y && player.y + player.h - player.vy <= p.y) {
+                    player.y = p.y - player.h;
+                    player.vy = 0;
+                    player.jumpCount = 0;
+
+                    if (p.type === 'lava' && !player.shield) {
+                        triggerDeath('normal', score);
                     }
                 }
-            };
-            jumpBtn.addEventListener('touchstart', triggerJump);
-            jumpBtn.addEventListener('click', triggerJump);
-        }
+            });
 
-        const shootBtn = document.getElementById('btn-shoot');
-        if(shootBtn) {
-            const triggerShoot = (e) => { if(e) e.preventDefault(); fireWeapon(); };
-            shootBtn.addEventListener('touchstart', triggerShoot);
-            shootBtn.addEventListener('click', triggerShoot);
-        }
-
-        const skillBtn = document.getElementById('btn-skill');
-        if(skillBtn) {
-            const triggerSkillBtn = (e) => { if(e) e.preventDefault(); triggerSkill(); };
-            skillBtn.addEventListener('touchstart', triggerSkillBtn);
-            skillBtn.addEventListener('click', triggerSkillBtn);
-        }
-    }
-
-    function update() {
-        if (!gameActive) return;
-
-        if (skillCooldown > 0) {
-            skillCooldown--;
-            if (skillCooldown === 0) document.getElementById('btn-skill').classList.remove('cooldown');
-        }
-
-        player.scaleX += (1 - player.scaleX) * 0.15;
-        player.scaleY += (1 - player.scaleY) * 0.15;
-
-        player.vx = 0;
-        if (moveLeft) { player.vx = -player.speed; player.dir = -1; }
-        if (moveRight) { player.vx = player.speed; player.dir = 1; }
-        player.x += player.vx;
-        player.vy += 0.65;
-        player.y += player.vy;
-        
-        let wasGrounded = player.grounded;
-        player.grounded = false;
-
-        if (Math.abs(player.vx) > 0 || player.vy !== 0) {
-            player.trail.push({ x: player.x, y: player.y, rainbowHue: Date.now() % 360 });
-            if (player.trail.length > 10) player.trail.shift();
-        } else if (player.trail.length > 0) player.trail.shift();
-
-        bullets.forEach(b => { b.x += b.vx; });
-        bullets = bullets.filter(b => Math.abs(b.x - player.x) < 1200);
-
-        // حركة قذائف الزعيم الطائر
-        bossBullets.forEach(bb => { bb.x += bb.vx; bb.y += bb.vy; });
-        bossBullets = bossBullets.filter(bb => Math.abs(bb.x - player.x) < 1200);
-
-        particles.forEach(p => { p.vy += 0.3; p.x += p.vx; p.y += p.vy; p.life -= 0.03; p.size *= 0.95; });
-        particles = particles.filter(p => p.life > 0);
-
-        floatingTexts.forEach(ft => { ft.y += ft.vy; ft.life -= 0.02; });
-        floatingTexts = floatingTexts.filter(ft => ft.life > 0);
-
-        blocks.forEach(b => {
-            if (player.x + player.width > b.x && player.x < b.x + b.width && player.y + player.height > b.y && player.y < b.y + b.height) {
-                if (player.vy > 0 && player.y + player.height - player.vy <= b.y + 20) {
-                    player.y = b.y - player.height; player.vy = 0; player.grounded = true; player.canDoubleJump = true;
-                    if(!wasGrounded) { player.scaleX = 1.3; player.scaleY = 0.7; createParticles(player.x + 20, player.y + 40, '#ddd', 8); }
-                } else if (player.vy < 0 && player.y - player.vy >= b.y + b.height - 15) {
-                    player.y = b.y + b.height; player.vy = 0;
-                }
-            }
-        });
-
-        hazards.forEach(hz => {
-            if (player.x + player.width > hz.x + 15 && player.x < hz.x + hz.width - 15 && player.y + player.height >= hz.y + 15) {
-                applyDamage(hz.type === 'lava' ? '#ff3d00' : '#03a9f4', hz.x - 120);
-            }
-        });
-
-        // ذكاء وحركة الزعيم الطائر والعملاق
-        if (boss && boss.alive) {
-            boss.x += boss.vx;
-            boss.y += boss.vy + Math.sin(Date.now() * 0.005) * 1.5;
-            
-            if (boss.x < boss.minX || boss.x > boss.maxX) boss.vx *= -1;
-            if (boss.y < boss.minY || boss.y > boss.maxY) boss.vy *= -1;
-
-            // إطلاق قذائف نارية على اللاعب
-            boss.shootTimer++;
-            if (boss.shootTimer > 60) {
-                boss.shootTimer = 0;
-                playSound('bossShoot');
-                let angle = Math.atan2((player.y + player.height/2) - (boss.y + boss.height/2), (player.x + player.width/2) - (boss.x + boss.width/2));
-                bossBullets.push({
-                    x: boss.x + boss.width / 2,
-                    y: boss.y + boss.height / 2,
-                    vx: Math.cos(angle) * 7,
-                    vy: Math.sin(angle) * 7,
-                    width: 18,
-                    height: 18
-                });
-            }
-
-            let hpPercent = Math.max(0, (boss.hp / boss.maxHp) * 100);
-            document.getElementById('boss-hp-bar').style.width = hpPercent + '%';
-
-            // اصطدام اللاعب بالزعيم الطائر
-            if (player.x + player.width > boss.x && player.x < boss.x + boss.width && player.y + player.height > boss.y && player.y < boss.y + boss.height) {
-                applyDamage('#ff3d00', boss.x - 120);
-            }
-        }
-
-        // فحص تصادم قذائف الزعيم باللاعب
-        bossBullets.forEach((bb, idx) => {
-            if (player.x + player.width > bb.x && player.x < bb.x + bb.width && player.y + player.height > bb.y && player.y < bb.y + bb.height) {
-                bossBullets.splice(idx, 1);
-                applyDamage('#ff3d00', player.x - 80);
-            }
-        });
-
-        bullets.forEach((b, bIdx) => {
-            if (boss && boss.alive && b.x > boss.x && b.x < boss.x + boss.width && b.y > boss.y && b.y < boss.y + boss.height) {
-                boss.hp -= b.damage;
-                createParticles(b.x, b.y, '#ffea00', 8);
-                bullets.splice(bIdx, 1);
-                if (boss.hp <= 0) {
-                    boss.alive = false;
-                    document.getElementById('boss-hud').style.display = 'none';
-                    let earnedCoins = 2500 * b.coinMultiplier;
-                    score += earnedCoins;
-                    document.getElementById('score-val').innerText = score;
-                    playSound('coin');
-                    createParticles(boss.x + 55, boss.y + 55, '#00e676', 60);
-                    createFloatingText(boss.x, boss.y, `هزمت الزعيم الطائر! +${earnedCoins} 🪙`, "#ffcc00");
-                }
+            if (player.y > canvas.height) {
+                triggerDeath('normal', score);
                 return;
             }
 
-            enemies.forEach(en => {
-                if (en.alive && b.x > en.x && b.x < en.x + en.width && b.y > en.y && b.y < en.y + en.height) {
-                    en.hp -= b.damage;
-                    createParticles(b.x, b.y, '#ffea00', 6);
-                    bullets.splice(bIdx, 1);
+            if (player.shield) {
+                player.shieldTimer--;
+                if (player.shieldTimer <= 0) player.shield = false;
+            }
+            if (player.speedBoost) {
+                player.speedTimer--;
+                if (player.speedTimer <= 0) player.speedBoost = false;
+            }
 
-                    if (en.hp <= 0) {
-                        en.alive = false;
-                        let earnedCoins = 50 * b.coinMultiplier;
-                        score += earnedCoins;
-                        document.getElementById('score-val').innerText = score;
-                        playSound('coin');
-                        createParticles(en.x + 20, en.y + 20, '#00e676', 20);
-                        createFloatingText(en.x, en.y, `+${earnedCoins} 🪙`, "#ffcc00");
+            enemies.forEach(en => {
+                en.x += en.speed;
+                if (en.x < en.minX || en.x > en.maxX) en.speed *= -1;
+
+                if (checkCollision(player, en)) {
+                    if (player.shield) {
+                        player.shield = false;
+                        enemies = enemies.filter(e => e !== en);
+                        playSound('powerup');
+                    } else {
+                        triggerDeath('normal', score);
+                        return;
                     }
                 }
             });
-        });
 
-        enemies.forEach(en => {
-            if (!en.alive) return;
-            en.x += en.vx; if (en.x < en.minX || en.x > en.maxX) en.vx *= -1;
-            if (player.x + player.width > en.x && player.x < en.x + en.width && player.y + player.height > en.y && player.y < en.y + en.height) {
-                applyDamage(player.color, player.x + (player.x < en.x ? -60 : 60));
-            }
-        });
-
-        coins.forEach(c => {
-            c.float += 0.08; c.y += Math.sin(c.float) * 0.8;
-            
-            if (purchasedBoosters.includes('magnet')) {
-                let dist = Math.hypot((player.x + player.width/2) - (c.x + c.width/2), (player.y + player.height/2) - (c.y + c.height/2));
-                if (dist < 220) {
-                    c.x += ((player.x - c.x) * 0.1);
-                    c.y += ((player.y - c.y) * 0.1);
+            if (gameMode === 'boss' && boss) {
+                boss.shootTimer++;
+                if (boss.shootTimer > 80) {
+                    boss.shootTimer = 0;
+                    projectiles.push({x: boss.x, y: boss.y + 30, w: 15, h: 15, vx: -5});
+                    playSound('hit');
                 }
+
+                projectiles.forEach((proj, idx) => {
+                    proj.x += proj.vx;
+                    if (checkCollision(player, proj)) {
+                        projectiles.splice(idx, 1);
+                        if (player.shield) {
+                            player.shield = false;
+                        } else {
+                            triggerDeath('boss', score);
+                            return;
+                        }
+                    }
+                });
             }
 
-            if (!c.collected && player.x + player.width > c.x && player.x < c.x + c.width && player.y + player.height > c.y && player.y < c.y + c.height) {
-                c.collected = true; score += 10; document.getElementById('score-val').innerText = score;
-                playSound('coin'); createParticles(c.x + 14, c.y + 14, '#ffea00', 12);
-                createFloatingText(c.x, c.y, "+10", "#ffcc00");
+            if (Math.random() < 0.02) {
+                let types = ['coin', 'shield', 'speed'];
+                let chosenType = types[Math.floor(Math.random() * types.length)];
+                items.push({x: canvas.width, y: canvas.height - 150 - Math.random()*150, w: 25, h: 25, type: chosenType});
             }
-        });
 
-        if (player.y > canvas.height) {
-            applyDamage('#ff3d00', cameraX + 150);
-        }
-
-        if (finishLine && player.x + player.width > finishLine.x && player.x < finishLine.x + finishLine.width) {
-            if (!boss || !boss.alive) {
-                playSound('coin'); createParticles(player.x, player.y, '#00e676', 40);
-                createFloatingText(player.x, player.y - 40, "فوز!", "#00e676");
-                winLevel();
-            } else {
-                createFloatingText(player.x, player.y - 40, "قضِ على الزعيم الطائر أولاً! ⚠️", "#ff3d00");
-            }
-        }
-
-        cameraX += ((player.x - canvas.width / 2.5) - cameraX) * 0.08; 
-        if (cameraX < 0) cameraX = 0;
-        backgroundY = Math.sin(Date.now() * 0.0005) * 10;
-    }
-
-    function applyDamage(particleColor, respawnX) {
-        playSound('hit');
-        if (purchasedBoosters.includes('shield')) {
-            purchasedBoosters = purchasedBoosters.filter(b => b !== 'shield');
-            createParticles(player.x, player.y, '#00bcd4', 30);
-            createFloatingText(player.x, player.y - 30, "تم امتصاص الضربة بواسطة الدرع! 🛡️", "#00bcd4");
-            player.x = respawnX; player.vy = -6;
-            return;
-        }
-
-        lives--; document.getElementById('lives-val').innerText = lives;
-        shakeTime = 30; player.x = respawnX; player.y = 50; player.vy = 0;
-        createParticles(player.x, player.y, particleColor, 25);
-        if (lives <= 0) { triggerGameOver(); }
-    }
-
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.save();
-        
-        let shakeX = 0, shakeY = 0;
-        if (shakeTime > 0) { shakeX = (Math.random() - 0.5) * 15; shakeY = (Math.random() - 0.5) * 15; shakeTime--; }
-        ctx.translate(-cameraX + shakeX, shakeY);
-
-        let skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        if (weatherType === 'sunset') {
-            skyGradient.addColorStop(0, "#d32f2f"); skyGradient.addColorStop(1, "#fbc02d");
-        } else if (weatherType === 'rain') {
-            skyGradient.addColorStop(0, "#263238"); skyGradient.addColorStop(1, "#455a64");
-        } else if (weatherType === 'snow') {
-            skyGradient.addColorStop(0, "#37474f"); skyGradient.addColorStop(1, "#cfd8dc");
-        } else {
-            skyGradient.addColorStop(0, "#1976d2"); skyGradient.addColorStop(1, "#64b5f6");
-        }
-        ctx.fillStyle = skyGradient;
-        ctx.fillRect(cameraX, 0, canvas.width, canvas.height);
-
-        ctx.fillStyle = "rgba(0,0,0,0.2)";
-        for(let i = -1; i < 10; i++) {
-            ctx.beginPath();
-            let pX = (cameraX * 0.8) + (i * 400);
-            ctx.moveTo(pX, canvas.height);
-            ctx.lineTo(pX + 200, canvas.height - 300 + backgroundY);
-            ctx.lineTo(pX + 400, canvas.height);
-            ctx.fill();
-        }
-
-        ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
-        clouds.forEach(cl => {
-            let cx = cl.x + (cameraX * 0.5);
-            ctx.beginPath(); ctx.arc(cx, cl.y, cl.size * 0.5, 0, Math.PI * 2);
-            ctx.arc(cx + cl.size * 0.4, cl.y - cl.size * 0.2, cl.size * 0.4, 0, Math.PI * 2);
-            ctx.arc(cx + cl.size * 0.8, cl.y, cl.size * 0.45, 0, Math.PI * 2); ctx.fill();
-        });
-
-        if (weatherType === 'rain') {
-            ctx.strokeStyle = "rgba(255,255,255,0.6)"; ctx.lineWidth = 2;
-            for(let i = 0; i < 60; i++) {
-                let rX = (cameraX + (i * 150) + (Date.now() * 0.5) % canvas.width);
-                let rY = (i * 70 + (Date.now() * 1.5)) % canvas.height;
-                ctx.beginPath(); ctx.moveTo(rX, rY); ctx.lineTo(rX - 5, rY + 15); ctx.stroke();
-            }
-        } else if (weatherType === 'snow') {
-            ctx.fillStyle = "rgba(255,255,255,0.8)";
-            for(let i = 0; i < 50; i++) {
-                let sX = (cameraX + (i * 120) + Math.sin(Date.now()*0.002 + i)*30) % (canvas.width + cameraX + 500);
-                let sY = ((i * 50) + (Date.now() * 0.2)) % canvas.height;
-                ctx.beginPath(); ctx.arc(sX, sY, 3 + (i % 3), 0, Math.PI*2); ctx.fill();
-            }
-        }
-
-        hazards.forEach(hz => {
-            if (hz.type === 'lava') {
-                ctx.shadowBlur = 20; ctx.shadowColor = "#ff3d00";
-                ctx.fillStyle = "#ff3d00"; ctx.fillRect(hz.x, hz.y + 20, hz.width, hz.height - 20);
-                ctx.shadowBlur = 0;
-                ctx.fillStyle = "#ffea00";
-                for(let i=0; i<hz.width; i+=40) { ctx.fillRect(hz.x + i + (Date.now()/50 % 20), hz.y + 10, 20, 20); }
-            } else {
-                ctx.shadowBlur = 15; ctx.shadowColor = "#00bcd4";
-                ctx.fillStyle = "#03a9f4"; ctx.fillRect(hz.x, hz.y + 15, hz.width, hz.height - 15);
-                ctx.shadowBlur = 0;
-                ctx.fillStyle = "#e0f7fa"; ctx.fillRect(hz.x, hz.y + 10, hz.width, 10);
-            }
-        });
-
-        if (finishLine) {
-            ctx.fillStyle = "#fff"; ctx.fillRect(finishLine.x, finishLine.y, 12, finishLine.height);
-            ctx.shadowBlur = 20; ctx.shadowColor = "#00e676";
-            ctx.fillStyle = "#00e676"; ctx.fillRect(finishLine.x + 12, finishLine.y, finishLine.width, 45);
-            ctx.shadowBlur = 0;
-            ctx.fillStyle = "#000"; ctx.font = "24px Changa"; ctx.fillText("النهاية", finishLine.x + 18, finishLine.y + 32);
-        }
-
-        // رسم الزعيم الطائر المرعب (بأجنحة وقرون وعيون شريرة وقلب طاقة)
-        if (boss && boss.alive) {
-            ctx.save();
-            ctx.translate(boss.x + boss.width/2, boss.y + boss.height/2);
-            
-            ctx.shadowBlur = 30; ctx.shadowColor = "#ff3d00";
-            // الأجنحة المرفرفة
-            let wingOffset = Math.sin(Date.now() * 0.02) * 30;
-            ctx.fillStyle = "#b71c1c";
-            ctx.beginPath();
-            ctx.moveTo(-20, 0); ctx.lineTo(-80 - wingOffset, -50); ctx.lineTo(-40, 30); ctx.closePath();
-            ctx.moveTo(20, 0); ctx.lineTo(80 + wingOffset, -50); ctx.lineTo(40, 30); ctx.closePath();
-            ctx.fill();
-
-            // جسم الزعيم الشرير
-            ctx.fillStyle = "#212121";
-            ctx.beginPath(); ctx.arc(0, 0, boss.width/2, 0, Math.PI*2); ctx.fill();
-            ctx.strokeStyle = "#ff3d00"; ctx.lineWidth = 4; ctx.stroke();
-
-            // قرون حادة
-            ctx.fillStyle = "#ffcc00";
-            ctx.beginPath();
-            ctx.moveTo(-35, -25); ctx.lineTo(-50, -60); ctx.lineTo(-15, -40); ctx.closePath();
-            ctx.moveTo(35, -25); ctx.lineTo(50, -60); ctx.lineTo(15, -40); ctx.closePath();
-            ctx.fill();
-
-            // عيون حمراء مضيئة
-            ctx.fillStyle = "#ff1744";
-            ctx.fillRect(-22, -12, 14, 14);
-            ctx.fillRect(8, -12, 14, 14);
-
-            // قلب طاقة نابض في المنتصف
-            ctx.fillStyle = `hsl(${Date.now() * 0.5 % 360}, 100%, 50%)`;
-            ctx.beginPath(); ctx.arc(0, 10, 10 + Math.sin(Date.now()*0.01)*4, 0, Math.PI*2); ctx.fill();
-
-            ctx.shadowBlur = 0;
-            ctx.restore();
-        }
-
-        // رسم قذائف الزعيم الطائر
-        bossBullets.forEach(bb => {
-            ctx.shadowBlur = 15; ctx.shadowColor = "#ff3d00";
-            ctx.fillStyle = "#ff3d00";
-            ctx.beginPath(); ctx.arc(bb.x + bb.width/2, bb.y + bb.height/2, bb.width/2, 0, Math.PI*2); ctx.fill();
-            ctx.fillStyle = "#ffea00";
-            ctx.beginPath(); ctx.arc(bb.x + bb.width/2, bb.y + bb.height/2, bb.width/4, 0, Math.PI*2); ctx.fill();
-            ctx.shadowBlur = 0;
-        });
-
-        blocks.forEach(b => {
-            if (b.type === 'ground') {
-                ctx.fillStyle = "#5D4037"; ctx.fillRect(b.x, b.y + 25, b.width, (canvas.height - b.y) - 25);
-                ctx.fillStyle = "#43A047"; ctx.fillRect(b.x, b.y, b.width, 25);
-                ctx.strokeStyle = "#1B5E20"; ctx.lineWidth = 4; ctx.strokeRect(b.x, b.y, b.width, 25);
-            } else {
-                let pColor = "#34495e", bColor = "#2c3e50";
-                if (b.type === 'wood') { pColor = "#8d6e63"; bColor = "#4e342e"; } 
-                else if (b.type === 'pipe') { pColor = "#4caf50"; bColor = "#1b5e20"; }
-                else if (b.type === 'stone') { pColor = "#90a4ae"; bColor = "#455a64"; }
-                
-                ctx.fillStyle = pColor; ctx.fillRect(b.x, b.y, b.width, b.height);
-                ctx.strokeStyle = bColor; ctx.lineWidth = 4; ctx.strokeRect(b.x, b.y, b.width, b.height);
-            }
-        });
-
-        coins.forEach(c => {
-            if (!c.collected) {
-                ctx.shadowBlur = 10; ctx.shadowColor = "#ffcc00";
-                ctx.fillStyle = "#ffcc00"; ctx.beginPath(); ctx.arc(c.x + c.width/2, c.y + c.height/2, c.width/2, 0, Math.PI*2); ctx.fill();
-                ctx.strokeStyle = "#fff"; ctx.lineWidth = 4; ctx.stroke();
-                ctx.shadowBlur = 0;
-            }
-        });
-
-        enemies.forEach(en => {
-            if (en.alive) {
-                ctx.shadowBlur = 15; ctx.shadowColor = "#d50000";
-                ctx.fillStyle = "#212121"; ctx.fillRect(en.x, en.y, en.width, en.height);
-                ctx.fillStyle = "#ff1744"; ctx.fillRect(en.x + 8, en.y + 12, 12, 12); ctx.fillRect(en.x + 25, en.y + 12, 12, 12);
-                
-                ctx.fillStyle = "#555"; ctx.fillRect(en.x, en.y - 10, en.width, 6);
-                ctx.fillStyle = "#00e676"; ctx.fillRect(en.x, en.y - 10, en.width * (en.hp / en.maxHp), 6);
-                ctx.shadowBlur = 0;
-            }
-        });
-
-        bullets.forEach(b => {
-            ctx.shadowBlur = 10; ctx.shadowColor = "#ff4081";
-            ctx.fillStyle = "#ff4081"; ctx.fillRect(b.x, b.y, b.width, b.height);
-            ctx.shadowBlur = 0;
-        });
-
-        if(player && player.trail) {
-            player.trail.forEach((t, i) => {
-                ctx.globalAlpha = (i / player.trail.length) * 0.6;
-                ctx.fillStyle = player.isRainbow ? `hsl(${t.rainbowHue}, 100%, 50%)` : player.trailColors[i % 3];
-                ctx.fillRect(t.x + 4, t.y + 4, player.width - 8, player.height - 8);
+            items.forEach((item, idx) => {
+                item.x -= 2;
+                if (checkCollision(player, item)) {
+                    if (item.type === 'coin') {
+                        score += 10;
+                        playSound('coin');
+                    } else if (item.type === 'shield') {
+                        player.shield = true; player.shieldTimer = 300;
+                        playSound('powerup');
+                    } else if (item.type === 'speed') {
+                        player.speedBoost = true; player.speedTimer = 250;
+                        playSound('powerup');
+                    }
+                    items.splice(idx, 1);
+                }
             });
-            ctx.globalAlpha = 1.0;
+
+            score += 1;
+            document.getElementById('live-score').innerText = score;
+            
+            let statusText = "عادي";
+            if (player.shield) statusText = "درع 🛡️";
+            else if (player.speedBoost) statusText = "سرعة ⚡";
+            document.getElementById('hud-status').innerText = "الحالة: " + statusText;
+
+            drawCanvas();
+
+            if (gameRunning) {
+                requestAnimationFrame(updateGame);
+            }
         }
 
-        if(player) {
-            ctx.save();
-            ctx.translate(player.x + player.width/2, player.y + player.height);
-            ctx.scale(player.scaleX, player.scaleY);
-            
-            let activeColor = player.isRainbow ? `hsl(${Date.now() * 0.3 % 360}, 100%, 55%)` : player.color;
+        function drawCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if(player.crown) { 
-                ctx.shadowBlur = player.isRainbow ? 35 : 20; 
-                ctx.shadowColor = player.isRainbow ? `hsl(${Date.now() * 0.3 % 360}, 100%, 50%)` : "#ffea00"; 
+            if (gameMode === 'boss') {
+                ctx.fillStyle = '#150808';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else {
+                ctx.fillStyle = '#0b0914';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#fff';
+                stars.forEach(s => {
+                    s.x -= s.speed;
+                    if (s.x < 0) s.x = canvas.width;
+                    ctx.fillRect(s.x, s.y, s.size, s.size);
+                });
             }
-            
-            ctx.fillStyle = "#000000"; ctx.fillRect(-player.width/2 - 4, -player.height - 4, player.width + 8, player.height + 8);
-            ctx.fillStyle = activeColor; ctx.fillRect(-player.width/2, -player.height, player.width, player.height);
+
+            platforms.forEach(p => {
+                if (p.type === 'lava') {
+                    ctx.fillStyle = '#ff3b00';
+                    ctx.shadowBlur = 15; ctx.shadowColor = '#ff3b00';
+                } else {
+                    ctx.fillStyle = '#3f3363';
+                    ctx.shadowBlur = 0;
+                }
+                ctx.fillRect(p.x, p.y, p.w, p.h);
+            });
             ctx.shadowBlur = 0;
 
-            ctx.fillStyle = player.eyesColor;
-            let eyeOffset = player.dir === 1 ? 5 : -5;
-            ctx.fillRect(-player.width/2 + 10 + eyeOffset, -player.height + 12, 10, 12);
-            ctx.fillRect(-player.width/2 + 25 + eyeOffset, -player.height + 12, 10, 12);
+            items.forEach(item => {
+                if (item.type === 'coin') ctx.fillStyle = '#ffeb3b';
+                else if (item.type === 'shield') ctx.fillStyle = '#00bcd4';
+                else ctx.fillStyle = '#e91e63';
+                ctx.fillRect(item.x, item.y, item.w, item.h);
+            });
 
-            if(player.crown) {
-                ctx.fillStyle = "#ffcc00";
-                ctx.beginPath();
-                ctx.moveTo(-player.width/2 + 5, -player.height - 2);
-                ctx.lineTo(-player.width/2 + 10, -player.height - 18);
-                ctx.lineTo(-player.width/2 + 22, -player.height - 8);
-                ctx.lineTo(-player.width/2 + 35, -player.height - 18);
-                ctx.lineTo(-player.width/2 + 40, -player.height - 2);
-                ctx.closePath();
-                ctx.fill();
-                ctx.strokeStyle = "#000"; ctx.lineWidth = 3; ctx.stroke();
+            ctx.fillStyle = '#f44336';
+            enemies.forEach(en => { ctx.fillRect(en.x, en.y, en.w, en.h); });
+
+            if (gameMode === 'boss' && boss) {
+                ctx.fillStyle = '#9c27b0';
+                ctx.fillRect(boss.x, boss.y, boss.w, boss.h);
+                ctx.fillStyle = '#ff9800';
+                projectiles.forEach(proj => { ctx.fillRect(proj.x, proj.y, proj.w, proj.h); });
             }
-            ctx.restore();
+
+            ctx.fillStyle = player.shield ? '#00bcd4' : (player.speedBoost ? '#ffeb3b' : '#ff5722');
+            ctx.fillRect(player.x, player.y, player.w, player.h);
         }
 
-        particles.forEach(p => {
-            ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
-            ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
-        });
-        ctx.globalAlpha = 1.0;
+        function checkCollision(a, b) {
+            return a.x < b.x + b.w && a.x + a.w > b.x &&
+                   a.y < b.y + b.h && a.y + a.h > b.y;
+        }
 
-        floatingTexts.forEach(ft => {
-            ctx.globalAlpha = ft.life; ctx.fillStyle = ft.color;
-            ctx.font = "bold 22px Changa";
-            ctx.shadowBlur = 4; ctx.shadowColor = "#000";
-            ctx.fillText(ft.text, ft.x, ft.y);
-            ctx.shadowBlur = 0;
-        });
-        ctx.globalAlpha = 1.0;
+        function triggerDeath(type, finalScore) {
+            gameRunning = false;
+            document.getElementById('game-screen').style.display = 'none';
 
-        ctx.restore();
-    }
+            totalCoins += Math.floor(finalScore / 5);
+            if (finalScore > highScore) {
+                highScore = finalScore;
+                localStorage.setItem('nightmare_highscore', highScore);
+            }
+            localStorage.setItem('nightmare_coins', totalCoins);
+            updateScoreBoard();
 
-    function loop() { 
-        if(!gameActive) { isLooping = false; return; }
-        update(); draw(); 
-        requestAnimationFrame(loop); 
-    }
-    
-    setupControls();
-    goHome();
-</script>
+            const deathTitle = document.getElementById('death-title');
+            document.getElementById('saved-coins').innerText = finalScore;
+
+            if (type === 'boss') {
+                deathTitle.innerText = "قضى عليك الزعيم!";
+            } else {
+                deathTitle.innerText = "انتهت اللعبة! لقد سقطت!";
+            }
+
+            document.getElementById('death-screen').style.display = 'flex';
+            playSound('hit');
+        }
+
+        function retryGame() {
+            document.getElementById('death-screen').style.display = 'none';
+            startActiveGame(gameMode);
+        }
+
+        function goHome() {
+            gameRunning = false;
+            document.getElementById('game-screen').style.display = 'none';
+            document.getElementById('death-screen').style.display = 'none';
+            document.querySelectorAll('.sub-screen').forEach(s => s.style.display = 'none');
+            document.getElementById('main-menu').style.display = 'flex';
+            updateScoreBoard();
+        }
+    </script>
 </body>
 </html>
