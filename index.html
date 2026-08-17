@@ -279,7 +279,6 @@
         finishLine = { x: levelLength - 300, y: canvas.height - 320, width: 60, height: 240 };
 
         for (let i = 0; i < levelLength / 55; i++) {
-            // اجعل طبقة الأرض تبدأ من ارتفاع معين وتستمر لنهاية الشاشة بالأسفل
             blocks.push({ x: i * 55, y: canvas.height - 140, width: 55, height: 180, type: 'ground' });
         }
 
@@ -401,6 +400,19 @@
         if (shakeTime > 0) { shakeX = (Math.random() - 0.5) * 12; shakeY = (Math.random() - 0.5) * 12; shakeTime--; }
         ctx.translate(-cameraX + shakeX, shakeY);
 
+        // تعديل ألوان وخلفيات العوالم تلقائياً حسب رقم المرحلة (عالم طبيعة، ثلوج، كهوف)
+        let skyColor = "#2b8cbe";
+        if (currentLevel === 1 || currentLevel === 2) {
+            skyColor = "#2b8cbe"; // عالم الطبيعة
+        } else if (currentLevel === 3 || currentLevel === 4) {
+            skyColor = "#455a64"; // عالم الثلوج والبرد
+        } else {
+            skyColor = "#111122"; // عالم الكهوف والليل
+        }
+
+        ctx.fillStyle = skyColor;
+        ctx.fillRect(cameraX, 0, canvas.width, canvas.height);
+
         ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
         clouds.forEach(cl => {
             ctx.beginPath(); ctx.arc(cl.x, cl.y, cl.size * 0.5, 0, Math.PI * 2);
@@ -416,62 +428,76 @@
 
         blocks.forEach(b => {
             if (b.type === 'ground') {
-                let grassHeight = 22; // ارتفاع طبقة العشب بالأعلى
-                let totalHeightToBottom = canvas.height - b.y; // يمتد للأسفل تماماً
+                let grassColor = "#43A047";
+                let dirtColor = "#8B5A2B";
+                let grassTopColor = "#66BB6A";
+                let grassBorder = "#1B5E20";
 
-                // 1. قاعدة الطين وتمتد لنهاية الشاشة للأسفل
-                ctx.fillStyle = "#8B5A2B"; 
+                // تخصيص ألوان الأرضية حسب العالم التلقائي
+                if (currentLevel === 3 || currentLevel === 4) {
+                    grassColor = "#ffffff";     // عشب ثلجي أبيض
+                    dirtColor = "#546e7a";      // طين صخري بارد
+                    grassTopColor = "#eceff1";
+                    grassBorder = "#37474f";
+                } else if (currentLevel >= 5) {
+                    grassColor = "#37474f";     // صخور كهف داكنة
+                    dirtColor = "#212121";      // طين أسود مظلم
+                    grassTopColor = "#546e7a";
+                    grassBorder = "#000000";
+                }
+
+                let grassHeight = 22;
+                let totalHeightToBottom = canvas.height - b.y;
+
+                // 1. قاعدة الطين
+                ctx.fillStyle = dirtColor; 
                 ctx.fillRect(b.x, b.y + grassHeight, b.width, totalHeightToBottom - grassHeight);
 
-                // 2. إضافة تفاصيل الطين والحجارة الصغيرة المعتمة والفاتحة والنقوش
-                ctx.fillStyle = "#5C3A21"; // ظلال وعروق الطين
+                // 2. تفاصيل الطين والحجارة
+                ctx.fillStyle = (currentLevel >= 5) ? "#111" : "#5C3A21";
                 ctx.fillRect(b.x + 6, b.y + 35, 12, 8);
                 ctx.fillRect(b.x + 28, b.y + 55, 16, 10);
                 ctx.fillRect(b.x + 12, b.y + 85, 10, 8);
                 ctx.fillRect(b.x + 35, b.y + 115, 14, 12);
-                ctx.fillRect(b.x + 8, b.y + 145, 18, 10);
 
-                ctx.fillStyle = "#A0653B"; // حبيبات طينية مضيئة
+                ctx.fillStyle = (currentLevel >= 5) ? "#333" : "#A0653B";
                 ctx.fillRect(b.x + 4, b.y + 50, 8, 6);
                 ctx.fillRect(b.x + 20, b.y + 70, 7, 7);
-                ctx.fillRect(b.x + 25, b.y + 100, 9, 8);
-                ctx.fillRect(b.x + 10, b.y + 130, 8, 6);
 
-                // رسم حجارة واقعية مبعثرة داخل طبقة الطين
+                // حجارة مبعثرة
                 ctx.fillStyle = "#6E6E6E";
                 ctx.beginPath();
                 ctx.arc(b.x + 15, b.y + 45, 5, 0, Math.PI*2);
                 ctx.arc(b.x + 40, b.y + 90, 7, 0, Math.PI*2);
-                ctx.arc(b.x + 22, b.y + 135, 6, 0, Math.PI*2);
                 ctx.fill();
                 ctx.strokeStyle = "#424242"; ctx.lineWidth = 1.5; ctx.stroke();
 
-                // رسم الجذور المتدلية من أعلى الطين بشكل فني رائع
-                ctx.strokeStyle = "#3D2314";
+                // الجذور المعلقة
+                ctx.strokeStyle = (currentLevel >= 5) ? "#000" : "#3D2314";
                 ctx.lineWidth = 2;
                 ctx.beginPath();
                 ctx.moveTo(b.x + 12, b.y + grassHeight);
                 ctx.quadraticCurveTo(b.x + 8, b.y + 40, b.x + 15, b.y + 60);
-                ctx.moveTo(b.x + 38, b.y + grassHeight);
-                ctx.quadraticCurveTo(b.x + 44, b.y + 50, b.x + 32, b.y + 80);
                 ctx.stroke();
 
-                // 3. رسم طبقة العشب الأخضر في النصف العلوي تماماً
-                ctx.fillStyle = "#43A047"; 
+                // 3. طبقة العشب العلوي
+                ctx.fillStyle = grassColor; 
                 ctx.fillRect(b.x, b.y, b.width, grassHeight);
                 
-                // حواف العشب المتعرجة والجميلة بالأعلى
-                ctx.fillStyle = "#66BB6A";
+                ctx.fillStyle = grassTopColor;
                 for(let gx = 0; gx < b.width; gx += 10) {
                     ctx.fillRect(b.x + gx, b.y - 3, 6, 5);
                 }
 
-                // إطار حدودي علوي مرتب
-                ctx.strokeStyle = "#1B5E20"; ctx.lineWidth = 2.5; 
+                ctx.strokeStyle = grassBorder; ctx.lineWidth = 2.5; 
                 ctx.strokeRect(b.x, b.y, b.width, grassHeight);
             } else {
-                ctx.fillStyle = "#e67e22"; ctx.fillRect(b.x, b.y, b.width, b.height);
-                ctx.strokeStyle = "#873600"; ctx.lineWidth = 3; ctx.strokeRect(b.x, b.y, b.width, b.height);
+                let brickColor = "#e67e22";
+                if (currentLevel === 3 || currentLevel === 4) brickColor = "#78909c";
+                else if (currentLevel >= 5) brickColor = "#494949";
+
+                ctx.fillStyle = brickColor; ctx.fillRect(b.x, b.y, b.width, b.height);
+                ctx.strokeStyle = "#000"; ctx.lineWidth = 3; ctx.strokeRect(b.x, b.y, b.width, b.height);
             }
         });
 
