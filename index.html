@@ -3,64 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SuperDrix</title>
+    <title>SuperDrix Pro</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Changa:wght@700;800&display=swap');
         
         * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
-        body, html { width: 100%; height: 100%; overflow: hidden; background: #2b8cbe; font-family: 'Changa', sans-serif; }
-        canvas { display: block; background: linear-gradient(#2b8cbe, #74c2e1); }
+        body, html { width: 100%; height: 100%; overflow: hidden; background: #1a1a2e; font-family: 'Changa', sans-serif; }
+        canvas { display: block; }
 
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 20, 30, 0.95);
             z-index: 30; display: none; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center;
             overflow-y: auto; padding: 20px;
         }
-        #home-screen { display: flex; }
+        #home-screen { display: flex; background: radial-gradient(circle, #2b2b4e, #1a1a2e); }
         
-        h1.title { font-size: 50px; color: #e52521; text-shadow: 4px 4px #000, -2px -2px #fff; font-weight: 900; letter-spacing: 2px; margin-bottom: 10px; }
+        h1.title { font-size: 55px; color: #00e676; text-shadow: 0 0 15px rgba(0,230,118,0.6), 4px 4px #000; font-weight: 900; letter-spacing: 2px; margin-bottom: 10px; }
         h2.subtitle { font-size: 35px; color: #ffcc00; text-shadow: 2px 2px #000; margin-bottom: 15px; }
 
-        .btn-main { background: #00e676; color: #000; font-size: 22px; font-weight: 800; padding: 10px 30px; margin: 8px; border-radius: 40px; border: 4px solid #fff; cursor: pointer; box-shadow: 0 6px 0px #00793c; transition: all 0.2s; width: 250px; }
+        .btn-main { background: #00e676; color: #000; font-size: 22px; font-weight: 800; padding: 12px 30px; margin: 10px; border-radius: 40px; border: 4px solid #fff; cursor: pointer; box-shadow: 0 6px 0px #00793c; transition: all 0.1s; width: 260px; }
         .btn-main:active { transform: translateY(6px); box-shadow: 0 0px 0px #00793c; }
-        .btn-shop { background: #ff9800; box-shadow: 0 6px 0px #e65100; }
+        .btn-shop { background: #ff9800; box-shadow: 0 6px 0px #e65100; color: #fff; text-shadow: 1px 1px 2px #000;}
         .btn-levels { background: #03a9f4; box-shadow: 0 6px 0px #01579b; }
-        .btn-back { background: #f44336; box-shadow: 0 6px 0px #b71c1c; margin-top: 20px; }
+        .btn-back { background: #f44336; box-shadow: 0 6px 0px #b71c1c; margin-top: 25px; color: #fff; }
         .btn-retry { background: #ffcc00; box-shadow: 0 6px 0px #f57f17; }
 
-        .grid-container { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; max-width: 700px; padding: 10px; }
-        .card { background: rgba(255,255,255,0.1); border: 3px solid #fff; border-radius: 15px; padding: 12px; width: 130px; text-align: center; }
+        .grid-container { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; max-width: 750px; padding: 10px; }
+        .card { background: rgba(255,255,255,0.1); border: 3px solid #fff; border-radius: 15px; padding: 15px; width: 140px; text-align: center; backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         .card.locked { opacity: 0.5; filter: grayscale(100%); pointer-events: none; }
         .card-title { font-size: 16px; margin-bottom: 8px; font-weight: bold; }
-        .buy-btn, .level-btn { background: #ffcc00; color: #000; font-weight: 800; border: 2px solid #000; padding: 5px 8px; border-radius: 10px; width: 100%; cursor: pointer; margin-top: 8px; font-size: 14px; }
-        .buy-btn:disabled { background: #888; color: #ccc; cursor: not-allowed; }
-        .buy-btn.equipped { background: #00e676; }
+        .buy-btn, .level-btn { background: #ffcc00; color: #000; font-weight: 800; border: 2px solid #000; padding: 6px 8px; border-radius: 10px; width: 100%; cursor: pointer; margin-top: 8px; font-size: 15px; transition: 0.2s;}
+        .buy-btn:disabled { background: #555; color: #999; cursor: not-allowed; border-color: #333; }
+        .buy-btn.equipped { background: #00e676; border-color: #fff; color: #fff; }
 
         #ui-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; pointer-events: none;
-            display: none; flex-direction: column; justify-content: space-between; padding: 10px 15px;
+            display: none; flex-direction: column; justify-content: space-between; padding: 15px;
         }
         .top-hud-container { width: 100%; pointer-events: auto; }
         .top-row { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
         .hud-group { display: flex; gap: 10px; align-items: center; }
         
-        .score-box { background: rgba(0, 0, 0, 0.8); color: #ffcc00; padding: 4px 10px; border-radius: 15px; font-size: 18px; font-weight: 800; border: 2px solid #fff; display: flex; align-items: center; }
-        .home-icon-btn { font-size: 20px; background: #fff; border: 2px solid #111; border-radius: 50%; width: 38px; height: 38px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 3px 0px #111; }
-        .home-icon-btn:active { transform: translateY(3px); box-shadow: 0 0px 0px #111; }
+        .score-box { background: rgba(0, 0, 0, 0.7); color: #ffcc00; padding: 5px 15px; border-radius: 20px; font-size: 20px; font-weight: 900; border: 2px solid #fff; display: flex; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+        .home-icon-btn { font-size: 20px; background: #fff; border: 2px solid #111; border-radius: 50%; width: 42px; height: 42px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 0px #111; transition: 0.1s;}
+        .home-icon-btn:active { transform: translateY(4px); box-shadow: 0 0px 0px #111; }
 
-        .level-indicator { background: rgba(0,0,0,0.8); color: #fff; padding: 2px 15px; border-radius: 15px; font-size: 16px; font-weight: bold; border: 2px solid #fff; margin: 4px auto 0; width: fit-content; box-shadow: 0 2px 6px rgba(0,0,0,0.5); }
+        .level-indicator { background: rgba(0,0,0,0.8); color: #fff; padding: 3px 20px; border-radius: 20px; font-size: 18px; font-weight: bold; border: 2px solid #00e676; margin: 10px auto 0; width: fit-content; box-shadow: 0 0 10px rgba(0,230,118,0.4); text-shadow: 1px 1px #000; }
 
         .controls-bar {
             position: absolute; bottom: 30px; width: 100%; left: 0; display: flex; justify-content: space-between; padding: 0 30px; z-index: 20; pointer-events: auto; direction: ltr;
         }
         .control-group { display: flex; gap: 15px; }
         .control-btn {
-            width: 75px; height: 75px; background: rgba(255, 255, 255, 0.9); border: 4px solid #111; border-radius: 50%; font-size: 30px; font-weight: bold; color: #111; display: flex; justify-content: center; align-items: center; box-shadow: 0 6px 0px rgba(0,0,0,0.5); cursor: pointer; transition: transform 0.05s;
+            width: 80px; height: 80px; background: rgba(255, 255, 255, 0.85); border: 4px solid #111; border-radius: 50%; font-size: 35px; font-weight: bold; color: #111; display: flex; justify-content: center; align-items: center; box-shadow: 0 6px 0px rgba(0,0,0,0.6); cursor: pointer; backdrop-filter: blur(5px);
         }
-        .control-btn:active { transform: translateY(6px); box-shadow: 0 0px 0px rgba(0,0,0,0.5); background: #ddd; }
+        .control-btn:active { transform: translateY(6px); box-shadow: 0 0px 0px rgba(0,0,0,0.6); background: #ccc; }
         #btn-jump { background: #ffcc00; color: #111; }
 
-        #total-coins-display { font-size: 22px; color: #ffcc00; font-weight: bold; margin-bottom: 15px; background: #000; padding: 8px 20px; border-radius: 20px; border: 2px solid #fff;}
+        #total-coins-display { font-size: 24px; color: #ffcc00; font-weight: bold; margin-bottom: 20px; background: rgba(0,0,0,0.6); padding: 10px 25px; border-radius: 25px; border: 2px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
@@ -87,14 +87,14 @@
 
     <div id="win-screen" class="screen">
         <h1 class="title" style="color: #00e676;">اكتملت المرحلة!</h1>
-        <p style="font-size: 24px; margin-bottom: 20px;">جمعت: <span id="win-coins">0</span> 🪙</p>
+        <p style="font-size: 26px; margin-bottom: 20px;">جمعت: <span id="win-coins">0</span> 🪙</p>
         <button class="btn-main" onclick="nextLevel()">المرحلة التالية ⏩</button>
         <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
     </div>
 
     <div id="game-over-screen" class="screen">
-        <h1 class="title" style="color: #f44336;">انتهت المحاولات!</h1>
-        <p style="font-size: 24px; margin-bottom: 20px;">لقد جمعت: <span id="game-over-coins">0</span> 🪙 (تم حفظها)</p>
+        <h1 class="title" style="color: #f44336; text-shadow: 0 0 15px rgba(244,67,54,0.6), 4px 4px #000;">انتهت المحاولات!</h1>
+        <p style="font-size: 24px; margin-bottom: 20px;">النقاط المحفوظة: <span id="game-over-coins">0</span> 🪙</p>
         <button class="btn-main btn-retry" onclick="startLevel(currentLevel)">إعادة المحاولة 🔄</button>
         <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
     </div>
@@ -122,6 +122,7 @@
     <canvas id="gameCanvas"></canvas>
 
 <script>
+    // --- الصوتيات الاحترافية ---
     let audioCtx;
     function initAudio() {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -136,36 +137,37 @@
         const now = audioCtx.currentTime;
 
         if (type === 'jump') {
-            osc.type = 'square'; osc.frequency.setValueAtTime(200, now); osc.frequency.exponentialRampToValueAtTime(400, now + 0.1);
-            gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
-            osc.start(now); osc.stop(now + 0.1);
+            osc.type = 'square'; osc.frequency.setValueAtTime(250, now); osc.frequency.exponentialRampToValueAtTime(500, now + 0.15);
+            gain.gain.setValueAtTime(0.15, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.15);
+            osc.start(now); osc.stop(now + 0.15);
         } else if (type === 'coin') {
-            osc.type = 'sine'; osc.frequency.setValueAtTime(800, now); osc.frequency.setValueAtTime(1200, now + 0.05);
+            osc.type = 'sine'; osc.frequency.setValueAtTime(1000, now); osc.frequency.setValueAtTime(1500, now + 0.08);
             gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
             osc.start(now); osc.stop(now + 0.2);
         } else if (type === 'hit') {
-            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(40, now + 0.3);
-            gain.gain.setValueAtTime(0.3, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-            osc.start(now); osc.stop(now + 0.3);
+            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(100, now); osc.frequency.exponentialRampToValueAtTime(30, now + 0.4);
+            gain.gain.setValueAtTime(0.4, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+            osc.start(now); osc.stop(now + 0.4);
         } else if (type === 'click') {
-            osc.type = 'triangle'; osc.frequency.setValueAtTime(600, now); osc.frequency.exponentialRampToValueAtTime(800, now + 0.05);
-            gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
+            osc.type = 'triangle'; osc.frequency.setValueAtTime(800, now); osc.frequency.exponentialRampToValueAtTime(1000, now + 0.05);
+            gain.gain.setValueAtTime(0.1, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.05);
             osc.start(now); osc.stop(now + 0.05);
         }
     }
 
     document.addEventListener('pointerdown', function(e) {
         if(e.target.tagName === 'BUTTON' || e.target.classList.contains('home-icon-btn') || e.target.closest('button')) {
-            initAudio();
-            playSound('click');
+            initAudio(); playSound('click');
         }
     });
 
+    // --- البيانات والمتجر ---
     let totalCoins = parseInt(localStorage.getItem('superdrix_coins')) || 0;
     let unlockedLevels = parseInt(localStorage.getItem('superdrix_unlocked_levels')) || 1;
     let unlockedSkins = JSON.parse(localStorage.getItem('superdrix_skins')) || [0];
     let currentSkinId = parseInt(localStorage.getItem('superdrix_current_skin')) || 0;
 
+    // تم إضافة شخصيات جديدة ومميزة
     const skinsData = [
         { id: 0, name: 'رُوكْ فِيكْس', cost: 0, color: '#e52521', eyes: '#ffffff', trail: ['#ffffff', '#ff9999', '#99ccff'], crown: false },
         { id: 1, name: 'النينجا الأزرق', cost: 100, color: '#00bcd4', eyes: '#ffeb3b', trail: ['#e0f7fa', '#80deea', '#26c6da'], crown: false },
@@ -173,7 +175,8 @@
         { id: 3, name: 'سایبر نيون', cost: 500, color: '#9c27b0', eyes: '#00e676', trail: ['#e1bee7', '#ba68c8', '#7b1fa2'], crown: false },
         { id: 4, name: 'الفضاء الحارق', cost: 800, color: '#ff5722', eyes: '#ffff00', trail: ['#ffccbc', '#ff7043', '#d84315'], crown: false },
         { id: 5, name: 'شبح الظلام', cost: 1200, color: '#212121', eyes: '#00bcd4', trail: ['#bdbdbd', '#757575', '#212121'], crown: false },
-        { id: 6, name: 'الملك الأسطوري', cost: 2000, color: '#ffd700', eyes: '#ff0000', trail: ['#ffea00', '#ff9100', '#ff3d00'], crown: true }
+        { id: 6, name: 'Banan_FF', cost: 2000, color: '#d50000', eyes: '#fff', trail: ['#ff5252', '#ff1744', '#d50000'], crown: true },
+        { id: 7, name: 'أم الدويس', cost: 3500, color: '#111111', eyes: '#ff0000', trail: ['#424242', '#212121', '#000000'], crown: false }
     ];
 
     const maxLevels = 6;
@@ -191,15 +194,14 @@
     }
 
     function showScreen(id) {
-        initAudio();
-        document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
+        initAudio(); document.querySelectorAll('.screen').forEach(s => s.style.display = 'none');
         document.getElementById('ui-layer').style.display = 'none';
         if (id) document.getElementById(id).style.display = 'flex';
         updateDisplayData();
     }
 
     function goHome() { gameActive = false; showScreen('home-screen'); }
-    function quitToHome() { if(confirm("هل أنت متأكد أنك تريد الخروج؟ ستفقد تقدمك في هذه المرحلة.")) goHome(); }
+    function quitToHome() { if(confirm("هل أنت متأكد أنك تريد الخروج؟")) goHome(); }
 
     function openShop() {
         showScreen('shop-screen');
@@ -210,11 +212,11 @@
             let btnHtml = isEquipped ? `<button class="buy-btn equipped" disabled>مُجهز ✔️</button>` : 
                           isUnlocked ? `<button class="buy-btn" onclick="equipSkin(${skin.id})">استخدام</button>` : 
                           `<button class="buy-btn" ${totalCoins < skin.cost ? 'disabled' : ''} onclick="buySkin(${skin.id}, ${skin.cost})">شراء 🪙 ${skin.cost}</button>`;
-            grid.innerHTML += `<div class="card"><div style="width: 45px; height: 45px; background:${skin.color}; margin: 0 auto 8px; border: 3px solid #000; border-radius: 8px; position:relative;">${skin.crown ? '<div style="position:absolute; top:-12px; left:10px; font-size:16px;">👑</div>' : ''}</div><div class="card-title">${skin.name}</div>${btnHtml}</div>`;
+            grid.innerHTML += `<div class="card"><div style="width: 50px; height: 50px; background:${skin.color}; margin: 0 auto 10px; border: 3px solid #000; border-radius: 8px; position:relative; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">${skin.crown ? '<div style="position:absolute; top:-15px; left:12px; font-size:20px; text-shadow: 1px 1px 0 #000;">👑</div>' : ''}</div><div class="card-title">${skin.name}</div>${btnHtml}</div>`;
         });
     }
 
-    function buySkin(id, cost) { if (totalCoins >= cost) { totalCoins -= cost; unlockedSkins.push(id); equipSkin(id); openShop(); } }
+    function buySkin(id, cost) { if (totalCoins >= cost) { totalCoins -= cost; unlockedSkins.push(id); equipSkin(id); } }
     function equipSkin(id) { currentSkinId = id; updateDisplayData(); openShop(); }
 
     function openLevelsScreen() {
@@ -222,33 +224,24 @@
         const grid = document.getElementById('levels-grid'); grid.innerHTML = '';
         for (let i = 1; i <= maxLevels; i++) {
             let isUnlocked = i <= unlockedLevels;
-            grid.innerHTML += `<div class="card ${isUnlocked ? '' : 'locked'}"><div style="font-size: 26px; margin-bottom: 5px;">${isUnlocked ? i : '🔒'}</div><div class="card-title">مرحلة ${i}</div>${isUnlocked ? `<button class="level-btn" onclick="startLevel(${i})">العب</button>` : ''}</div>`;
+            grid.innerHTML += `<div class="card ${isUnlocked ? '' : 'locked'}"><div style="font-size: 30px; margin-bottom: 5px; text-shadow: 2px 2px #000;">${isUnlocked ? i : '🔒'}</div><div class="card-title">مرحلة ${i}</div>${isUnlocked ? `<button class="level-btn" onclick="startLevel(${i})">العب</button>` : ''}</div>`;
         }
     }
 
     function triggerGameOver() {
-        gameActive = false;
-        totalCoins += score;
-        document.getElementById('game-over-coins').innerText = score;
-        showScreen('game-over-screen');
+        gameActive = false; totalCoins += score;
+        document.getElementById('game-over-coins').innerText = score; showScreen('game-over-screen');
     }
 
     function startLevel(lvl) {
-        initAudio();
-        currentLevel = lvl; score = 0; lives = 3;
+        initAudio(); currentLevel = lvl; score = 0; lives = 3;
         document.getElementById('current-level-text').innerText = currentLevel;
-        document.getElementById('score-val').innerText = score;
-        document.getElementById('lives-val').innerText = lives;
+        document.getElementById('score-val').innerText = score; document.getElementById('lives-val').innerText = lives;
         
-        showScreen(''); 
-        document.getElementById('ui-layer').style.display = 'flex';
+        showScreen(''); document.getElementById('ui-layer').style.display = 'flex';
         initLevel(currentLevel);
-        
         gameActive = true; 
-        if (!isLooping) {
-            isLooping = true;
-            requestAnimationFrame(loop);
-        }
+        if (!isLooping) { isLooping = true; requestAnimationFrame(loop); }
     }
 
     function winLevel() {
@@ -256,77 +249,79 @@
         if (currentLevel === unlockedLevels && unlockedLevels < maxLevels) unlockedLevels++;
         document.getElementById('win-coins').innerText = score; showScreen('win-screen');
     }
-
     function nextLevel() {
         if (currentLevel < maxLevels) startLevel(currentLevel + 1);
-        else { alert("لقد أنهيت جميع المراحل الأسطورية الحالية! مبروك يا بطل!"); goHome(); }
+        else { alert("مبروك! لقد ختمت جميع المراحل!"); goHome(); }
     }
 
+    // --- محرك اللعبة والرسومات ---
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
     function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
-    let player, blocks = [], hazards = [], coins = [], enemies = [], clouds = [], particles = [], finishLine = null;
-    let cameraX = 0, shakeTime = 0;
+    let player, blocks = [], hazards = [], coins = [], enemies = [], clouds = [], particles = [], floatingTexts = [], finishLine = null;
+    let cameraX = 0, shakeTime = 0, backgroundY = 0;
 
     function initLevel(lvl) {
-        blocks = []; hazards = []; coins = []; enemies = []; clouds = []; particles = [];
+        blocks = []; hazards = []; coins = []; enemies = []; clouds = []; particles = []; floatingTexts = [];
         let activeSkin = skinsData.find(s => s.id === currentSkinId) || skinsData[0];
-        player = { x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0, speed: 6, jumpForce: -13, grounded: false, dir: 1, trail: [], color: activeSkin.color, eyesColor: activeSkin.eyes, trailColors: activeSkin.trail, crown: activeSkin.crown };
-        let levelLength = 2500 + (lvl * 1200);
-        finishLine = { x: levelLength - 300, y: canvas.height - 350, width: 60, height: 270 };
+        
+        // تم إضافة scaleX و scaleY للفيزياء الحركية
+        player = { x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0, speed: 6.5, jumpForce: -14.5, grounded: false, dir: 1, trail: [], color: activeSkin.color, eyesColor: activeSkin.eyes, trailColors: activeSkin.trail, crown: activeSkin.crown, scaleX: 1, scaleY: 1 };
+        
+        let levelLength = 2500 + (lvl * 1500);
+        finishLine = { x: levelLength - 300, y: canvas.height - 350, width: 80, height: 270 };
 
-        // بناء أرضية متقطعة تحتوي على فجوات (حفر ماء أو نار مثل الألعاب الحقيقية)
         let cursorX = 0;
         while (cursorX < levelLength) {
-            let groundWidth = 250 + Math.random() * 250;
+            let groundWidth = 300 + Math.random() * 300;
+            let baseHeightY = canvas.height - 120;
             
-            // إضافة قطع أرضية متصلة أو سلالم وأدراج صعود وهبوط
-            let baseHeightY = canvas.height - 140;
-            
-            // إنشاء أرضية مع سلالم وأدراج صعود ونزول
-            blocks.push({ x: cursorX, y: baseHeightY, width: groundWidth, height: 180, type: 'ground' });
+            blocks.push({ x: cursorX, y: baseHeightY, width: groundWidth, height: 200, type: 'ground' });
 
-            // إضافة درج أو سلم مرتفع فوق بعض الأراضي لتشبه ألعاب المغامرات
-            if (Math.random() > 0.4 && cursorX > 300) {
-                let stairX = cursorX + 50;
-                let stairY = baseHeightY - 70;
-                blocks.push({ x: stairX, y: stairY, width: 120, height: 25, type: 'stone' });
-                coins.push({ x: stairX + 45, y: stairY - 45, width: 26, height: 26, collected: false, float: 0 });
+            if (Math.random() > 0.4 && cursorX > 400) {
+                let stairX = cursorX + 50; let stairY = baseHeightY - 80;
+                blocks.push({ x: stairX, y: stairY, width: 140, height: 30, type: 'stone' });
+                coins.push({ x: stairX + 55, y: stairY - 50, width: 28, height: 28, collected: false, float: 0 });
             }
-
             cursorX += groundWidth;
 
-            // إنشاء فجوة (حفرة) بين الأراضي تحتوي على نار أو ماء خطير
-            if (cursorX < finishLine.x - 200) {
-                let gapWidth = 120 + (lvl * 15);
+            if (cursorX < finishLine.x - 300) {
+                let gapWidth = 140 + (lvl * 20);
                 let hazardType = Math.random() > 0.5 ? 'lava' : 'water';
                 hazards.push({ x: cursorX, y: canvas.height - 60, width: gapWidth, height: 60, type: hazardType });
                 cursorX += gapWidth;
             }
         }
 
-        // إضافة منصات معلقة وعوائق وأعداء في الجو
-        for (let i = 400; i < finishLine.x; i += 320) {
+        for (let i = 500; i < finishLine.x; i += 400) {
             const blockTypes = ['wood', 'pipe', 'stone', 'metal'];
             let chosenType = blockTypes[Math.floor(Math.random() * blockTypes.length)];
             
-            blocks.push({ x: i, y: canvas.height - 260 - Math.random() * 80, width: 130, height: 32, type: chosenType });
-            coins.push({ x: i + 50, y: canvas.height - 350, width: 26, height: 26, collected: false, float: Math.random() * Math.PI });
+            blocks.push({ x: i, y: canvas.height - 280 - Math.random() * 100, width: 140, height: 35, type: chosenType });
+            coins.push({ x: i + 55, y: canvas.height - 380, width: 28, height: 28, collected: false, float: Math.random() * Math.PI });
             
-            if (Math.random() > 0.3) {
-                enemies.push({ x: i + 80, y: canvas.height - 210, width: 45, height: 45, vx: 2 + (lvl * 0.4), minX: i, maxX: i + 250, alive: true });
+            if (Math.random() > 0.2) {
+                enemies.push({ x: i + 80, y: canvas.height - 170, width: 45, height: 45, vx: 2.5 + (lvl * 0.5), minX: i, maxX: i + 300, alive: true });
             }
         }
 
-        for (let i = 0; i < 35; i++) clouds.push({ x: i * 300 + Math.random() * 100, y: 30 + Math.random() * 100, size: 40 + Math.random() * 40 });
+        for (let i = 0; i < 40; i++) clouds.push({ x: i * 350 + Math.random() * 150, y: 20 + Math.random() * 150, size: 50 + Math.random() * 50 });
         cameraX = 0;
     }
 
-    function createParticles(x, y, color) {
-        for(let i = 0; i < 15; i++) particles.push({ x: x, y: y, vx: (Math.random() - 0.5) * 10, vy: (Math.random() - 0.5) * 10, life: 1, color: color, size: Math.random() * 6 + 2 });
+    // جزيئات احترافية بالجاذبية
+    function createParticles(x, y, color, count = 20) {
+        for(let i = 0; i < count; i++) {
+            particles.push({ x: x, y: y, vx: (Math.random() - 0.5) * 12, vy: (Math.random() - 1) * 10, life: 1, color: color, size: Math.random() * 8 + 3 });
+        }
+    }
+    
+    // نصوص منبثقة للعملات
+    function createFloatingText(x, y, text, color) {
+        floatingTexts.push({ x: x, y: y, text: text, color: color, life: 1, vy: -2 });
     }
 
     let moveLeft = false, moveRight = false;
@@ -344,8 +339,10 @@
             initAudio(); 
             if (player.grounded) { 
                 player.vy = player.jumpForce; player.grounded = false; 
+                // تمدد عند القفز (Squash & Stretch)
+                player.scaleX = 0.7; player.scaleY = 1.3;
                 playSound('jump'); 
-                createParticles(player.x + 20, player.y + 40, '#ffffff'); 
+                createParticles(player.x + player.width/2, player.y + player.height, '#ffffff', 10); 
             }
         });
     }
@@ -353,41 +350,50 @@
     function update() {
         if (!gameActive) return;
 
+        // عودة الحجم الطبيعي للاعب بالتدريج
+        player.scaleX += (1 - player.scaleX) * 0.15;
+        player.scaleY += (1 - player.scaleY) * 0.15;
+
         player.vx = 0;
         if (moveLeft) { player.vx = -player.speed; player.dir = -1; }
         if (moveRight) { player.vx = player.speed; player.dir = 1; }
         player.x += player.vx;
-        player.vy += 0.6; 
+        player.vy += 0.7; // الجاذبية
         player.y += player.vy;
+        
+        let wasGrounded = player.grounded;
         player.grounded = false;
 
         if (Math.abs(player.vx) > 0 || player.vy !== 0) {
             player.trail.push({ x: player.x, y: player.y });
-            if (player.trail.length > 10) player.trail.shift();
+            if (player.trail.length > 8) player.trail.shift();
         } else if (player.trail.length > 0) player.trail.shift();
 
-        particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.life -= 0.04; });
+        // تحديث الجزيئات (إضافة جاذبية لها)
+        particles.forEach(p => { p.vy += 0.3; p.x += p.vx; p.y += p.vy; p.life -= 0.03; p.size *= 0.95; });
         particles = particles.filter(p => p.life > 0);
 
-        // اصطدام المنصات والأرضيات
+        // تحديث النصوص العائمة
+        floatingTexts.forEach(ft => { ft.y += ft.vy; ft.life -= 0.02; });
+        floatingTexts = floatingTexts.filter(ft => ft.life > 0);
+
         blocks.forEach(b => {
             if (player.x + player.width > b.x && player.x < b.x + b.width && player.y + player.height > b.y && player.y < b.y + b.height) {
-                if (player.vy > 0 && player.y + player.height - player.vy <= b.y + 15) {
+                if (player.vy > 0 && player.y + player.height - player.vy <= b.y + 20) {
                     player.y = b.y - player.height; player.vy = 0; player.grounded = true;
-                } else if (player.vy < 0 && player.y - player.vy >= b.y + b.height - 12) {
+                    // انكماش عند الهبوط (Squash)
+                    if(!wasGrounded) { player.scaleX = 1.3; player.scaleY = 0.7; createParticles(player.x + 20, player.y + 40, '#ddd', 8); }
+                } else if (player.vy < 0 && player.y - player.vy >= b.y + b.height - 15) {
                     player.y = b.y + b.height; player.vy = 0;
                 }
             }
         });
 
-        // اصطدام الحفر الخطيرة (النار أو الماء)
         hazards.forEach(hz => {
-            if (player.x + player.width > hz.x + 10 && player.x < hz.x + hz.width - 10 && player.y + player.height >= hz.y + 10) {
-                playSound('hit');
-                lives--; document.getElementById('lives-val').innerText = lives;
-                shakeTime = 20;
-                player.x = Math.max(0, hz.x - 90); player.y = 100; player.vy = 0;
-                createParticles(player.x, player.y, hz.type === 'lava' ? '#ff3d00' : '#03a9f4');
+            if (player.x + player.width > hz.x + 15 && player.x < hz.x + hz.width - 15 && player.y + player.height >= hz.y + 15) {
+                playSound('hit'); lives--; document.getElementById('lives-val').innerText = lives;
+                shakeTime = 30; player.x = Math.max(0, hz.x - 120); player.y = 50; player.vy = 0;
+                createParticles(player.x, player.y, hz.type === 'lava' ? '#ff3d00' : '#03a9f4', 30);
                 if (lives <= 0) { triggerGameOver(); }
             }
         });
@@ -396,44 +402,43 @@
             if (!en.alive) return;
             en.x += en.vx; if (en.x < en.minX || en.x > en.maxX) en.vx *= -1;
             if (player.x + player.width > en.x && player.x < en.x + en.width && player.y + player.height > en.y && player.y < en.y + en.height) {
-                if (player.vy > 0 && player.y + player.height - player.vy <= en.y + 15) {
-                    en.alive = false; player.vy = -9; score += 50; document.getElementById('score-val').innerText = score;
-                    playSound('jump'); 
-                    createParticles(en.x + 20, en.y + 20, '#ff0000');
+                if (player.vy > 0 && player.y + player.height - player.vy <= en.y + 20) {
+                    en.alive = false; player.vy = -10; score += 50; document.getElementById('score-val').innerText = score;
+                    playSound('jump'); createParticles(en.x + 20, en.y + 20, '#ff0000', 20);
+                    createFloatingText(en.x, en.y, "+50", "#ff1744");
                 } else {
-                    playSound('hit'); 
-                    lives--; document.getElementById('lives-val').innerText = lives;
-                    shakeTime = 15; player.vy = -6; player.x += (player.x < en.x) ? -50 : 50; createParticles(player.x, player.y, player.color);
+                    playSound('hit'); lives--; document.getElementById('lives-val').innerText = lives;
+                    shakeTime = 25; player.vy = -8; player.x += (player.x < en.x) ? -60 : 60; createParticles(player.x, player.y, player.color, 25);
                     if (lives <= 0) { triggerGameOver(); }
                 }
             }
         });
 
         coins.forEach(c => {
-            c.float += 0.1; c.y += Math.sin(c.float) * 0.5;
+            c.float += 0.08; c.y += Math.sin(c.float) * 0.8;
             if (!c.collected && player.x + player.width > c.x && player.x < c.x + c.width && player.y + player.height > c.y && player.y < c.y + c.height) {
                 c.collected = true; score += 10; document.getElementById('score-val').innerText = score;
-                playSound('coin'); 
-                createParticles(c.x + 13, c.y + 13, '#ffcc00');
+                playSound('coin'); createParticles(c.x + 14, c.y + 14, '#ffea00', 15);
+                createFloatingText(c.x, c.y, "+10", "#ffcc00");
             }
         });
 
         if (player.y > canvas.height) {
-            playSound('hit'); 
-            lives--; document.getElementById('lives-val').innerText = lives; shakeTime = 20;
-            player.x = cameraX + 100; player.y = 50; player.vy = 0;
+            playSound('hit'); lives--; document.getElementById('lives-val').innerText = lives; shakeTime = 30;
+            player.x = cameraX + 150; player.y = 50; player.vy = 0;
             if (lives <= 0) { triggerGameOver(); }
         }
 
         if (finishLine && player.x + player.width > finishLine.x && player.x < finishLine.x + finishLine.width) {
-            playSound('coin');
-            createParticles(player.x, player.y, '#00e676');
-            createParticles(player.x+20, player.y-20, '#ffcc00');
+            playSound('coin'); createParticles(player.x, player.y, '#00e676', 40);
+            createFloatingText(player.x, player.y - 40, "فوز!", "#00e676");
             winLevel();
         }
 
-        cameraX += ((player.x - canvas.width / 3) - cameraX) * 0.1; 
+        // حركة الكاميرا السلسة (Smooth Camera)
+        cameraX += ((player.x - canvas.width / 2.5) - cameraX) * 0.08; 
         if (cameraX < 0) cameraX = 0;
+        backgroundY = Math.sin(Date.now() * 0.0005) * 10; // حركة طفيفة للسماء
     }
 
     function draw() {
@@ -441,128 +446,156 @@
         ctx.save();
         
         let shakeX = 0, shakeY = 0;
-        if (shakeTime > 0) { shakeX = (Math.random() - 0.5) * 12; shakeY = (Math.random() - 0.5) * 12; shakeTime--; }
+        if (shakeTime > 0) { shakeX = (Math.random() - 0.5) * 15; shakeY = (Math.random() - 0.5) * 15; shakeTime--; }
         ctx.translate(-cameraX + shakeX, shakeY);
 
-        let skyColor = "#2b8cbe";
-        if (currentLevel === 3 || currentLevel === 4) skyColor = "#455a64"; 
-        else if (currentLevel >= 5) skyColor = "#111122"; 
+        // --- رسم الخلفية والجبال (Parallax Effect) ---
+        let skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        if (currentLevel === 3 || currentLevel === 4) { skyGradient.addColorStop(0, "#263238"); skyGradient.addColorStop(1, "#455a64"); } 
+        else if (currentLevel >= 5) { skyGradient.addColorStop(0, "#0a0a1a"); skyGradient.addColorStop(1, "#1a1a2e"); }
+        else { skyGradient.addColorStop(0, "#1976d2"); skyGradient.addColorStop(1, "#64b5f6"); }
 
-        ctx.fillStyle = skyColor;
+        ctx.fillStyle = skyGradient;
         ctx.fillRect(cameraX, 0, canvas.width, canvas.height);
 
-        ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+        // الجبال في الخلفية (تتحرك ببطء)
+        ctx.fillStyle = (currentLevel >= 5) ? "#111" : (currentLevel > 2 ? "#37474f" : "#1565c0");
+        for(let i = -1; i < 10; i++) {
+            ctx.beginPath();
+            let pX = (cameraX * 0.8) + (i * 400); // 0.8 للبارالاكس
+            ctx.moveTo(pX, canvas.height);
+            ctx.lineTo(pX + 200, canvas.height - 300 + backgroundY);
+            ctx.lineTo(pX + 400, canvas.height);
+            ctx.fill();
+        }
+
+        // السحب
+        ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
         clouds.forEach(cl => {
-            ctx.beginPath(); ctx.arc(cl.x, cl.y, cl.size * 0.5, 0, Math.PI * 2);
-            ctx.arc(cl.x + cl.size * 0.4, cl.y - cl.size * 0.2, cl.size * 0.4, 0, Math.PI * 2);
-            ctx.arc(cl.x + cl.size * 0.8, cl.y, cl.size * 0.45, 0, Math.PI * 2); ctx.fill();
+            let cx = cl.x + (cameraX * 0.5); // حركة بطيئة للسحب
+            ctx.beginPath(); ctx.arc(cx, cl.y, cl.size * 0.5, 0, Math.PI * 2);
+            ctx.arc(cx + cl.size * 0.4, cl.y - cl.size * 0.2, cl.size * 0.4, 0, Math.PI * 2);
+            ctx.arc(cx + cl.size * 0.8, cl.y, cl.size * 0.45, 0, Math.PI * 2); ctx.fill();
         });
 
-        // رسم الحفر الخطيرة (النار أو الماء)
+        // رسم الحفر مع التوهج الشفاف
         hazards.forEach(hz => {
             if (hz.type === 'lava') {
-                ctx.fillStyle = "#ff3d00";
-                ctx.fillRect(hz.x, hz.y + 20, hz.width, hz.height - 20);
-                // تأثير حريق مضيء متحرك
+                ctx.shadowBlur = 20; ctx.shadowColor = "#ff3d00"; // توهج
+                ctx.fillStyle = "#ff3d00"; ctx.fillRect(hz.x, hz.y + 20, hz.width, hz.height - 20);
+                ctx.shadowBlur = 0;
                 ctx.fillStyle = "#ffea00";
-                for(let i=0; i<hz.width; i+=30) {
-                    ctx.fillRect(hz.x + i + (Date.now()/100 % 15), hz.y + 10, 15, 15);
-                }
+                for(let i=0; i<hz.width; i+=40) { ctx.fillRect(hz.x + i + (Date.now()/50 % 20), hz.y + 10, 20, 20); }
             } else {
-                ctx.fillStyle = "#03a9f4";
-                ctx.fillRect(hz.x, hz.y + 15, hz.width, hz.height - 15);
-                ctx.fillStyle = "#81d4fa";
-                ctx.fillRect(hz.x, hz.y + 10, hz.width, 8);
+                ctx.shadowBlur = 15; ctx.shadowColor = "#00bcd4";
+                ctx.fillStyle = "#03a9f4"; ctx.fillRect(hz.x, hz.y + 15, hz.width, hz.height - 15);
+                ctx.shadowBlur = 0;
+                ctx.fillStyle = "#e0f7fa"; ctx.fillRect(hz.x, hz.y + 10, hz.width, 10);
             }
         });
 
         if (finishLine) {
-            ctx.fillStyle = "#fff"; ctx.fillRect(finishLine.x, finishLine.y, 10, finishLine.height);
-            ctx.fillStyle = "#00e676"; ctx.fillRect(finishLine.x + 10, finishLine.y, finishLine.width, 40);
-            ctx.fillStyle = "#000"; ctx.font = "20px Changa"; ctx.fillText("النهاية", finishLine.x + 15, finishLine.y + 28);
+            ctx.fillStyle = "#fff"; ctx.fillRect(finishLine.x, finishLine.y, 12, finishLine.height);
+            ctx.shadowBlur = 20; ctx.shadowColor = "#00e676";
+            ctx.fillStyle = "#00e676"; ctx.fillRect(finishLine.x + 12, finishLine.y, finishLine.width, 45);
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = "#000"; ctx.font = "24px Changa"; ctx.fillText("النهاية", finishLine.x + 18, finishLine.y + 32);
         }
 
         blocks.forEach(b => {
             if (b.type === 'ground') {
-                let grassColor = "#43A047", dirtColor = "#8B5A2B", grassBorder = "#1B5E20";
-                if (currentLevel === 3 || currentLevel === 4) { grassColor = "#eceff1"; dirtColor = "#546e7a"; grassBorder = "#37474f"; } 
-                else if (currentLevel >= 5) { grassColor = "#546e7a"; dirtColor = "#212121"; grassBorder = "#000"; }
+                let grassColor = "#43A047", dirtColor = "#5D4037", grassBorder = "#1B5E20";
+                if (currentLevel === 3 || currentLevel === 4) { grassColor = "#b0bec5"; dirtColor = "#37474f"; grassBorder = "#263238"; } 
+                else if (currentLevel >= 5) { grassColor = "#455a64"; dirtColor = "#212121"; grassBorder = "#000"; }
 
-                let grassHeight = 22;
-                ctx.fillStyle = dirtColor; 
-                ctx.fillRect(b.x, b.y + grassHeight, b.width, (canvas.height - b.y) - grassHeight);
-                ctx.fillStyle = grassColor; 
-                ctx.fillRect(b.x, b.y, b.width, grassHeight);
-                ctx.strokeStyle = grassBorder; ctx.lineWidth = 2.5; 
-                ctx.strokeRect(b.x, b.y, b.width, grassHeight);
+                ctx.fillStyle = dirtColor; ctx.fillRect(b.x, b.y + 25, b.width, (canvas.height - b.y) - 25);
+                ctx.fillStyle = grassColor; ctx.fillRect(b.x, b.y, b.width, 25);
+                ctx.strokeStyle = grassBorder; ctx.lineWidth = 4; ctx.strokeRect(b.x, b.y, b.width, 25);
             } else {
-                if (b.type === 'wood') {
-                    ctx.fillStyle = "#a0522d"; ctx.fillRect(b.x, b.y, b.width, b.height);
-                    ctx.strokeStyle = "#5c2c16"; ctx.lineWidth = 3; ctx.strokeRect(b.x, b.y, b.width, b.height);
-                } else if (b.type === 'pipe') {
-                    ctx.fillStyle = "#2ecc71"; ctx.fillRect(b.x, b.y, b.width, b.height);
-                    ctx.strokeStyle = "#145a32"; ctx.lineWidth = 3; ctx.strokeRect(b.x, b.y, b.width, b.height);
-                } else if (b.type === 'stone') {
-                    ctx.fillStyle = "#7f8c8d"; ctx.fillRect(b.x, b.y, b.width, b.height);
-                    ctx.strokeStyle = "#2c3e50"; ctx.lineWidth = 3; ctx.strokeRect(b.x, b.y, b.width, b.height);
-                } else {
-                    ctx.fillStyle = "#34495e"; ctx.fillRect(b.x, b.y, b.width, b.height);
-                    ctx.strokeStyle = "#00bcd4"; ctx.lineWidth = 3; ctx.strokeRect(b.x, b.y, b.width, b.height);
-                }
+                let pColor = "#34495e", bColor = "#2c3e50";
+                if (b.type === 'wood') { pColor = "#8d6e63"; bColor = "#4e342e"; } 
+                else if (b.type === 'pipe') { pColor = "#4caf50"; bColor = "#1b5e20"; }
+                else if (b.type === 'stone') { pColor = "#90a4ae"; bColor = "#455a64"; }
+                
+                ctx.fillStyle = pColor; ctx.fillRect(b.x, b.y, b.width, b.height);
+                ctx.strokeStyle = bColor; ctx.lineWidth = 4; ctx.strokeRect(b.x, b.y, b.width, b.height);
             }
         });
 
         coins.forEach(c => {
             if (!c.collected) {
+                ctx.shadowBlur = 10; ctx.shadowColor = "#ffcc00";
                 ctx.fillStyle = "#ffcc00"; ctx.beginPath(); ctx.arc(c.x + c.width/2, c.y + c.height/2, c.width/2, 0, Math.PI*2); ctx.fill();
-                ctx.strokeStyle = "#fff"; ctx.lineWidth = 3; ctx.stroke();
+                ctx.strokeStyle = "#fff"; ctx.lineWidth = 4; ctx.stroke();
+                ctx.shadowBlur = 0;
             }
         });
 
         enemies.forEach(en => {
             if (en.alive) {
-                ctx.fillStyle = "#7b1fa2"; ctx.fillRect(en.x, en.y, en.width, en.height);
-                ctx.fillStyle = "#ffeb3b"; ctx.fillRect(en.x + 8, en.y + 10, 10, 10); ctx.fillRect(en.x + 28, en.y + 10, 10, 10);
+                ctx.shadowBlur = 15; ctx.shadowColor = "#d50000";
+                ctx.fillStyle = "#212121"; ctx.fillRect(en.x, en.y, en.width, en.height);
+                ctx.fillStyle = "#ff1744"; ctx.fillRect(en.x + 8, en.y + 12, 12, 12); ctx.fillRect(en.x + 25, en.y + 12, 12, 12);
+                ctx.shadowBlur = 0;
             }
         });
 
+        // رسم أثر اللاعب
         if(player && player.trailColors) {
             player.trail.forEach((t, i) => {
-                ctx.globalAlpha = (i / player.trail.length) * 0.6;
+                ctx.globalAlpha = (i / player.trail.length) * 0.5;
                 ctx.fillStyle = player.trailColors[i % 3];
-                ctx.fillRect(t.x + 2, t.y + 2, player.width - 4, player.height - 4);
+                ctx.fillRect(t.x + 4, t.y + 4, player.width - 8, player.height - 8);
             });
             ctx.globalAlpha = 1.0;
         }
 
+        // رسم اللاعب مع التمدد والانكماش
         if(player) {
-            if(player.crown) { ctx.shadowBlur = 15; ctx.shadowColor = "#ffea00"; }
-            ctx.fillStyle = "#000000"; ctx.fillRect(player.x - 3, player.y - 3, player.width + 6, player.height + 6);
-            ctx.fillStyle = player.color; ctx.fillRect(player.x, player.y, player.width, player.height);
+            ctx.save();
+            // نقل النقطة المركزية لأسفل اللاعب ليكون التمدد من القاعدة
+            ctx.translate(player.x + player.width/2, player.y + player.height);
+            ctx.scale(player.scaleX, player.scaleY);
+            
+            if(player.crown) { ctx.shadowBlur = 20; ctx.shadowColor = "#ffea00"; }
+            ctx.fillStyle = "#000000"; ctx.fillRect(-player.width/2 - 4, -player.height - 4, player.width + 8, player.height + 8);
+            ctx.fillStyle = player.color; ctx.fillRect(-player.width/2, -player.height, player.width, player.height);
             ctx.shadowBlur = 0;
 
             ctx.fillStyle = player.eyesColor;
-            let eyeOffset = player.dir === 1 ? 4 : -4;
-            ctx.fillRect(player.x + 10 + eyeOffset, player.y + 12, 8, 10);
-            ctx.fillRect(player.x + 26 + eyeOffset, player.y + 12, 8, 10);
+            let eyeOffset = player.dir === 1 ? 5 : -5;
+            ctx.fillRect(-player.width/2 + 10 + eyeOffset, -player.height + 12, 10, 12);
+            ctx.fillRect(-player.width/2 + 25 + eyeOffset, -player.height + 12, 10, 12);
 
             if(player.crown) {
                 ctx.fillStyle = "#ffcc00";
                 ctx.beginPath();
-                ctx.moveTo(player.x + 5, player.y - 2);
-                ctx.lineTo(player.x + 10, player.y - 14);
-                ctx.lineTo(player.x + 22, player.y - 6);
-                ctx.lineTo(player.x + 35, player.y - 14);
-                ctx.lineTo(player.x + 40, player.y - 2);
+                ctx.moveTo(-player.width/2 + 5, -player.height - 2);
+                ctx.lineTo(-player.width/2 + 10, -player.height - 18);
+                ctx.lineTo(-player.width/2 + 22, -player.height - 8);
+                ctx.lineTo(-player.width/2 + 35, -player.height - 18);
+                ctx.lineTo(-player.width/2 + 40, -player.height - 2);
                 ctx.closePath();
                 ctx.fill();
-                ctx.strokeStyle = "#000"; ctx.lineWidth = 2; ctx.stroke();
+                ctx.strokeStyle = "#000"; ctx.lineWidth = 3; ctx.stroke();
             }
+            ctx.restore();
         }
 
+        // الجزيئات
         particles.forEach(p => {
             ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
             ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
+        });
+        ctx.globalAlpha = 1.0;
+
+        // النصوص العائمة
+        floatingTexts.forEach(ft => {
+            ctx.globalAlpha = ft.life; ctx.fillStyle = ft.color;
+            ctx.font = "bold 24px Changa";
+            ctx.shadowBlur = 4; ctx.shadowColor = "#000";
+            ctx.fillText(ft.text, ft.x, ft.y);
+            ctx.shadowBlur = 0;
         });
         ctx.globalAlpha = 1.0;
 
