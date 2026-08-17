@@ -19,7 +19,6 @@
         body, html { width: 100%; height: 100%; overflow: hidden; background: #1a1a2e; font-family: 'Changa', sans-serif; }
         canvas { display: block; }
 
-        /* تم تعديل الشاشات لتسمح بالتمرير الطبيعي على الموبايل من الأعلى للأسفل */
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 20, 30, 0.98);
             z-index: 30; display: none; flex-direction: column; justify-content: flex-start; align-items: center; color: white; text-align: center;
@@ -180,7 +179,7 @@
 
     const skinsData = [];
     for (let i = 0; i < 100; i++) {
-        let cost = i === 0 ? 0 : (i === 99 ? 15000 : i * 150);
+        let cost = i === 0 ? 0 : (i === 99 ? 0 : i * 150); // جعل سعر سكن قوس قزح مجاني تماماً
         let tierClass = "tier-common";
         let tierName = "عادي";
         let crown = false;
@@ -215,8 +214,10 @@
     const maxLevels = 100;
     let totalCoins = parseInt(localStorage.getItem('superdrix_coins')) || 50000;
     let unlockedLevels = parseInt(localStorage.getItem('superdrix_unlocked_levels')) || 1;
-    let unlockedSkins = JSON.parse(localStorage.getItem('superdrix_skins')) || [0];
-    let currentSkinId = parseInt(localStorage.getItem('superdrix_current_skin')) || 0;
+    // جعل سكن الملك قوس قزح (رقم 99) مفتوح ومجهز افتراضياً للجميع
+    let unlockedSkins = JSON.parse(localStorage.getItem('superdrix_skins')) || [0, 99];
+    if(!unlockedSkins.includes(99)) unlockedSkins.push(99);
+    let currentSkinId = parseInt(localStorage.getItem('superdrix_current_skin')) || 99;
 
     let currentLevel = 1;
     let score = 0, lives = 3, gameActive = false;
@@ -237,7 +238,7 @@
         if (id) {
             const targetScreen = document.getElementById(id);
             targetScreen.style.display = 'flex';
-            targetScreen.scrollTop = 0; // إعادة التمرير للأعلى عند فتح الشاشة
+            targetScreen.scrollTop = 0;
         }
         updateDisplayData();
     }
@@ -320,7 +321,7 @@
 
     function initLevel(lvl) {
         blocks = []; hazards = []; coins = []; enemies = []; clouds = []; particles = []; floatingTexts = [];
-        let activeSkin = skinsData[currentSkinId] || skinsData[0];
+        let activeSkin = skinsData[currentSkinId] || skinsData[99];
         
         player = { 
             x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0, speed: 6.5, jumpForce: -14.5, grounded: false, dir: 1, trail: [], 
