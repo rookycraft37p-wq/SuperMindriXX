@@ -268,29 +268,60 @@
     function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
     window.addEventListener('resize', resizeCanvas); resizeCanvas();
 
-    let player, blocks = [], coins = [], enemies = [], clouds = [], particles = [], finishLine = null;
+    let player, blocks = [], hazards = [], coins = [], enemies = [], clouds = [], particles = [], finishLine = null;
     let cameraX = 0, shakeTime = 0;
 
     function initLevel(lvl) {
-        blocks = []; coins = []; enemies = []; clouds = []; particles = [];
+        blocks = []; hazards = []; coins = []; enemies = []; clouds = []; particles = [];
         let activeSkin = skinsData.find(s => s.id === currentSkinId) || skinsData[0];
         player = { x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0, speed: 6, jumpForce: -13, grounded: false, dir: 1, trail: [], color: activeSkin.color, eyesColor: activeSkin.eyes, trailColors: activeSkin.trail, crown: activeSkin.crown };
-        let levelLength = 2000 + (lvl * 1200);
-        finishLine = { x: levelLength - 300, y: canvas.height - 320, width: 60, height: 240 };
+        let levelLength = 2500 + (lvl * 1200);
+        finishLine = { x: levelLength - 300, y: canvas.height - 350, width: 60, height: 270 };
 
-        for (let i = 0; i < levelLength / 55; i++) {
-            blocks.push({ x: i * 55, y: canvas.height - 140, width: 55, height: 180, type: 'ground' });
-        }
+        // بناء أرضية متقطعة تحتوي على فجوات (حفر ماء أو نار مثل الألعاب الحقيقية)
+        let cursorX = 0;
+        while (cursorX < levelLength) {
+            let groundWidth = 250 + Math.random() * 250;
+            
+            // إضافة قطع أرضية متصلة أو سلالم وأدراج صعود وهبوط
+            let baseHeightY = canvas.height - 140;
+            
+            // إنشاء أرضية مع سلالم وأدراج صعود ونزول
+            blocks.push({ x: cursorX, y: baseHeightY, width: groundWidth, height: 180, type: 'ground' });
 
-        for (let i = 400; i < finishLine.x; i += 280) {
-            if (Math.random() > 0.3) {
-                blocks.push({ x: i, y: canvas.height - 240 - Math.random() * 80, width: 140, height: 35, type: 'brick' });
-                coins.push({ x: i + 50, y: canvas.height - 340, width: 26, height: 26, collected: false, float: Math.random() * Math.PI });
+            // إضافة درج أو سلم مرتفع فوق بعض الأراضي لتشبه ألعاب المغامرات
+            if (Math.random() > 0.4 && cursorX > 300) {
+                let stairX = cursorX + 50;
+                let stairY = baseHeightY - 70;
+                blocks.push({ x: stairX, y: stairY, width: 120, height: 25, type: 'stone' });
+                coins.push({ x: stairX + 45, y: stairY - 45, width: 26, height: 26, collected: false, float: 0 });
             }
-            if (Math.random() > 0.4) enemies.push({ x: i + 100, y: canvas.height - 190, width: 45, height: 45, vx: 2 + (lvl * 0.4), minX: i, maxX: i + 280, alive: true });
-            coins.push({ x: i + 140, y: canvas.height - 210, width: 26, height: 26, collected: false, float: 0 });
+
+            cursorX += groundWidth;
+
+            // إنشاء فجوة (حفرة) بين الأراضي تحتوي على نار أو ماء خطير
+            if (cursorX < finishLine.x - 200) {
+                let gapWidth = 120 + (lvl * 15);
+                let hazardType = Math.random() > 0.5 ? 'lava' : 'water';
+                hazards.push({ x: cursorX, y: canvas.height - 60, width: gapWidth, height: 60, type: hazardType });
+                cursorX += gapWidth;
+            }
         }
-        for (let i = 0; i < 30; i++) clouds.push({ x: i * 300 + Math.random() * 100, y: 30 + Math.random() * 100, size: 40 + Math.random() * 40 });
+
+        // إضافة منصات معلقة وعوائق وأعداء في الجو
+        for (let i = 400; i < finishLine.x; i += 320) {
+            const blockTypes = ['wood', 'pipe', 'stone', 'metal'];
+            let chosenType = blockTypes[Math.floor(Math.random() * blockTypes.length)];
+            
+            blocks.push({ x: i, y: canvas.height - 260 - Math.random() * 80, width: 130, height: 32, type: chosenType });
+            coins.push({ x: i + 50, y: canvas.height - 350, width: 26, height: 26, collected: false, float: Math.random() * Math.PI });
+            
+            if (Math.random() > 0.3) {
+                enemies.push({ x: i + 80, y: canvas.height - 210, width: 45, height: 45, vx: 2 + (lvl * 0.4), minX: i, maxX: i + 250, alive: true });
+            }
+        }
+
+        for (let i = 0; i < 35; i++) clouds.push({ x: i * 300 + Math.random() * 100, y: 30 + Math.random() * 100, size: 40 + Math.random() * 40 });
         cameraX = 0;
     }
 
@@ -338,6 +369,7 @@
         particles.forEach(p => { p.x += p.vx; p.y += p.vy; p.life -= 0.04; });
         particles = particles.filter(p => p.life > 0);
 
+        // اصطدام المنصات والأرضيات
         blocks.forEach(b => {
             if (player.x + player.width > b.x && player.x < b.x + b.width && player.y + player.height > b.y && player.y < b.y + b.height) {
                 if (player.vy > 0 && player.y + player.height - player.vy <= b.y + 15) {
@@ -345,6 +377,18 @@
                 } else if (player.vy < 0 && player.y - player.vy >= b.y + b.height - 12) {
                     player.y = b.y + b.height; player.vy = 0;
                 }
+            }
+        });
+
+        // اصطدام الحفر الخطيرة (النار أو الماء)
+        hazards.forEach(hz => {
+            if (player.x + player.width > hz.x + 10 && player.x < hz.x + hz.width - 10 && player.y + player.height >= hz.y + 10) {
+                playSound('hit');
+                lives--; document.getElementById('lives-val').innerText = lives;
+                shakeTime = 20;
+                player.x = Math.max(0, hz.x - 90); player.y = 100; player.vy = 0;
+                createParticles(player.x, player.y, hz.type === 'lava' ? '#ff3d00' : '#03a9f4');
+                if (lives <= 0) { triggerGameOver(); }
             }
         });
 
@@ -400,15 +444,9 @@
         if (shakeTime > 0) { shakeX = (Math.random() - 0.5) * 12; shakeY = (Math.random() - 0.5) * 12; shakeTime--; }
         ctx.translate(-cameraX + shakeX, shakeY);
 
-        // تعديل ألوان وخلفيات العوالم تلقائياً حسب رقم المرحلة (عالم طبيعة، ثلوج، كهوف)
         let skyColor = "#2b8cbe";
-        if (currentLevel === 1 || currentLevel === 2) {
-            skyColor = "#2b8cbe"; // عالم الطبيعة
-        } else if (currentLevel === 3 || currentLevel === 4) {
-            skyColor = "#455a64"; // عالم الثلوج والبرد
-        } else {
-            skyColor = "#111122"; // عالم الكهوف والليل
-        }
+        if (currentLevel === 3 || currentLevel === 4) skyColor = "#455a64"; 
+        else if (currentLevel >= 5) skyColor = "#111122"; 
 
         ctx.fillStyle = skyColor;
         ctx.fillRect(cameraX, 0, canvas.width, canvas.height);
@@ -420,6 +458,24 @@
             ctx.arc(cl.x + cl.size * 0.8, cl.y, cl.size * 0.45, 0, Math.PI * 2); ctx.fill();
         });
 
+        // رسم الحفر الخطيرة (النار أو الماء)
+        hazards.forEach(hz => {
+            if (hz.type === 'lava') {
+                ctx.fillStyle = "#ff3d00";
+                ctx.fillRect(hz.x, hz.y + 20, hz.width, hz.height - 20);
+                // تأثير حريق مضيء متحرك
+                ctx.fillStyle = "#ffea00";
+                for(let i=0; i<hz.width; i+=30) {
+                    ctx.fillRect(hz.x + i + (Date.now()/100 % 15), hz.y + 10, 15, 15);
+                }
+            } else {
+                ctx.fillStyle = "#03a9f4";
+                ctx.fillRect(hz.x, hz.y + 15, hz.width, hz.height - 15);
+                ctx.fillStyle = "#81d4fa";
+                ctx.fillRect(hz.x, hz.y + 10, hz.width, 8);
+            }
+        });
+
         if (finishLine) {
             ctx.fillStyle = "#fff"; ctx.fillRect(finishLine.x, finishLine.y, 10, finishLine.height);
             ctx.fillStyle = "#00e676"; ctx.fillRect(finishLine.x + 10, finishLine.y, finishLine.width, 40);
@@ -428,76 +484,31 @@
 
         blocks.forEach(b => {
             if (b.type === 'ground') {
-                let grassColor = "#43A047";
-                let dirtColor = "#8B5A2B";
-                let grassTopColor = "#66BB6A";
-                let grassBorder = "#1B5E20";
-
-                // تخصيص ألوان الأرضية حسب العالم التلقائي
-                if (currentLevel === 3 || currentLevel === 4) {
-                    grassColor = "#ffffff";     // عشب ثلجي أبيض
-                    dirtColor = "#546e7a";      // طين صخري بارد
-                    grassTopColor = "#eceff1";
-                    grassBorder = "#37474f";
-                } else if (currentLevel >= 5) {
-                    grassColor = "#37474f";     // صخور كهف داكنة
-                    dirtColor = "#212121";      // طين أسود مظلم
-                    grassTopColor = "#546e7a";
-                    grassBorder = "#000000";
-                }
+                let grassColor = "#43A047", dirtColor = "#8B5A2B", grassBorder = "#1B5E20";
+                if (currentLevel === 3 || currentLevel === 4) { grassColor = "#eceff1"; dirtColor = "#546e7a"; grassBorder = "#37474f"; } 
+                else if (currentLevel >= 5) { grassColor = "#546e7a"; dirtColor = "#212121"; grassBorder = "#000"; }
 
                 let grassHeight = 22;
-                let totalHeightToBottom = canvas.height - b.y;
-
-                // 1. قاعدة الطين
                 ctx.fillStyle = dirtColor; 
-                ctx.fillRect(b.x, b.y + grassHeight, b.width, totalHeightToBottom - grassHeight);
-
-                // 2. تفاصيل الطين والحجارة
-                ctx.fillStyle = (currentLevel >= 5) ? "#111" : "#5C3A21";
-                ctx.fillRect(b.x + 6, b.y + 35, 12, 8);
-                ctx.fillRect(b.x + 28, b.y + 55, 16, 10);
-                ctx.fillRect(b.x + 12, b.y + 85, 10, 8);
-                ctx.fillRect(b.x + 35, b.y + 115, 14, 12);
-
-                ctx.fillStyle = (currentLevel >= 5) ? "#333" : "#A0653B";
-                ctx.fillRect(b.x + 4, b.y + 50, 8, 6);
-                ctx.fillRect(b.x + 20, b.y + 70, 7, 7);
-
-                // حجارة مبعثرة
-                ctx.fillStyle = "#6E6E6E";
-                ctx.beginPath();
-                ctx.arc(b.x + 15, b.y + 45, 5, 0, Math.PI*2);
-                ctx.arc(b.x + 40, b.y + 90, 7, 0, Math.PI*2);
-                ctx.fill();
-                ctx.strokeStyle = "#424242"; ctx.lineWidth = 1.5; ctx.stroke();
-
-                // الجذور المعلقة
-                ctx.strokeStyle = (currentLevel >= 5) ? "#000" : "#3D2314";
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.moveTo(b.x + 12, b.y + grassHeight);
-                ctx.quadraticCurveTo(b.x + 8, b.y + 40, b.x + 15, b.y + 60);
-                ctx.stroke();
-
-                // 3. طبقة العشب العلوي
+                ctx.fillRect(b.x, b.y + grassHeight, b.width, (canvas.height - b.y) - grassHeight);
                 ctx.fillStyle = grassColor; 
                 ctx.fillRect(b.x, b.y, b.width, grassHeight);
-                
-                ctx.fillStyle = grassTopColor;
-                for(let gx = 0; gx < b.width; gx += 10) {
-                    ctx.fillRect(b.x + gx, b.y - 3, 6, 5);
-                }
-
                 ctx.strokeStyle = grassBorder; ctx.lineWidth = 2.5; 
                 ctx.strokeRect(b.x, b.y, b.width, grassHeight);
             } else {
-                let brickColor = "#e67e22";
-                if (currentLevel === 3 || currentLevel === 4) brickColor = "#78909c";
-                else if (currentLevel >= 5) brickColor = "#494949";
-
-                ctx.fillStyle = brickColor; ctx.fillRect(b.x, b.y, b.width, b.height);
-                ctx.strokeStyle = "#000"; ctx.lineWidth = 3; ctx.strokeRect(b.x, b.y, b.width, b.height);
+                if (b.type === 'wood') {
+                    ctx.fillStyle = "#a0522d"; ctx.fillRect(b.x, b.y, b.width, b.height);
+                    ctx.strokeStyle = "#5c2c16"; ctx.lineWidth = 3; ctx.strokeRect(b.x, b.y, b.width, b.height);
+                } else if (b.type === 'pipe') {
+                    ctx.fillStyle = "#2ecc71"; ctx.fillRect(b.x, b.y, b.width, b.height);
+                    ctx.strokeStyle = "#145a32"; ctx.lineWidth = 3; ctx.strokeRect(b.x, b.y, b.width, b.height);
+                } else if (b.type === 'stone') {
+                    ctx.fillStyle = "#7f8c8d"; ctx.fillRect(b.x, b.y, b.width, b.height);
+                    ctx.strokeStyle = "#2c3e50"; ctx.lineWidth = 3; ctx.strokeRect(b.x, b.y, b.width, b.height);
+                } else {
+                    ctx.fillStyle = "#34495e"; ctx.fillRect(b.x, b.y, b.width, b.height);
+                    ctx.strokeStyle = "#00bcd4"; ctx.lineWidth = 3; ctx.strokeRect(b.x, b.y, b.width, b.height);
+                }
             }
         });
 
@@ -525,14 +536,9 @@
         }
 
         if(player) {
-            if(player.crown) {
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = "#ffea00";
-            }
-
+            if(player.crown) { ctx.shadowBlur = 15; ctx.shadowColor = "#ffea00"; }
             ctx.fillStyle = "#000000"; ctx.fillRect(player.x - 3, player.y - 3, player.width + 6, player.height + 6);
             ctx.fillStyle = player.color; ctx.fillRect(player.x, player.y, player.width, player.height);
-
             ctx.shadowBlur = 0;
 
             ctx.fillStyle = player.eyesColor;
@@ -550,9 +556,7 @@
                 ctx.lineTo(player.x + 40, player.y - 2);
                 ctx.closePath();
                 ctx.fill();
-                ctx.strokeStyle = "#000";
-                ctx.lineWidth = 2;
-                ctx.stroke();
+                ctx.strokeStyle = "#000"; ctx.lineWidth = 2; ctx.stroke();
             }
         }
 
@@ -566,12 +570,8 @@
     }
 
     function loop() { 
-        if(!gameActive) {
-            isLooping = false; 
-            return;
-        }
-        update(); 
-        draw(); 
+        if(!gameActive) { isLooping = false; return; }
+        update(); draw(); 
         requestAnimationFrame(loop); 
     }
     
