@@ -3,37 +3,56 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SuperDrix Pro</title>
+    <title>Super Mindrix Pro - 100 Levels & Skins</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Changa:wght@700;800&display=swap');
         
-        * { box-sizing: border-box; user-select: none; -webkit-user-select: none; margin: 0; padding: 0; }
+        * { 
+            box-sizing: border-box; 
+            user-select: none; 
+            -webkit-user-select: none; 
+            -webkit-touch-callout: none;
+            margin: 0; 
+            padding: 0; 
+            touch-action: manipulation; 
+        }
         body, html { width: 100%; height: 100%; overflow: hidden; background: #1a1a2e; font-family: 'Changa', sans-serif; }
         canvas { display: block; }
 
         .screen {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 20, 30, 0.95);
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 20, 30, 0.96);
             z-index: 30; display: none; flex-direction: column; justify-content: center; align-items: center; color: white; text-align: center;
-            overflow-y: auto; padding: 20px;
+            overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 20px;
         }
         #home-screen { display: flex; background: radial-gradient(circle, #2b2b4e, #1a1a2e); }
         
-        h1.title { font-size: 55px; color: #00e676; text-shadow: 0 0 15px rgba(0,230,118,0.6), 4px 4px #000; font-weight: 900; letter-spacing: 2px; margin-bottom: 10px; }
-        h2.subtitle { font-size: 35px; color: #ffcc00; text-shadow: 2px 2px #000; margin-bottom: 15px; }
+        h1.title { font-size: 50px; color: #00e676; text-shadow: 0 0 15px rgba(0,230,118,0.6), 4px 4px #000; font-weight: 900; letter-spacing: 2px; margin-bottom: 5px; }
+        h2.subtitle { font-size: 32px; color: #ffcc00; text-shadow: 2px 2px #000; margin-bottom: 15px; }
 
-        .btn-main { background: #00e676; color: #000; font-size: 22px; font-weight: 800; padding: 12px 30px; margin: 10px; border-radius: 40px; border: 4px solid #fff; cursor: pointer; box-shadow: 0 6px 0px #00793c; transition: all 0.1s; width: 260px; }
+        .btn-main { background: #00e676; color: #000; font-size: 20px; font-weight: 800; padding: 12px 30px; margin: 8px; border-radius: 40px; border: 4px solid #fff; cursor: pointer; box-shadow: 0 6px 0px #00793c; transition: all 0.1s; width: 280px; }
         .btn-main:active { transform: translateY(6px); box-shadow: 0 0px 0px #00793c; }
         .btn-shop { background: #ff9800; box-shadow: 0 6px 0px #e65100; color: #fff; text-shadow: 1px 1px 2px #000;}
-        .btn-levels { background: #03a9f4; box-shadow: 0 6px 0px #01579b; }
-        .btn-back { background: #f44336; box-shadow: 0 6px 0px #b71c1c; margin-top: 25px; color: #fff; }
+        .btn-levels { background: #03a9f4; box-shadow: 0 6px 0px #01579b; color: #fff; }
+        .btn-back { background: #f44336; box-shadow: 0 6px 0px #b71c1c; margin-top: 20px; color: #fff; }
         .btn-retry { background: #ffcc00; box-shadow: 0 6px 0px #f57f17; }
 
-        .grid-container { display: flex; gap: 15px; flex-wrap: wrap; justify-content: center; max-width: 750px; padding: 10px; }
-        .card { background: rgba(255,255,255,0.1); border: 3px solid #fff; border-radius: 15px; padding: 15px; width: 140px; text-align: center; backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-        .card.locked { opacity: 0.5; filter: grayscale(100%); pointer-events: none; }
-        .card-title { font-size: 16px; margin-bottom: 8px; font-weight: bold; }
-        .buy-btn, .level-btn { background: #ffcc00; color: #000; font-weight: 800; border: 2px solid #000; padding: 6px 8px; border-radius: 10px; width: 100%; cursor: pointer; margin-top: 8px; font-size: 15px; transition: 0.2s;}
-        .buy-btn:disabled { background: #555; color: #999; cursor: not-allowed; border-color: #333; }
+        .grid-container { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; max-width: 850px; padding: 10px; }
+        
+        /* تصميم كارد الشخصيات والمراحل مع دعم التأثيرات الفخمة */
+        .card { background: rgba(255,255,255,0.08); border: 3px solid #555; border-radius: 15px; padding: 12px; width: 150px; text-align: center; backdrop-filter: blur(5px); box-shadow: 0 4px 15px rgba(0,0,0,0.3); position: relative; transition: 0.2s; }
+        .card.locked { opacity: 0.4; filter: grayscale(100%); pointer-events: none; }
+        .card-title { font-size: 15px; margin-bottom: 5px; font-weight: bold; text-shadow: 1px 1px #000; }
+        
+        /* تأثيرات الفئات الفخمة للشخصيات بناءً على السعر */
+        .card.tier-rare { border-color: #00bcd4; box-shadow: 0 0 10px rgba(0,188,212,0.5); }
+        .card.tier-epic { border-color: #9c27b0; box-shadow: 0 0 15px rgba(156,39,176,0.6); animation: pulseCard 2s infinite alternate; }
+        .card.tier-legendary { border-color: #ff4500; box-shadow: 0 0 25px rgba(255,69,0,0.8), 0 0 40px #ffea00; animation: fireCard 1.5s infinite alternate; }
+
+        @keyframes pulseCard { 0% { transform: scale(1); } 100% { transform: scale(1.03); } }
+        @keyframes fireCard { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(45deg); } }
+
+        .buy-btn, .level-btn { background: #ffcc00; color: #000; font-weight: 800; border: 2px solid #000; padding: 6px 8px; border-radius: 10px; width: 100%; cursor: pointer; margin-top: 6px; font-size: 14px; transition: 0.1s;}
+        .buy-btn:disabled { background: #444; color: #888; cursor: not-allowed; border-color: #222; }
         .buy-btn.equipped { background: #00e676; border-color: #fff; color: #fff; }
 
         #ui-layer {
@@ -44,23 +63,23 @@
         .top-row { display: flex; justify-content: space-between; align-items: flex-start; width: 100%; }
         .hud-group { display: flex; gap: 10px; align-items: center; }
         
-        .score-box { background: rgba(0, 0, 0, 0.7); color: #ffcc00; padding: 5px 15px; border-radius: 20px; font-size: 20px; font-weight: 900; border: 2px solid #fff; display: flex; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
-        .home-icon-btn { font-size: 20px; background: #fff; border: 2px solid #111; border-radius: 50%; width: 42px; height: 42px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 0px #111; transition: 0.1s;}
+        .score-box { background: rgba(0, 0, 0, 0.75); color: #ffcc00; padding: 5px 15px; border-radius: 20px; font-size: 18px; font-weight: 900; border: 2px solid #fff; display: flex; align-items: center; box-shadow: 0 4px 10px rgba(0,0,0,0.5); backdrop-filter: blur(4px); }
+        .home-icon-btn { font-size: 18px; background: #fff; border: 2px solid #111; border-radius: 50%; width: 40px; height: 40px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 4px 0px #111; transition: 0.1s;}
         .home-icon-btn:active { transform: translateY(4px); box-shadow: 0 0px 0px #111; }
 
-        .level-indicator { background: rgba(0,0,0,0.8); color: #fff; padding: 3px 20px; border-radius: 20px; font-size: 18px; font-weight: bold; border: 2px solid #00e676; margin: 10px auto 0; width: fit-content; box-shadow: 0 0 10px rgba(0,230,118,0.4); text-shadow: 1px 1px #000; }
+        .level-indicator { background: rgba(0,0,0,0.8); color: #fff; padding: 3px 20px; border-radius: 20px; font-size: 16px; font-weight: bold; border: 2px solid #00e676; margin: 10px auto 0; width: fit-content; box-shadow: 0 0 10px rgba(0,230,118,0.4); text-shadow: 1px 1px #000; }
 
         .controls-bar {
-            position: absolute; bottom: 30px; width: 100%; left: 0; display: flex; justify-content: space-between; padding: 0 30px; z-index: 20; pointer-events: auto; direction: ltr;
+            position: absolute; bottom: 25px; width: 100%; left: 0; display: flex; justify-content: space-between; padding: 0 25px; z-index: 20; pointer-events: auto; direction: ltr;
         }
         .control-group { display: flex; gap: 15px; }
         .control-btn {
-            width: 80px; height: 80px; background: rgba(255, 255, 255, 0.85); border: 4px solid #111; border-radius: 50%; font-size: 35px; font-weight: bold; color: #111; display: flex; justify-content: center; align-items: center; box-shadow: 0 6px 0px rgba(0,0,0,0.6); cursor: pointer; backdrop-filter: blur(5px);
+            width: 75px; height: 75px; background: rgba(255, 255, 255, 0.85); border: 4px solid #111; border-radius: 50%; font-size: 30px; font-weight: bold; color: #111; display: flex; justify-content: center; align-items: center; box-shadow: 0 6px 0px rgba(0,0,0,0.6); cursor: pointer; backdrop-filter: blur(5px);
         }
         .control-btn:active { transform: translateY(6px); box-shadow: 0 0px 0px rgba(0,0,0,0.6); background: #ccc; }
         #btn-jump { background: #ffcc00; color: #111; }
 
-        #total-coins-display { font-size: 24px; color: #ffcc00; font-weight: bold; margin-bottom: 20px; background: rgba(0,0,0,0.6); padding: 10px 25px; border-radius: 25px; border: 2px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        #total-coins-display { font-size: 22px; color: #ffcc00; font-weight: bold; margin-bottom: 15px; background: rgba(0,0,0,0.6); padding: 8px 20px; border-radius: 25px; border: 2px solid #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
@@ -68,18 +87,18 @@
     <div id="home-screen" class="screen">
         <h1 class="title">SUPERDRIX</h1>
         <div id="total-coins-display">🪙 <span id="home-coins">0</span></div>
-        <button class="btn-main" onclick="openLevelsScreen()">▶ العب الآن</button>
-        <button class="btn-main btn-shop" onclick="openShop()">🛒 المتجر والشخصيات</button>
+        <button class="btn-main" onclick="openLevelsScreen()">▶ المراحل (100)</button>
+        <button class="btn-main btn-shop" onclick="openShop()">🛒 المتجر (100 شخصية)</button>
     </div>
 
     <div id="levels-screen" class="screen">
-        <h2 class="subtitle">المراحل</h2>
+        <h2 class="subtitle">اختر المرحلة (1 إلى 100)</h2>
         <div class="grid-container" id="levels-grid"></div>
         <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
     </div>
 
     <div id="shop-screen" class="screen">
-        <h2 class="subtitle">المتجر الأسطوري</h2>
+        <h2 class="subtitle">المتجر الأسطوري (100 شخصية)</h2>
         <div id="total-coins-display">رصيدك: 🪙 <span id="shop-coins">0</span></div>
         <div class="grid-container" id="shop-grid"></div>
         <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
@@ -87,14 +106,14 @@
 
     <div id="win-screen" class="screen">
         <h1 class="title" style="color: #00e676;">اكتملت المرحلة!</h1>
-        <p style="font-size: 26px; margin-bottom: 20px;">جمعت: <span id="win-coins">0</span> 🪙</p>
+        <p style="font-size: 24px; margin-bottom: 15px;">جمعت: <span id="win-coins">0</span> 🪙</p>
         <button class="btn-main" onclick="nextLevel()">المرحلة التالية ⏩</button>
         <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
     </div>
 
     <div id="game-over-screen" class="screen">
         <h1 class="title" style="color: #f44336; text-shadow: 0 0 15px rgba(244,67,54,0.6), 4px 4px #000;">انتهت المحاولات!</h1>
-        <p style="font-size: 24px; margin-bottom: 20px;">النقاط المحفوظة: <span id="game-over-coins">0</span> 🪙</p>
+        <p style="font-size: 22px; margin-bottom: 15px;">النقاط المحفوظة: <span id="game-over-coins">0</span> 🪙</p>
         <button class="btn-main btn-retry" onclick="startLevel(currentLevel)">إعادة المحاولة 🔄</button>
         <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
     </div>
@@ -122,7 +141,6 @@
     <canvas id="gameCanvas"></canvas>
 
 <script>
-    // --- الصوتيات الاحترافية ---
     let audioCtx;
     function initAudio() {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -161,25 +179,40 @@
         }
     });
 
-    // --- البيانات والمتجر ---
-    let totalCoins = parseInt(localStorage.getItem('superdrix_coins')) || 0;
+    // توليد 100 شخصية ديناميكياً بأسعار تصاعدية وتأثيرات فخمة تزيد كلما ارتفع السعر
+    const skinsData = [];
+    for (let i = 0; i < 100; i++) {
+        let cost = i === 0 ? 0 : i * 150;
+        let tierClass = "tier-common";
+        let tierName = "عادي";
+        let crown = false;
+        
+        if (i >= 25 && i < 50) { tierClass = "tier-rare"; tierName = "نادر ✨"; }
+        else if (i >= 50 && i < 85) { tierClass = "tier-epic"; tierName = "ملحمي 💎"; }
+        else if (i >= 85) { tierClass = "tier-legendary"; tierName = "أسطوري 🔥"; crown = true; }
+
+        let name = i === 0 ? "رُوكْ فِيكْس" : (i === 6 ? "Banan_FF" : (i === 7 ? "أم الدويس" : `شخصية ${i + 1}`));
+        let color = `hsl(${i * 3.6}, 85%, 55%)`;
+
+        skinsData.push({
+            id: i,
+            name: name,
+            cost: cost,
+            color: color,
+            eyes: i % 2 === 0 ? '#ffffff' : '#ffeb3b',
+            trail: [color, '#ffffff', '#ff9999'],
+            crown: crown,
+            tierName: tierName,
+            cardClass: tierClass
+        });
+    }
+
+    const maxLevels = 100;
+    let totalCoins = parseInt(localStorage.getItem('superdrix_coins')) || 5000;
     let unlockedLevels = parseInt(localStorage.getItem('superdrix_unlocked_levels')) || 1;
     let unlockedSkins = JSON.parse(localStorage.getItem('superdrix_skins')) || [0];
     let currentSkinId = parseInt(localStorage.getItem('superdrix_current_skin')) || 0;
 
-    // تم إضافة شخصيات جديدة ومميزة
-    const skinsData = [
-        { id: 0, name: 'رُوكْ فِيكْس', cost: 0, color: '#e52521', eyes: '#ffffff', trail: ['#ffffff', '#ff9999', '#99ccff'], crown: false },
-        { id: 1, name: 'النينجا الأزرق', cost: 100, color: '#00bcd4', eyes: '#ffeb3b', trail: ['#e0f7fa', '#80deea', '#26c6da'], crown: false },
-        { id: 2, name: 'الملك الذهبي', cost: 300, color: '#ffcc00', eyes: '#000000', trail: ['#fffde7', '#fff59d', '#ffeb3b'], crown: false },
-        { id: 3, name: 'سایبر نيون', cost: 500, color: '#9c27b0', eyes: '#00e676', trail: ['#e1bee7', '#ba68c8', '#7b1fa2'], crown: false },
-        { id: 4, name: 'الفضاء الحارق', cost: 800, color: '#ff5722', eyes: '#ffff00', trail: ['#ffccbc', '#ff7043', '#d84315'], crown: false },
-        { id: 5, name: 'شبح الظلام', cost: 1200, color: '#212121', eyes: '#00bcd4', trail: ['#bdbdbd', '#757575', '#212121'], crown: false },
-        { id: 6, name: 'Banan_FF', cost: 2000, color: '#d50000', eyes: '#fff', trail: ['#ff5252', '#ff1744', '#d50000'], crown: true },
-        { id: 7, name: 'أم الدويس', cost: 3500, color: '#111111', eyes: '#ff0000', trail: ['#424242', '#212121', '#000000'], crown: false }
-    ];
-
-    const maxLevels = 6;
     let currentLevel = 1;
     let score = 0, lives = 3, gameActive = false;
     let isLooping = false;
@@ -212,7 +245,16 @@
             let btnHtml = isEquipped ? `<button class="buy-btn equipped" disabled>مُجهز ✔️</button>` : 
                           isUnlocked ? `<button class="buy-btn" onclick="equipSkin(${skin.id})">استخدام</button>` : 
                           `<button class="buy-btn" ${totalCoins < skin.cost ? 'disabled' : ''} onclick="buySkin(${skin.id}, ${skin.cost})">شراء 🪙 ${skin.cost}</button>`;
-            grid.innerHTML += `<div class="card"><div style="width: 50px; height: 50px; background:${skin.color}; margin: 0 auto 10px; border: 3px solid #000; border-radius: 8px; position:relative; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">${skin.crown ? '<div style="position:absolute; top:-15px; left:12px; font-size:20px; text-shadow: 1px 1px 0 #000;">👑</div>' : ''}</div><div class="card-title">${skin.name}</div>${btnHtml}</div>`;
+            
+            grid.innerHTML += `
+                <div class="card ${skin.cardClass}">
+                    <div style="font-size:11px; color:#ffcc00; margin-bottom:3px;">#${skin.id + 1} (${skin.tierName})</div>
+                    <div style="width: 45px; height: 45px; background:${skin.color}; margin: 0 auto 8px; border: 3px solid #000; border-radius: 8px; position:relative; box-shadow: 0 4px 8px rgba(0,0,0,0.5);">
+                        ${skin.crown ? '<div style="position:absolute; top:-16px; left:10px; font-size:18px; text-shadow: 1px 1px 0 #000;">👑</div>' : ''}
+                    </div>
+                    <div class="card-title">${skin.name}</div>
+                    ${btnHtml}
+                </div>`;
         });
     }
 
@@ -224,7 +266,11 @@
         const grid = document.getElementById('levels-grid'); grid.innerHTML = '';
         for (let i = 1; i <= maxLevels; i++) {
             let isUnlocked = i <= unlockedLevels;
-            grid.innerHTML += `<div class="card ${isUnlocked ? '' : 'locked'}"><div style="font-size: 30px; margin-bottom: 5px; text-shadow: 2px 2px #000;">${isUnlocked ? i : '🔒'}</div><div class="card-title">مرحلة ${i}</div>${isUnlocked ? `<button class="level-btn" onclick="startLevel(${i})">العب</button>` : ''}</div>`;
+            grid.innerHTML += `
+                <div class="card ${isUnlocked ? '' : 'locked'}" style="width: 75px; height: 75px; justify-content: center; align-items: center; display: flex; flex-direction: column;">
+                    <div style="font-size: 20px; font-weight: bold; text-shadow: 2px 2px #000;">${isUnlocked ? i : '🔒'}</div>
+                    ${isUnlocked ? `<button class="level-btn" style="padding: 2px; font-size: 11px;" onclick="startLevel(${i})">العب</button>` : ''}
+                </div>`;
         }
     }
 
@@ -251,10 +297,9 @@
     }
     function nextLevel() {
         if (currentLevel < maxLevels) startLevel(currentLevel + 1);
-        else { alert("مبروك! لقد ختمت جميع المراحل!"); goHome(); }
+        else { alert("مبروك! لقد ختمت جميع المراحل الـ 100 بنجاح!"); goHome(); }
     }
 
-    // --- محرك اللعبة والرسومات ---
     const canvas = document.getElementById("gameCanvas");
     const ctx = canvas.getContext("2d");
 
@@ -266,17 +311,16 @@
 
     function initLevel(lvl) {
         blocks = []; hazards = []; coins = []; enemies = []; clouds = []; particles = []; floatingTexts = [];
-        let activeSkin = skinsData.find(s => s.id === currentSkinId) || skinsData[0];
+        let activeSkin = skinsData[currentSkinId] || skinsData[0];
         
-        // تم إضافة scaleX و scaleY للفيزياء الحركية
         player = { x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0, speed: 6.5, jumpForce: -14.5, grounded: false, dir: 1, trail: [], color: activeSkin.color, eyesColor: activeSkin.eyes, trailColors: activeSkin.trail, crown: activeSkin.crown, scaleX: 1, scaleY: 1 };
         
-        let levelLength = 2500 + (lvl * 1500);
+        let levelLength = 3000 + (lvl * 300);
         finishLine = { x: levelLength - 300, y: canvas.height - 350, width: 80, height: 270 };
 
         let cursorX = 0;
         while (cursorX < levelLength) {
-            let groundWidth = 300 + Math.random() * 300;
+            let groundWidth = 300 + Math.random() * 250;
             let baseHeightY = canvas.height - 120;
             
             blocks.push({ x: cursorX, y: baseHeightY, width: groundWidth, height: 200, type: 'ground' });
@@ -289,14 +333,14 @@
             cursorX += groundWidth;
 
             if (cursorX < finishLine.x - 300) {
-                let gapWidth = 140 + (lvl * 20);
+                let gapWidth = 120 + Math.min(lvl * 2, 80);
                 let hazardType = Math.random() > 0.5 ? 'lava' : 'water';
                 hazards.push({ x: cursorX, y: canvas.height - 60, width: gapWidth, height: 60, type: hazardType });
                 cursorX += gapWidth;
             }
         }
 
-        for (let i = 500; i < finishLine.x; i += 400) {
+        for (let i = 500; i < finishLine.x; i += 350) {
             const blockTypes = ['wood', 'pipe', 'stone', 'metal'];
             let chosenType = blockTypes[Math.floor(Math.random() * blockTypes.length)];
             
@@ -304,22 +348,20 @@
             coins.push({ x: i + 55, y: canvas.height - 380, width: 28, height: 28, collected: false, float: Math.random() * Math.PI });
             
             if (Math.random() > 0.2) {
-                enemies.push({ x: i + 80, y: canvas.height - 170, width: 45, height: 45, vx: 2.5 + (lvl * 0.5), minX: i, maxX: i + 300, alive: true });
+                enemies.push({ x: i + 80, y: canvas.height - 170, width: 45, height: 45, vx: 2 + (lvl * 0.05), minX: i, maxX: i + 250, alive: true });
             }
         }
 
-        for (let i = 0; i < 40; i++) clouds.push({ x: i * 350 + Math.random() * 150, y: 20 + Math.random() * 150, size: 50 + Math.random() * 50 });
+        for (let i = 0; i < 50; i++) clouds.push({ x: i * 350 + Math.random() * 150, y: 20 + Math.random() * 150, size: 50 + Math.random() * 50 });
         cameraX = 0;
     }
 
-    // جزيئات احترافية بالجاذبية
-    function createParticles(x, y, color, count = 20) {
+    function createParticles(x, y, color, count = 18) {
         for(let i = 0; i < count; i++) {
             particles.push({ x: x, y: y, vx: (Math.random() - 0.5) * 12, vy: (Math.random() - 1) * 10, life: 1, color: color, size: Math.random() * 8 + 3 });
         }
     }
     
-    // نصوص منبثقة للعملات
     function createFloatingText(x, y, text, color) {
         floatingTexts.push({ x: x, y: y, text: text, color: color, life: 1, vy: -2 });
     }
@@ -328,6 +370,7 @@
     function setupControls() {
         const bindBtn = (id, start, end) => {
             const el = document.getElementById(id);
+            if(!el) return;
             el.addEventListener('touchstart', (e) => { e.preventDefault(); initAudio(); start(); });
             el.addEventListener('touchend', (e) => { e.preventDefault(); end(); });
             el.addEventListener('mousedown', () => { initAudio(); start(); });
@@ -335,22 +378,27 @@
         };
         bindBtn('btn-left', () => moveLeft = true, () => moveLeft = false);
         bindBtn('btn-right', () => moveRight = true, () => moveRight = false);
-        document.getElementById('btn-jump').addEventListener('click', () => {
-            initAudio(); 
-            if (player.grounded) { 
-                player.vy = player.jumpForce; player.grounded = false; 
-                // تمدد عند القفز (Squash & Stretch)
-                player.scaleX = 0.7; player.scaleY = 1.3;
-                playSound('jump'); 
-                createParticles(player.x + player.width/2, player.y + player.height, '#ffffff', 10); 
-            }
-        });
+        
+        const jumpBtn = document.getElementById('btn-jump');
+        if(jumpBtn) {
+            const triggerJump = (e) => {
+                if(e) e.preventDefault();
+                initAudio(); 
+                if (player && player.grounded) { 
+                    player.vy = player.jumpForce; player.grounded = false; 
+                    player.scaleX = 0.7; player.scaleY = 1.3;
+                    playSound('jump'); 
+                    createParticles(player.x + player.width/2, player.y + player.height, '#ffffff', 10); 
+                }
+            };
+            jumpBtn.addEventListener('touchstart', triggerJump);
+            jumpBtn.addEventListener('click', triggerJump);
+        }
     }
 
     function update() {
         if (!gameActive) return;
 
-        // عودة الحجم الطبيعي للاعب بالتدريج
         player.scaleX += (1 - player.scaleX) * 0.15;
         player.scaleY += (1 - player.scaleY) * 0.15;
 
@@ -358,7 +406,7 @@
         if (moveLeft) { player.vx = -player.speed; player.dir = -1; }
         if (moveRight) { player.vx = player.speed; player.dir = 1; }
         player.x += player.vx;
-        player.vy += 0.7; // الجاذبية
+        player.vy += 0.7;
         player.y += player.vy;
         
         let wasGrounded = player.grounded;
@@ -369,11 +417,9 @@
             if (player.trail.length > 8) player.trail.shift();
         } else if (player.trail.length > 0) player.trail.shift();
 
-        // تحديث الجزيئات (إضافة جاذبية لها)
         particles.forEach(p => { p.vy += 0.3; p.x += p.vx; p.y += p.vy; p.life -= 0.03; p.size *= 0.95; });
         particles = particles.filter(p => p.life > 0);
 
-        // تحديث النصوص العائمة
         floatingTexts.forEach(ft => { ft.y += ft.vy; ft.life -= 0.02; });
         floatingTexts = floatingTexts.filter(ft => ft.life > 0);
 
@@ -381,7 +427,6 @@
             if (player.x + player.width > b.x && player.x < b.x + b.width && player.y + player.height > b.y && player.y < b.y + b.height) {
                 if (player.vy > 0 && player.y + player.height - player.vy <= b.y + 20) {
                     player.y = b.y - player.height; player.vy = 0; player.grounded = true;
-                    // انكماش عند الهبوط (Squash)
                     if(!wasGrounded) { player.scaleX = 1.3; player.scaleY = 0.7; createParticles(player.x + 20, player.y + 40, '#ddd', 8); }
                 } else if (player.vy < 0 && player.y - player.vy >= b.y + b.height - 15) {
                     player.y = b.y + b.height; player.vy = 0;
@@ -435,10 +480,9 @@
             winLevel();
         }
 
-        // حركة الكاميرا السلسة (Smooth Camera)
         cameraX += ((player.x - canvas.width / 2.5) - cameraX) * 0.08; 
         if (cameraX < 0) cameraX = 0;
-        backgroundY = Math.sin(Date.now() * 0.0005) * 10; // حركة طفيفة للسماء
+        backgroundY = Math.sin(Date.now() * 0.0005) * 10;
     }
 
     function draw() {
@@ -449,39 +493,32 @@
         if (shakeTime > 0) { shakeX = (Math.random() - 0.5) * 15; shakeY = (Math.random() - 0.5) * 15; shakeTime--; }
         ctx.translate(-cameraX + shakeX, shakeY);
 
-        // --- رسم الخلفية والجبال (Parallax Effect) ---
         let skyGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        if (currentLevel === 3 || currentLevel === 4) { skyGradient.addColorStop(0, "#263238"); skyGradient.addColorStop(1, "#455a64"); } 
-        else if (currentLevel >= 5) { skyGradient.addColorStop(0, "#0a0a1a"); skyGradient.addColorStop(1, "#1a1a2e"); }
-        else { skyGradient.addColorStop(0, "#1976d2"); skyGradient.addColorStop(1, "#64b5f6"); }
-
+        skyGradient.addColorStop(0, "#1976d2"); skyGradient.addColorStop(1, "#64b5f6");
         ctx.fillStyle = skyGradient;
         ctx.fillRect(cameraX, 0, canvas.width, canvas.height);
 
-        // الجبال في الخلفية (تتحرك ببطء)
-        ctx.fillStyle = (currentLevel >= 5) ? "#111" : (currentLevel > 2 ? "#37474f" : "#1565c0");
+        ctx.fillStyle = "#1565c0";
         for(let i = -1; i < 10; i++) {
             ctx.beginPath();
-            let pX = (cameraX * 0.8) + (i * 400); // 0.8 للبارالاكس
+            let pX = (cameraX * 0.8) + (i * 400);
             ctx.moveTo(pX, canvas.height);
             ctx.lineTo(pX + 200, canvas.height - 300 + backgroundY);
             ctx.lineTo(pX + 400, canvas.height);
             ctx.fill();
         }
 
-        // السحب
         ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
         clouds.forEach(cl => {
-            let cx = cl.x + (cameraX * 0.5); // حركة بطيئة للسحب
+            let cx = cl.x + (cameraX * 0.5);
             ctx.beginPath(); ctx.arc(cx, cl.y, cl.size * 0.5, 0, Math.PI * 2);
             ctx.arc(cx + cl.size * 0.4, cl.y - cl.size * 0.2, cl.size * 0.4, 0, Math.PI * 2);
             ctx.arc(cx + cl.size * 0.8, cl.y, cl.size * 0.45, 0, Math.PI * 2); ctx.fill();
         });
 
-        // رسم الحفر مع التوهج الشفاف
         hazards.forEach(hz => {
             if (hz.type === 'lava') {
-                ctx.shadowBlur = 20; ctx.shadowColor = "#ff3d00"; // توهج
+                ctx.shadowBlur = 20; ctx.shadowColor = "#ff3d00";
                 ctx.fillStyle = "#ff3d00"; ctx.fillRect(hz.x, hz.y + 20, hz.width, hz.height - 20);
                 ctx.shadowBlur = 0;
                 ctx.fillStyle = "#ffea00";
@@ -504,13 +541,9 @@
 
         blocks.forEach(b => {
             if (b.type === 'ground') {
-                let grassColor = "#43A047", dirtColor = "#5D4037", grassBorder = "#1B5E20";
-                if (currentLevel === 3 || currentLevel === 4) { grassColor = "#b0bec5"; dirtColor = "#37474f"; grassBorder = "#263238"; } 
-                else if (currentLevel >= 5) { grassColor = "#455a64"; dirtColor = "#212121"; grassBorder = "#000"; }
-
-                ctx.fillStyle = dirtColor; ctx.fillRect(b.x, b.y + 25, b.width, (canvas.height - b.y) - 25);
-                ctx.fillStyle = grassColor; ctx.fillRect(b.x, b.y, b.width, 25);
-                ctx.strokeStyle = grassBorder; ctx.lineWidth = 4; ctx.strokeRect(b.x, b.y, b.width, 25);
+                ctx.fillStyle = "#5D4037"; ctx.fillRect(b.x, b.y + 25, b.width, (canvas.height - b.y) - 25);
+                ctx.fillStyle = "#43A047"; ctx.fillRect(b.x, b.y, b.width, 25);
+                ctx.strokeStyle = "#1B5E20"; ctx.lineWidth = 4; ctx.strokeRect(b.x, b.y, b.width, 25);
             } else {
                 let pColor = "#34495e", bColor = "#2c3e50";
                 if (b.type === 'wood') { pColor = "#8d6e63"; bColor = "#4e342e"; } 
@@ -540,7 +573,6 @@
             }
         });
 
-        // رسم أثر اللاعب
         if(player && player.trailColors) {
             player.trail.forEach((t, i) => {
                 ctx.globalAlpha = (i / player.trail.length) * 0.5;
@@ -550,10 +582,8 @@
             ctx.globalAlpha = 1.0;
         }
 
-        // رسم اللاعب مع التمدد والانكماش
         if(player) {
             ctx.save();
-            // نقل النقطة المركزية لأسفل اللاعب ليكون التمدد من القاعدة
             ctx.translate(player.x + player.width/2, player.y + player.height);
             ctx.scale(player.scaleX, player.scaleY);
             
@@ -582,14 +612,12 @@
             ctx.restore();
         }
 
-        // الجزيئات
         particles.forEach(p => {
             ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
             ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill();
         });
         ctx.globalAlpha = 1.0;
 
-        // النصوص العائمة
         floatingTexts.forEach(ft => {
             ctx.globalAlpha = ft.life; ctx.fillStyle = ft.color;
             ctx.font = "bold 24px Changa";
