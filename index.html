@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SuperDrix Pro - العوالم الأسطورية</title>
+    <title>SuperDrix Pro - النسخة الكاملة المطورة</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Changa:wght@700;800&display=swap');
         
@@ -58,7 +58,6 @@
         .buy-btn:disabled { background: #444; color: #888; cursor: not-allowed; border-color: #222; }
         .buy-btn.equipped { background: #00e676; border-color: #fff; color: #fff; }
 
-        /* نافذة اختيار العوالم محسنة ومقاومة للتقطيع وقابلة للتمرير بالموبايل */
         #world-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(5, 7, 15, 0.95); backdrop-filter: blur(10px); z-index: 100;
@@ -82,7 +81,6 @@
         .world-card h3 { font-size: 15px; color: #fff; text-shadow: 1px 1px #000; margin-top: 8px; }
         .world-card p { font-size: 10px; color: #ddd; text-shadow: 1px 1px #000; margin-top: 4px; }
 
-        /* Onboarding Screen Styles */
         #onboarding-screen {
             background: rgba(10, 12, 20, 0.95); backdrop-filter: blur(12px); z-index: 50;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
@@ -117,12 +115,18 @@
         #boss-hp-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #d32f2f, #ffea00); transition: width 0.2s; }
         #boss-name-text { position: absolute; width: 100%; top: -2px; font-size: 12px; font-weight: bold; color: #fff; text-shadow: 1px 1px #000; text-align: center; }
 
+        /* شريط التحكم المرتب في الأسفل */
         .controls-bar {
-            position: absolute; bottom: 20px; width: 100%; left: 0; display: flex; justify-content: space-between; padding: 0 20px; z-index: 20; pointer-events: auto; direction: ltr;
+            position: absolute; bottom: 20px; width: 100%; left: 0; 
+            display: flex; justify-content: space-between; align-items: center; 
+            padding: 0 25px; z-index: 20; pointer-events: auto; direction: ltr;
         }
-        .control-group { display: flex; gap: 10px; align-items: center; }
+        .control-group { display: flex; gap: 12px; align-items: center; }
         .control-btn {
-            width: 60px; height: 60px; background: rgba(255, 255, 255, 0.85); border: 4px solid #111; border-radius: 50%; font-size: 22px; font-weight: bold; color: #111; display: flex; justify-content: center; align-items: center; box-shadow: 0 5px 0px rgba(0,0,0,0.6); cursor: pointer;
+            width: 62px; height: 62px; background: rgba(255, 255, 255, 0.9); 
+            border: 3px solid #111; border-radius: 50%; font-size: 22px; 
+            font-weight: bold; color: #111; display: flex; justify-content: center; 
+            align-items: center; box-shadow: 0 5px 0px rgba(0,0,0,0.6); cursor: pointer;
         }
         .control-btn:active { transform: translateY(5px); box-shadow: 0 0px 0px rgba(0,0,0,0.6); background: #ccc; }
         #btn-jump { background: #ffcc00; color: #111; }
@@ -135,7 +139,6 @@
 </head>
 <body>
 
-    <!-- Onboarding Screen -->
     <div id="onboarding-screen" class="screen">
         <div class="onboarding-card">
             <h2 id="onboarding-title">مرحباً بك في عالم المغامرة!</h2>
@@ -153,7 +156,6 @@
         </div>
     </div>
 
-    <!-- نافذة اختيار العوالم والتضاريس المحسنة للموبايل -->
     <div id="world-modal">
         <div class="world-selection-box">
             <h2 style="color: #ffcc00; font-size: 24px; margin-bottom: 8px;">اختر بيئة وعالم المغامرة 🌍✨</h2>
@@ -200,7 +202,6 @@
         </div>
     </div>
 
-    <!-- Home Screen -->
     <div id="home-screen" class="screen">
         <h1 class="title">SuperDrix</h1>
         <div id="total-coins-display">🪙 <span id="home-coins">0</span></div>
@@ -302,7 +303,6 @@
     <canvas id="gameCanvas"></canvas>
 
 <script>
-    // Onboarding Logic
     let currentOnboardingStep = 0;
     const onboardingSteps = [
         { title: "مرحباً بك في SuperDrix", desc: "انطلق في مغامرة ملحمية عبر 100 مرحلة متنوعة وعوالم فخمة مليئة بالتحديات والمخاطر." },
@@ -346,7 +346,6 @@
         }
     });
 
-    // Audio Engine
     let audioCtx;
     function initAudio() {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -397,7 +396,6 @@
         }
     });
 
-    // Skins Data (101 Skins including Godlike)
     const skinsData = [];
     for (let i = 0; i < 100; i++) {
         let cost = i === 0 ? 0 : (i * 200);
@@ -426,7 +424,6 @@
         tierName: "مدمّر المليون 🌌⚡", cardClass: "tier-godlike"
     });
 
-    // Weapons Data (50 Weapons)
     const weaponsData = [];
     for (let i = 0; i < 50; i++) {
         let cost = i === 0 ? 0 : (i * 1000);
@@ -462,18 +459,26 @@
     let currentWeaponId = parseInt(localStorage.getItem('superdrix_current_weapon')) || 0;
     let purchasedBoosters = JSON.parse(localStorage.getItem('superdrix_boosters')) || [];
 
+    // قائمة ضخمة وشاملة من أكواد الهدايا والأكواد السرية
     const validPromoCodes = {
         "SUPER100K": { coins: 100000, message: "تم شحن 100,000 عملة بنجاح! 🪙🔥" },
         "GOLD50K": { coins: 50000, message: "تم شحن 50,000 عملة بنجاح! 🪙✨" },
-        "MINDRIX": { coins: 10000, message: "حصلت على 10,000 عملة هدية! 🎁" }
+        "MINDRIX": { coins: 10000, message: "حصلت على 10,000 عملة هدية! 🎁" },
+        "SUPER2026": { coins: 150000, message: "تم شحن 150,000 عملة جديدة بنجاح! 🚀" },
+        "PRODRIX": { coins: 200000, message: "تم شحن 200,000 عملة بنجاح! 💎" },
+        "LEGENDARY": { coins: 300000, message: "تم شحن 300,000 عملة أسطورية بنجاح! 🔥👑" },
+        "DIAMOND999": { coins: 500000, message: "كود الألماس: تم منحك 500,000 عملة! 💎✨" },
+        "VIPGIFT": { coins: 250000, message: "مكافأة VIP: تم إضافة 250,000 عملة! 🌟" },
+        "KING2026": { coins: 400000, message: "كود الملك: تم إضافة 400,000 عملة! 👑" },
+        "EPICWIN": { coins: 120000, message: "كود الفوز الملحمي: 120,000 عملة! 🔥" },
+        "DRIXPRO": { coins: 175000, message: "كود المحترف: 175,000 عملة! ⚡" },
+        "MONSTERKILL": { coins: 220000, message: "كود اصطياد الوحوش: 220,000 عملة! 👾" },
+        "FREECOINS": { coins: 50000, message: "عملات مجانية: 50,000 عملة! 🪙" },
+        "MEGACHEST": { coins: 1000000, message: "الصندوق الأسطوري الضخم: مليون عملة كاملة! 🌌💰" }
     };
     let usedPromoCodes = JSON.parse(localStorage.getItem('superdrix_used_codes')) || [];
 
-    // World & Environment Selection State
-    let selectedWorld = {
-        time: 'day',     // 'day' أو 'night'
-        terrain: 'grass' // 'grass', 'mud', 'snow'
-    };
+    let selectedWorld = { time: 'day', terrain: 'grass' };
     let pendingLevel = 1;
     let currentLevel = 1;
 
@@ -716,12 +721,10 @@
             }
         }
 
-        // غيوم الخلفية المتحركة
         for (let i = 0; i < 15; i++) {
             clouds.push({ x: Math.random() * levelLength, y: Math.random() * (canvas.height / 2), size: 40 + Math.random() * 60, speed: 0.2 + Math.random() * 0.4 });
         }
 
-        // إنشاء نجوم متحركة ومتلألئة لكل نجمة خصائصها المنظمة
         nightStars = [];
         for (let i = 0; i < 90; i++) {
             nightStars.push({
@@ -952,6 +955,7 @@
             }
         });
 
+        // الوحوش الآن تهاجم وتسبب ضرراً فعالاً عند الاصطدام باللاعب
         enemies.forEach(en => {
             if (!en.alive) return;
             en.x += en.vx;
@@ -962,7 +966,7 @@
                     createParticles(en.x, en.y, '#ff3d00', 12);
                     if (en.hp <= 0) { en.alive = false; score += 150; createFloatingText(en.x, en.y, "+150", "#ffcc00"); }
                 } else {
-                    applyDamage('#ff3d00', en.x, false);
+                    applyDamage('#ff3d00', en.x, false); // خصم حياة عند الاصطدام بالوحش
                 }
             }
         });
@@ -1044,7 +1048,6 @@
         ctx.save();
         if (shakeTime > 0) { ctx.translate((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 10); }
 
-        // تدرج الخلفية مع أنميشن بسيط للحركة
         let bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         if (selectedWorld.time === 'night') {
             bgGradient.addColorStop(0, '#0a0f24');
@@ -1057,10 +1060,9 @@
         ctx.fillStyle = bgGradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // رسم النجوم المتحركة والمتلألئة (تظهر وتختفي بانتظام لكل نجمة)
         if (selectedWorld.time === 'night') {
             nightStars.forEach(star => {
-                let alpha = (Math.sin(Date.now() * star.twinkleSpeed + star.twinkleOffset) + 1) / 2; // تتراوح بين 0 و 1 للإضاءة والاختفاء
+                let alpha = (Math.sin(Date.now() * star.twinkleSpeed + star.twinkleOffset) + 1) / 2;
                 ctx.fillStyle = `rgba(255, 255, 255, ${0.15 + alpha * 0.85})`;
                 let sX = (star.x - cameraX * star.driftSpeed) % (canvas.width + 400);
                 if (sX < -50) sX += canvas.width + 500;
@@ -1070,10 +1072,9 @@
             });
         }
 
-        // رسم الغيوم الخلفية المتحركة بانميشن مستمر
         ctx.fillStyle = selectedWorld.time === 'night' ? "rgba(255, 255, 255, 0.06)" : "rgba(255, 255, 255, 0.22)";
         clouds.forEach(cl => {
-            cl.x -= cl.speed; // حركة أوتوماتيكية للخلفية
+            cl.x -= cl.speed;
             let cx = (cl.x - cameraX * 0.4) % (canvas.width + 600);
             if (cx < -200) cx += canvas.width + 800;
             ctx.beginPath();
@@ -1083,7 +1084,6 @@
             ctx.fill();
         });
 
-        // رسم حواجز الحمم (Lava Hazards)
         hazards.forEach(hz => {
             ctx.shadowBlur = 20; ctx.shadowColor = "#ff3d00";
             ctx.fillStyle = "#ff3d00"; ctx.fillRect(hz.x - cameraX, hz.y + 20, hz.width, hz.height - 20);
@@ -1093,14 +1093,12 @@
             }
         });
 
-        // رسم خط النهاية
         if (finishLine) {
             ctx.fillStyle = "#00e676"; ctx.fillRect(finishLine.x - cameraX, finishLine.y, 10, finishLine.height);
             ctx.fillStyle = "#ffcc00"; ctx.fillRect(finishLine.x - cameraX + 10, finishLine.y, 50, 40);
             ctx.fillStyle = "#000"; ctx.font = "bold 18px Changa"; ctx.fillText("🏁 النهاية", finishLine.x - cameraX + 15, finishLine.y + 26);
         }
 
-        // رسم المنصات حسب البيئة (عشب، طين، ثلج)
         blocks.forEach(b => {
             let bx = b.x - cameraX;
             if (b.type === 'ground') {
@@ -1122,7 +1120,6 @@
             }
         });
 
-        // رسم العملات الذهبية
         coins.forEach(c => {
             if (!c.collected) {
                 let cx = c.x - cameraX;
@@ -1136,22 +1133,19 @@
             }
         });
 
-        // رسم الوحوش الصغار باللون الأسود وعيون حمراء كما طلبت
         enemies.forEach(en => {
             if (en.alive) {
                 let ex = en.x - cameraX;
-                ctx.fillStyle = "#141414"; // اللون الأسود الأصلي
+                ctx.fillStyle = "#141414";
                 ctx.fillRect(ex, en.y, en.width, en.height);
                 ctx.strokeStyle = "#ff3d00"; ctx.lineWidth = 2;
                 ctx.strokeRect(ex, en.y, en.width, en.height);
-                // عيون حمراء مرعبة
                 ctx.fillStyle = "#ff3d00";
                 ctx.fillRect(ex + 8, en.y + 10, 10, 10);
                 ctx.fillRect(ex + 27, en.y + 10, 10, 10);
             }
         });
 
-        // رسم الزعيم
         if (boss && boss.alive) {
             let bx = boss.x - cameraX;
             ctx.shadowBlur = 20; ctx.shadowColor = "#ff3d00";
@@ -1163,7 +1157,6 @@
             ctx.shadowBlur = 0;
         }
 
-        // رسم رصاصات اللاعب والزعيم
         bullets.forEach(b => {
             ctx.shadowBlur = 12; ctx.shadowColor = "#00ffff";
             ctx.fillStyle = "#00ffff"; ctx.fillRect(b.x - cameraX, b.y, b.width, b.height);
@@ -1177,7 +1170,6 @@
             ctx.shadowBlur = 0;
         });
 
-        // رسم الشخصية (Player)
         if (player) {
             ctx.save();
             ctx.translate(player.x - cameraX + player.width/2, player.y + player.height);
@@ -1190,13 +1182,11 @@
             ctx.strokeStyle = "#000"; ctx.lineWidth = 3;
             ctx.strokeRect(-player.width/2, -player.height, player.width, player.height);
 
-            // العيون
             ctx.fillStyle = player.eyesColor;
             let eyeOffset = player.dir === 1 ? 6 : -6;
             ctx.fillRect(-player.width/2 + 8 + eyeOffset, -player.height + 12, 10, 12);
             ctx.fillRect(-player.width/2 + 25 + eyeOffset, -player.height + 12, 10, 12);
 
-            // التاج للشخصيات الملكية
             if(player.crown) {
                 ctx.fillStyle = "#ffcc00";
                 ctx.beginPath();
@@ -1212,7 +1202,6 @@
             ctx.restore();
         }
 
-        // جسيمات التأثيرات والنصوص العائمة
         particles.forEach(p => {
             ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
             ctx.beginPath(); ctx.arc(p.x - cameraX, p.y, p.size, 0, Math.PI * 2); ctx.fill();
