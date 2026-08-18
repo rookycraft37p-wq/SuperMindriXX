@@ -37,12 +37,7 @@
             left: 0;
         }
 
-        #orientation-warning {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #0b0b16; z-index: 9999; display: none;
-            flex-direction: column; justify-content: center; align-items: center;
-            color: #fff; text-align: center; padding: 20px;
-        }
+        
 
         #ad-modal {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -190,10 +185,17 @@
 </head>
 <body>
 
-    <div id="orientation-warning">
-        <h2 style="color: #ff3d00; font-size: 24px; margin-bottom: 8px;">الرجاء تدوير جهازك 📱🔄</h2>
-        <p style="font-size: 14px; color: #ddd; max-width: 380px;">هذه اللعبة مصممة للعمل في وضع العرض الأفقي (Landscape) للحصول على أفضل تجربة لعب وتحكم مثالي!</p>
+<body>
+    <!-- ⬇️ ضعه هنا في البداية تماماً -->
+    <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999;">
+        <h1 style="color: white; font-family: sans-serif; margin-bottom: 20px; font-size: 28px;">Super Mindrix</h1>
+        <button id="play-btn" style="padding: 15px 40px; font-size: 22px; background: #6366f1; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);">اضغط للبدء 🎮</button>
     </div>
+
+    <!-- باقي عناصر لعبتك (مثل الـ Canvas أو الـ divs الخاصة باللعبة) -->
+    <canvas id="gameCanvas"></canvas>
+...
+
 
     <div id="ad-modal">
         <h2 style="color: #ffcc00; font-size: 24px; margin-bottom: 10px;">📺 إعلان مكافئ قيد التشغيل</h2>
@@ -368,23 +370,31 @@
         </div>
     </div>
 
-    <canvas id="gameCanvas"></canvas>
+ 
+<canvas id="gameCanvas"></canvas>
 
-<script>
-    function checkOrientation() {
-        const warning = document.getElementById('orientation-warning');
-        if (window.innerHeight > window.innerWidth) {
-            warning.style.display = 'flex';
-        } else {
-            warning.style.display = 'none';
-            if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('landscape').catch(err => console.log(err));
-            }
+
+    <script>
+    document.getElementById('play-btn').addEventListener('click', async () => {
+    try {
+        const elem = document.documentElement;
+        if (elem.requestFullscreen) {
+            await elem.requestFullscreen();
+        } else if (elem.webkitRequestFullscreen) {
+            await elem.webkitRequestFullscreen();
         }
+        
+        if (screen.orientation && screen.orientation.lock) {
+            await screen.orientation.lock('landscape');
+        }
+    } catch (err) {
+        console.log("تم تخطي قفل الشاشة:", err);
     }
-    window.addEventListener('resize', checkOrientation);
-    window.addEventListener('load', checkOrientation);
-    window.addEventListener('orientationchange', checkOrientation);
+    
+    // إخفاء شاشة البداية وعرض اللعبة
+    document.getElementById('start-screen').style.display = 'none';
+});
+
 
     let currentOnboardingStep = 0;
     const onboardingSteps = [
