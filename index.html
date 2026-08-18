@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SuperDrix Pro - النسخة الأفقية المحسنة</title>
+    <title>SuperDrix Pro - النسخة الأفقية المحسنة والمصححة</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Changa:wght@700;800&display=swap');
         
@@ -751,14 +751,6 @@
         if (selectedWorld.terrain === 'mud') baseSpeed *= 0.72;
         if (selectedWorld.terrain === 'snow') baseSpeed *= 1.15;
 
-        player = {
-            x: 100, y: 150, width: 38, height: 38, vx: 0, vy: 0,
-            speed: baseSpeed, jumpForce: selectedWorld.terrain === 'mud' ? -11.5 : -13.5,
-            grounded: false, canDoubleJump: true, dir: 1, trail: [],
-            color: activeSkin.color, eyesColor: activeSkin.eyes, trailColors: activeSkin.trail,
-            crown: activeSkin.crown, isRainbow: activeSkin.isRainbow, scaleX: 1, scaleY: 1
-        };
-
         let levelLength = 3500 + (lvl * 300);
         let isBossLevel = lvl % 10 === 0;
         finishLine = { x: levelLength - 300, y: canvas.height - 320, width: 60, height: 240 };
@@ -815,6 +807,22 @@
             document.getElementById('boss-hud').style.display = 'block';
         } else {
             document.getElementById('boss-hud').style.display = 'none';
+        }
+
+        // إنشاء اللاعب وضبط وضعيته فوق أول بلوك لتجنب السقوط أو الاختراق
+        player = {
+            x: 100, y: 0, width: 38, height: 38, vx: 0, vy: 0,
+            speed: baseSpeed, jumpForce: selectedWorld.terrain === 'mud' ? -11.5 : -13.5,
+            grounded: true, canDoubleJump: true, dir: 1, trail: [],
+            color: activeSkin.color, eyesColor: activeSkin.eyes, trailColors: activeSkin.trail,
+            crown: activeSkin.crown, isRainbow: activeSkin.isRainbow, scaleX: 1, scaleY: 1
+        };
+
+        let startBlock = blocks.find(b => b.x <= 100 && b.x + b.width >= 100);
+        if (startBlock) {
+            player.y = startBlock.y - player.height;
+        } else {
+            player.y = canvas.height - 170;
         }
     }
 
@@ -1022,6 +1030,8 @@
         player.scaleY += (1 - player.scaleY) * 0.1;
 
         player.vy += 0.52;
+        if (player.vy > 10) player.vy = 10; // منع التسارع المفرط لمنع اختراق الأرضيات (Tunneling)
+
         player.x += player.vx;
         player.y += player.vy;
         player.grounded = false;
@@ -1040,7 +1050,7 @@
 
         blocks.forEach(b => {
             if (player.x + player.width > b.x && player.x < b.x + b.width && player.y + player.height > b.y && player.y < b.y + b.height) {
-                if (player.vy > 0 && player.y + player.height - player.vy <= b.y + 16) {
+                if (player.vy >= 0 && player.y + player.height - player.vy <= b.y + 16) {
                     player.y = b.y - player.height;
                     player.vy = 0; player.grounded = true; player.canDoubleJump = true;
                 }
