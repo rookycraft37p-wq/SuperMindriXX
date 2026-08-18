@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SuperDrix Pro - Landscape Mode</title>
+    <title>SuperDrix Pro - Ultimate Landscape</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Changa:wght@700;800&display=swap');
         
@@ -17,7 +17,7 @@
             touch-action: manipulation; 
         }
         body, html { width: 100%; height: 100%; overflow: hidden; background: #0b0b16; font-family: 'Changa', sans-serif; }
-        canvas { display: block; width: 100vw; height: 100vh; object-fit: cover; }
+        canvas { display: block; width: 100vw; height: 100vh; background: #0b0b16; }
 
         .screen {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(10, 12, 20, 0.98);
@@ -35,7 +35,6 @@
         .btn-weapons { background: #e91e63; box-shadow: 0 5px 0px #880e4f; color: #fff; text-shadow: 1px 1px 2px #000;}
         .btn-boosters { background: #00bcd4; box-shadow: 0 5px 0px #006064; color: #fff; text-shadow: 1px 1px 2px #000;}
         .btn-promo { background: #9c27b0; box-shadow: 0 5px 0px #4a148c; color: #fff; text-shadow: 1px 1px 2px #000;}
-        .btn-levels { background: #03a9f4; box-shadow: 0 5px 0px #01579b; color: #fff; }
         .btn-back { background: #f44336; box-shadow: 0 5px 0px #b71c1c; margin: 25px 0; color: #fff; width: 220px; }
         .btn-retry { background: #ffcc00; box-shadow: 0 5px 0px #f57f17; color: #000; }
 
@@ -59,7 +58,7 @@
         @keyframes rainbowGlow { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
         @keyframes godPulse { 0% { transform: scale(1); filter: brightness(1); } 100% { transform: scale(1.06); filter: brightness(1.5); box-shadow: 0 0 35px #ffff00, 0 0 15px #ff3300; } }
 
-        .buy-btn, .level-btn { background: #ffcc00; color: #000; font-weight: 800; border: 2px solid #000; padding: 6px 8px; border-radius: 10px; width: 100%; cursor: pointer; margin-top: 6px; font-size: 13px; }
+        .buy-btn { background: #ffcc00; color: #000; font-weight: 800; border: 2px solid #000; padding: 6px 8px; border-radius: 10px; width: 100%; cursor: pointer; margin-top: 6px; font-size: 13px; }
         .buy-btn:disabled { background: #444; color: #888; cursor: not-allowed; border-color: #222; }
         .buy-btn.equipped { background: #00e676; border-color: #fff; color: #fff; }
 
@@ -230,23 +229,20 @@
     <canvas id="gameCanvas"></canvas>
 
 <script>
-    // تفعيل وضع الشاشة الكاملة وإجبار العرض الأفقى برمجياً تلقائياً عند أول تفاعل
-    async function autoFullscreenAndLandscape() {
+    // تفعيل وضع الشاشة الكاملة وتثبيت العرض التلقائي
+    function autoFullscreen() {
         try {
             let elem = document.documentElement;
-            if (elem.requestFullscreen) await elem.requestFullscreen();
-            else if (elem.webkitRequestFullscreen) await elem.webkitRequestFullscreen();
-            
+            if (elem.requestFullscreen) elem.requestFullscreen();
+            else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
             if (screen.orientation && screen.orientation.lock) {
-                await screen.orientation.lock('landscape');
+                screen.orientation.lock('landscape').catch(() => {});
             }
-        } catch(e) {
-            console.log("Auto landscape/fullscreen restricted", e);
-        }
+        } catch(e) {}
     }
 
     document.addEventListener('pointerdown', function _initFull() {
-        autoFullscreenAndLandscape();
+        autoFullscreen();
         document.removeEventListener('pointerdown', _initFull);
     }, {once: true});
 
@@ -598,17 +594,15 @@
     const ctx = canvas.getContext('2d');
 
     function resizeCanvas() {
-        // تحديد أبعاد عالية الوضوح وعريضة تماماً تناسب الشاشة الأفقية تلقائياً
-        canvas.width = window.innerWidth * window.devicePixelRatio;
-        canvas.height = window.innerHeight * window.devicePixelRatio;
-        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
     }
     window.addEventListener('resize', resizeCanvas);
     resizeCanvas();
 
     let player, blocks = [], hazards = [], coins = [], speedBoosts = [], enemies = [], clouds = [], particles = [], floatingTexts = [], bullets = [], bossBullets = [], finishLine = null;
     let boss = null;
-    let cameraX = 0, shakeTime = 0, backgroundY = 0;
+    let cameraX = 0, backgroundY = 0;
     let weatherType = 'normal';
 
     function initLevel(lvl) {
@@ -623,14 +617,14 @@
         let baseSpeed = purchasedBoosters.includes('speedboost') ? 10 : 7;
         player = {
             x: 100, y: 200, width: 45, height: 45, vx: 0, vy: 0, speed: baseSpeed, jumpForce: -14,
-            grounded: false, canDoubleJump: true, dir: 1, trail: [], color: activeSkin.color,
-            eyesColor: activeSkin.eyes, trailColors: activeSkin.trail, crown: activeSkin.crown,
-            isRainbow: activeSkin.isRainbow, scaleX: 1, scaleY: 1
+            grounded: false, canDoubleJump: true, dir: 1, color: activeSkin.color,
+            eyesColor: activeSkin.eyes, crown: activeSkin.crown, isRainbow: activeSkin.isRainbow,
+            scaleX: 1, scaleY: 1
         };
 
         let levelLength = 3500 + (lvl * 300);
         let isBossLevel = lvl % 10 === 0;
-        finishLine = { x: levelLength - 300, y: (window.innerHeight) - 350, width: 80, height: 270 };
+        finishLine = { x: levelLength - 300, y: window.innerHeight - 350, width: 80, height: 270 };
 
         if (isBossLevel) {
             boss = {
@@ -858,7 +852,7 @@
         else { player.vx *= 0.8; }
 
         player.x += player.vx;
-        player.vy += 0.55; // Gravity
+        player.vy += 0.55;
         player.y += player.vy;
 
         player.grounded = false;
@@ -1012,7 +1006,6 @@
         lives--;
         document.getElementById('lives-val').innerText = lives;
         createParticles(player.x, player.y, particleColor, 30);
-        shakeTime = 15;
 
         if (lives <= 0) {
             gameOver(isBossDamage);
@@ -1066,19 +1059,15 @@
 
         hazards.forEach(hz => {
             if (hz.type === 'lava') {
-                ctx.shadowBlur = 20; ctx.shadowColor = "#ff3d00";
                 ctx.fillStyle = "#ff3d00";
                 ctx.fillRect(hz.x, hz.y + 20, hz.width, hz.height - 20);
-                ctx.shadowBlur = 0;
                 ctx.fillStyle = "#ffea00";
                 for(let i=0; i<hz.width; i+=40) {
                     ctx.fillRect(hz.x + i + (Date.now()/50 % 20), hz.y + 10, 15, 15);
                 }
             } else {
-                ctx.shadowBlur = 15; ctx.shadowColor = "#00bcd4";
                 ctx.fillStyle = "rgba(0, 188, 212, 0.6)";
                 ctx.fillRect(hz.x, hz.y + 15, hz.width, hz.height - 15);
-                ctx.shadowBlur = 0;
             }
         });
 
@@ -1113,23 +1102,19 @@
 
         speedBoosts.forEach(sb => {
             if (!sb.collected) {
-                ctx.shadowBlur = 15; ctx.shadowColor = "#00ffff";
                 ctx.fillStyle = "#00ffff";
                 ctx.beginPath(); ctx.arc(sb.x + 15, sb.y + 15, 14, 0, Math.PI * 2); ctx.fill();
                 ctx.fillStyle = "#000"; ctx.font = "bold 16px Changa"; ctx.fillText("⚡", sb.x + 5, sb.y + 21);
-                ctx.shadowBlur = 0;
             }
         });
 
         coins.forEach(c => {
             if (!c.collected) {
                 let fY = c.y + Math.sin(Date.now() * 0.008 + c.float) * 6;
-                ctx.shadowBlur = 12; ctx.shadowColor = "#ffea00";
                 ctx.fillStyle = "#ffcc00";
                 ctx.beginPath(); ctx.arc(c.x + 14, fY + 14, 13, 0, Math.PI * 2); ctx.fill();
                 ctx.strokeStyle = "#fff"; ctx.lineWidth = 2; ctx.stroke();
                 ctx.fillStyle = "#fff"; ctx.font = "bold 13px Changa"; ctx.fillText("🪙", c.x + 4, fY + 19);
-                ctx.shadowBlur = 0;
             }
         });
 
@@ -1142,35 +1127,26 @@
                 ctx.fillStyle = "#fff";
                 ctx.fillRect(en.x + 8, en.y + 12, 10, 10);
                 ctx.fillRect(en.x + 26, en.y + 12, 10, 10);
-                ctx.fillStyle = "#000";
-                ctx.fillRect(en.x + (en.vx > 0 ? 14 : 10), en.y + 14, 4, 4);
-                ctx.fillRect(en.x + (en.vx > 0 ? 32 : 28), en.y + 14, 4, 4);
             }
         });
 
         if (boss && boss.alive) {
             ctx.save();
             ctx.translate(boss.x + boss.width/2, boss.y + boss.height/2);
-            ctx.shadowBlur = 25; ctx.shadowColor = "#ff3d00";
             ctx.fillStyle = "#8E44AD"; ctx.fillRect(-55, -55, 110, 110);
             ctx.fillStyle = "#C0392B"; ctx.fillRect(-45, -45, 90, 90);
             ctx.fillStyle = "#ffcc00"; ctx.fillRect(-30, -20, 20, 15); ctx.fillRect(10, -20, 20, 15);
-            ctx.shadowBlur = 0;
             ctx.restore();
         }
 
         bullets.forEach(b => {
-            ctx.shadowBlur = 12; ctx.shadowColor = "#ff00ff";
             ctx.fillStyle = "#ff00ff";
             ctx.fillRect(b.x, b.y, b.width, b.height);
-            ctx.shadowBlur = 0;
         });
 
         bossBullets.forEach(bb => {
-            ctx.shadowBlur = 15; ctx.shadowColor = "#ff3d00";
             ctx.fillStyle = "#ff3d00";
             ctx.beginPath(); ctx.arc(bb.x + bb.width/2, bb.y + bb.height/2, bb.width/2, 0, Math.PI*2); ctx.fill();
-            ctx.shadowBlur = 0;
         });
 
         if (player) {
@@ -1179,10 +1155,6 @@
             ctx.scale(player.scaleX, player.scaleY);
 
             let activeColor = player.isRainbow ? `hsl(${Date.now() * 0.3 % 360}, 100%, 55%)` : player.color;
-            if (player.crown) {
-                ctx.shadowBlur = 20; ctx.shadowColor = "#ffcc00";
-            }
-
             ctx.fillStyle = activeColor;
             ctx.fillRect(-player.width/2, -player.height, player.width, player.height);
             ctx.strokeStyle = "#111"; ctx.lineWidth = 3;
@@ -1217,9 +1189,7 @@
         floatingTexts.forEach(ft => {
             ctx.globalAlpha = ft.life; ctx.fillStyle = ft.color;
             ctx.font = "bold 22px Changa";
-            ctx.shadowBlur = 4; ctx.shadowColor = "#000";
             ctx.fillText(ft.text, ft.x, ft.y);
-            ctx.shadowBlur = 0;
         });
         ctx.globalAlpha = 1.0;
 
