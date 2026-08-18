@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SuperDrix Pro - النسخة الأفقية المحسنة والمصححة</title>
+    <title>SuperDrix Pro - النسخة النهائية الخالية من الأخطاء</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Changa:wght@700;800&display=swap');
         
@@ -809,7 +809,6 @@
             document.getElementById('boss-hud').style.display = 'none';
         }
 
-        // إنشاء اللاعب وضبط وضعيته فوق أول بلوك لتجنب السقوط أو الاختراق
         player = {
             x: 100, y: 0, width: 38, height: 38, vx: 0, vy: 0,
             speed: baseSpeed, jumpForce: selectedWorld.terrain === 'mud' ? -11.5 : -13.5,
@@ -1030,16 +1029,92 @@
         player.scaleY += (1 - player.scaleY) * 0.1;
 
         player.vy += 0.52;
-        if (player.vy > 10) player.vy = 10; // منع التسارع المفرط لمنع اختراق الأرضيات (Tunneling)
+        if (player.vy > 10) player.vy = 10;
 
+        // تطبيق حركة أفقية وفحص التصادم الأفقي أولاً لمنع عبور الجدران
         player.x += player.vx;
+        blocks.forEach(b => {
+            if (player.x + player.width > b.x && player.x < b.x + b.width && player.y + player.height > b.y && player.y < b.y + b.height) {
+                if (player.vx > 0) {
+                    player.x = b.x - player.width;
+                } else if (player.vx < 0) {
+                    player.x = b.x + b.width;
+                }
+            }
+        });
+
+        // تطبيق حركة رأسية وفحص التصادم الرأسي
         player.y += player.vy;
         player.grounded = false;
+        blocks.forEach(b => {
+            if (player.x + player.width > b.x && player.x < b.x + b.width && player.y + player.height > b.y && player.y < b.y + b.height) {
+                if (player.vy > 0) { // سقوط على منصة
+                    player.y = b.y - player.height;
+                    player.vy = 0;
+                    player.grounded = true;
+                    player.canDoubleJump = true;
+                } else if (player.vy < 0) { // اصطدام الرأس بسقف المنصة من الأسفل
+                    player.y = b.y + b.height;
+                    player.vy = 0;
+                }
+            }
+        });
 
-        bullets.forEach(b => { b.x += b.vx; });
-        bullets = bullets.filter(b => Math.abs(b.x - player.x) < 1400);
+        // معالجة آمنة للطلقات باستخدام حلقة عكسية لتفادي أخطاء الحذف والتخطي
+        for (let i = bullets.length - 1; i >= 0; i--) {
+            let b = bullets[i];
+            b.x += b.vx;
 
-        bossBullets.forEach(bb => { bb.x += bb.vx; bb.y += bb.vy; });
+            let bulletHit = false;
+
+            // اصطدام الطلقة بالزعيم
+            if (boss && boss.alive && b.x > boss.x && b.x < boss.x + boss.width && b.y > boss.y && b.y < boss.y + boss.height) {
+                boss.hp -= b.damage;
+                createParticles(b.x, b.y, '#ffea00', 5);
+                bulletHit = true;
+                if (boss.hp <= 0) {
+                    boss.alive = false;
+                    document.getElementById('boss-hud').style.display = 'none';
+                    let earnedCoins = 2500 * b.coinMultiplier;
+                    score += earnedCoins;
+                    document.getElementById('score-val').innerText = score;
+                    playSound('coin');
+                    createParticles(boss.x + 45, boss.y + 45, '#00e676', 40);
+                    createFloatingText(boss.x, boss.y, `هزمت الزعيم! +${earnedCoins} 🪙`, "#ffcc00");
+                }
+            }
+
+            // اصطدام الطلقة بالأعداء العاديين
+            if (!bulletHit) {
+                for (let j = 0; j < enemies.length; j++) {
+                    let en = enemies[j];
+                    if (en.alive && b.x > en.x && b.x < en.x + en.width && b.y > en.y && b.y < en.y + en.height) {
+                        en.hp -= b.damage;
+                        createParticles(b.x, b.y, '#ffea00', 4);
+                        bulletHit = true;
+                        if (en.hp <= 0) {
+                            en.alive = false;
+                            score += 200;
+                            createFloatingText(en.x, en.y, "+200", "#ffcc00");
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // إزالة الطلقة إذا تجاوزت المسافة أو أصابت هدفاً
+            if (bulletHit || Math.abs(b.x - player.x) > 1400) {
+                bullets.splice(i, 1);
+            }
+        }
+
+        bossBullets.forEach((bb, idx) => {
+            bb.x += bb.vx; bb.y += bb.vy;
+            if (player.x + player.width > bb.x && player.x < bb.x + bb.width && player.y + player.height > bb.y && player.y < bb.y + bb.height) {
+                bossBullets.splice(idx, 1);
+                applyDamage('#ff3d00', player.x - 60, true);
+            }
+        });
         bossBullets = bossBullets.filter(bb => Math.abs(bb.x - player.x) < 1400);
 
         particles.forEach(p => { p.vy += 0.22; p.x += p.vx; p.y += p.vy; p.life -= 0.03; p.size *= 0.95; });
@@ -1047,15 +1122,6 @@
 
         floatingTexts.forEach(ft => { ft.y += ft.vy; ft.life -= 0.02; });
         floatingTexts = floatingTexts.filter(ft => ft.life > 0);
-
-        blocks.forEach(b => {
-            if (player.x + player.width > b.x && player.x < b.x + b.width && player.y + player.height > b.y && player.y < b.y + b.height) {
-                if (player.vy >= 0 && player.y + player.height - player.vy <= b.y + 16) {
-                    player.y = b.y - player.height;
-                    player.vy = 0; player.grounded = true; player.canDoubleJump = true;
-                }
-            }
-        });
 
         hazards.forEach(hz => {
             if (player.x + player.width > hz.x && player.x < hz.x + hz.width && player.y + player.height > hz.y && player.y < hz.y + hz.height) {
@@ -1068,7 +1134,7 @@
             en.x += en.vx;
             if (en.x < en.minX || en.x > en.maxX) en.vx *= -1;
             if (player.x + player.width > en.x && player.x < en.x + en.width && player.y + player.height > en.y && player.y < en.y + en.height) {
-                if (player.vy > 0 && player.y + player.height - player.vy <= en.y + 16) {
+                if (player.vy > 0 && player.y + player.height - player.vy <= en.y + 20) {
                     en.hp -= 50; player.vy = -9.5; playSound('jump');
                     createParticles(en.x, en.y, '#ff3d00', 8);
                     if (en.hp <= 0) { en.alive = false; score += 150; createFloatingText(en.x, en.y, "+150", "#ffcc00"); }
@@ -1092,33 +1158,6 @@
                 applyDamage('#ff3d00', boss.x - 90, true);
             }
         }
-
-        bossBullets.forEach((bb, idx) => {
-            if (player.x + player.width > bb.x && player.x < bb.x + bb.width && player.y + player.height > bb.y && player.y < bb.y + bb.height) {
-                bossBullets.splice(idx, 1);
-                applyDamage('#ff3d00', player.x - 60, true);
-            }
-        });
-
-        bullets.forEach((b, bIdx) => {
-            if (boss && boss.alive && b.x > boss.x && b.x < boss.x + boss.width && b.y > boss.y && b.y < boss.y + boss.height) {
-                boss.hp -= b.damage; createParticles(b.x, b.y, '#ffea00', 5); bullets.splice(bIdx, 1);
-                if (boss.hp <= 0) {
-                    boss.alive = false; document.getElementById('boss-hud').style.display = 'none';
-                    let earnedCoins = 2500 * b.coinMultiplier; score += earnedCoins;
-                    document.getElementById('score-val').innerText = score;
-                    playSound('coin'); createParticles(boss.x + 45, boss.y + 45, '#00e676', 40);
-                    createFloatingText(boss.x, boss.y, `هزمت الزعيم! +${earnedCoins} 🪙`, "#ffcc00");
-                }
-                return;
-            }
-            enemies.forEach(en => {
-                if (en.alive && b.x > en.x && b.x < en.x + en.width && b.y > en.y && b.y < en.y + en.height) {
-                    en.hp -= b.damage; createParticles(b.x, b.y, '#ffea00', 4); bullets.splice(bIdx, 1);
-                    if (en.hp <= 0) { en.alive = false; score += 200; createFloatingText(en.x, en.y, "+200", "#ffcc00"); }
-                }
-            });
-        });
 
         coins.forEach(c => {
             c.float += 0.05;
