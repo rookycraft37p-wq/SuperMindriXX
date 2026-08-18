@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SuperDrix Pro - النسخة الكاملة المطورة</title>
+    <title>SuperDrix Pro - النسخة المعدلة والمنظمة</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Changa:wght@700;800&display=swap');
         
@@ -35,7 +35,6 @@
         .btn-weapons { background: #e91e63; box-shadow: 0 5px 0px #880e4f; color: #fff; text-shadow: 1px 1px 2px #000;}
         .btn-boosters { background: #00bcd4; box-shadow: 0 5px 0px #006064; color: #fff; text-shadow: 1px 1px 2px #000;}
         .btn-promo { background: #9c27b0; box-shadow: 0 5px 0px #4a148c; color: #fff; text-shadow: 1px 1px 2px #000;}
-        .btn-levels { background: #03a9f4; box-shadow: 0 5px 0px #01579b; color: #fff; }
         .btn-back { background: #f44336; box-shadow: 0 5px 0px #b71c1c; margin: 25px 0; color: #fff; width: 220px; }
         .btn-retry { background: #ffcc00; box-shadow: 0 5px 0px #f57f17; color: #000; }
 
@@ -115,11 +114,11 @@
         #boss-hp-bar { width: 100%; height: 100%; background: linear-gradient(90deg, #d32f2f, #ffea00); transition: width 0.2s; }
         #boss-name-text { position: absolute; width: 100%; top: -2px; font-size: 12px; font-weight: bold; color: #fff; text-shadow: 1px 1px #000; text-align: center; }
 
-        /* شريط التحكم المرتب في الأسفل */
+        /* التحكمات المرتبة بشكل صحيح: أزرار الحركة يساراً، وأزرار الفعل يميناً */
         .controls-bar {
             position: absolute; bottom: 20px; width: 100%; left: 0; 
             display: flex; justify-content: space-between; align-items: center; 
-            padding: 0 25px; z-index: 20; pointer-events: auto; direction: ltr;
+            padding: 0 20px; z-index: 20; pointer-events: auto; direction: ltr;
         }
         .control-group { display: flex; gap: 12px; align-items: center; }
         .control-btn {
@@ -225,6 +224,7 @@
         <input type="text" id="promo-input" placeholder="ادخل الكود هنا" style="padding: 12px 20px; font-size: 20px; border-radius: 20px; border: 3px solid #ff3d00; background: rgba(0,0,0,0.5); color: #fff; text-align: center; width: 280px; margin-bottom: 15px; font-family: 'Changa', sans-serif; outline: none; text-transform: uppercase;">
         <br>
         <button class="btn-main" onclick="redeemCode()" style="background: #ff3d00; width: 280px; margin-bottom: 10px;">تفعيل الكود 🎯</button>
+        <button class="btn-main" onclick="resetPromoCodes()" style="background: #555; width: 280px; margin-bottom: 10px; font-size: 14px; padding: 6px;">إعادة تعيين الأكواد (لإعادة استخدامها) 🔄</button>
         <p id="promo-msg" style="font-size: 18px; margin-top: 15px; font-weight: bold; min-height: 30px;"></p>
         <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
     </div>
@@ -287,6 +287,7 @@
                 <div id="boss-name-text">الزعيم الطائر المرعب 🦇🔥</div>
             </div>
         </div>
+        
         <div class="controls-bar" id="controls">
             <div class="control-group">
                 <button class="control-btn" id="btn-left">◀</button>
@@ -459,7 +460,6 @@
     let currentWeaponId = parseInt(localStorage.getItem('superdrix_current_weapon')) || 0;
     let purchasedBoosters = JSON.parse(localStorage.getItem('superdrix_boosters')) || [];
 
-    // قائمة ضخمة وشاملة من أكواد الهدايا والأكواد السرية
     const validPromoCodes = {
         "SUPER100K": { coins: 100000, message: "تم شحن 100,000 عملة بنجاح! 🪙🔥" },
         "GOLD50K": { coins: 50000, message: "تم شحن 50,000 عملة بنجاح! 🪙✨" },
@@ -568,6 +568,15 @@
         } else {
             msgEl.style.color = '#f44336'; msgEl.innerText = "الكود غير صحيح أو منتهي الصلاحية!"; playSound('hit');
         }
+    }
+
+    function resetPromoCodes() {
+        usedPromoCodes = [];
+        localStorage.removeItem('superdrix_used_codes');
+        const msgEl = document.getElementById('promo-msg');
+        msgEl.style.color = '#00e676';
+        msgEl.innerText = "تمت إعادة تعيين الأكواد! يمكنك إعادة استخدامها الآن 🔄";
+        playSound('coin');
     }
 
     function openShop() {
@@ -955,7 +964,6 @@
             }
         });
 
-        // الوحوش الآن تهاجم وتسبب ضرراً فعالاً عند الاصطدام باللاعب
         enemies.forEach(en => {
             if (!en.alive) return;
             en.x += en.vx;
@@ -966,7 +974,7 @@
                     createParticles(en.x, en.y, '#ff3d00', 12);
                     if (en.hp <= 0) { en.alive = false; score += 150; createFloatingText(en.x, en.y, "+150", "#ffcc00"); }
                 } else {
-                    applyDamage('#ff3d00', en.x, false); // خصم حياة عند الاصطدام بالوحش
+                    applyDamage('#ff3d00', en.x, false);
                 }
             }
         });
