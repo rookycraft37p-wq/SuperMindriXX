@@ -22,10 +22,18 @@ canvas{display:block;width:100vw;height:100vh;position:fixed;inset:0;z-index:1}
 h1.title{font-size:34px;color:#ff3d00;text-shadow:0 0 25px rgba(255,61,0,0.9),3px 3px #000;font-weight:900;letter-spacing:2px;margin-bottom:2px}
 h2.subtitle{font-size:18px;color:#ffcc00;text-shadow:2px 2px #000;margin-bottom:8px}
 
-/* تصميم زجاجي فاخر iOS Style للبطاقات والأزرار */
 .btn-main{background:rgba(255,255,255,0.08);backdrop-filter:blur(12px);color:#fff;font-size:14px;font-weight:800;padding:8px 18px;margin:4px;border-radius:20px;border:1px solid rgba(255,255,255,0.2);cursor:pointer;box-shadow:0 8px 25px rgba(0,0,0,0.6);transition:all .2s;width:220px}
 .btn-main:active{transform:translateY(3px);box-shadow:0 0 #000}
 .btn-shop{background:rgba(255,152,0,0.2);border-color:rgba(255,152,0,0.4)}.btn-weapons{background:rgba(233,30,99,0.2);border-color:rgba(233,30,99,0.4)}.btn-boosters{background:rgba(0,188,212,0.2);border-color:rgba(0,188,212,0.4)}.btn-promo{background:rgba(156,39,176,0.2);border-color:rgba(156,39,176,0.4)}.btn-back{background:rgba(244,67,54,0.2);border-color:rgba(244,67,54,0.4);margin:10px 0;color:#fff;width:160px}.btn-retry{background:rgba(255,204,0,0.2);border-color:rgba(255,204,0,0.4);color:#fff}
+
+/* زر الإعدادات الموضع في الزاوية */
+#corner-settings-btn{position:fixed;top:15px;right:15px;z-index:40;width:42px;height:42px;background:rgba(255,255,255,0.1);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.3);border-radius:50%;display:flex;justify-content:center;align-items:center;font-size:20px;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,0.5)}
+#corner-settings-btn:active{transform:scale(0.9)}
+
+/* نافذة الإعدادات الزجاجية */
+#settings-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);backdrop-filter:blur(25px);z-index:50000;justify-content:center;align-items:center;flex-direction:column;padding:20px}
+.settings-box{background:rgba(20,20,35,0.8);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.2);border-radius:22px;padding:20px;max-width:400px;width:100%;text-align:center;box-shadow:0 15px 40px rgba(0,0,0,0.8)}
+.settings-row{display:flex;justify-content:space-between;align-items:center;margin:12px 0;background:rgba(255,255,255,0.05);padding:10px 15px;border-radius:14px;border:1px solid rgba(255,255,255,0.1);font-size:14px}
 
 .grid-container{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;max-width:850px;padding:8px;margin-bottom:10px}
 .card{background:rgba(20,20,30,0.65);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.15);border-radius:18px;padding:10px;width:130px;text-align:center;box-shadow:0 8px 32px rgba(0,0,0,0.5);position:relative;transition:.2s}
@@ -74,6 +82,37 @@ h2.subtitle{font-size:18px;color:#ffcc00;text-shadow:2px 2px #000;margin-bottom:
 <style>.lang-btn{background:rgba(30,41,59,0.7);backdrop-filter:blur(12px);border:1px solid rgba(99,102,241,0.5);color:white;padding:12px;border-radius:14px;font-weight:bold;cursor:pointer;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,0.5)}</style>
 
 <div id="start-screen"><h1>Super Mindrix</h1><button id="play-btn">اضغط للبدء 🎮</button></div>
+
+<!-- زر الإعدادات في زاوية الشاشة -->
+<div id="corner-settings-btn" onclick="openSettingsModal()">⚙️</div>
+
+<!-- نافذة الإعدادات الجديدة -->
+<div id="settings-modal">
+<div class="settings-box">
+<h2 style="color:#ffcc00;font-size:20px;margin-bottom:12px">⚙️ إعدادات اللعبة</h2>
+<div class="settings-row">
+<span>لغة اللعبة (Language):</span>
+<select id="settings-lang-select" onchange="changeGameLanguage(this.value)" style="background:rgba(0,0,0,0.5);color:#fff;border:1px solid rgba(255,255,255,0.3);padding:4px 8px;border-radius:10px;font-family:'Changa';outline:none">
+<option value="ar">العربية 🇸🇦</option>
+<option value="en">English 🇺🇸</option>
+<option value="fr">Français 🇫🇷</option>
+<option value="es">Español 🇪🇸</option>
+<option value="tr">Türkçe 🇹🇷</option>
+<option value="de">Deutsch 🇩🇪</option>
+</select>
+</div>
+<div class="settings-row">
+<span>المؤثرات الصوتية (SFX):</span>
+<button class="buy-btn" id="sfx-toggle-btn" onclick="toggleSFX()" style="width:90px;margin:0">تفعيل ✔️</button>
+</div>
+<div class="settings-row">
+<span>موسيقى الخلفية (BGM):</span>
+<button class="buy-btn" id="bgm-toggle-btn" onclick="toggleBGM()" style="width:90px;margin:0">تفعيل ✔️</button>
+</div>
+<button class="btn-main" onclick="closeSettingsModal()" style="width:100%;margin-top:15px;background:rgba(0,230,118,0.3);border-color:#00e676">إغلاق وحفظ</button>
+</div>
+</div>
+
 <div id="quit-modal"><div style="background:rgba(20,20,35,0.85);backdrop-filter:blur(25px);border:1px solid rgba(255,61,0,0.5);border-radius:20px;padding:25px;text-align:center;max-width:350px;width:90%;box-shadow:0 15px 40px rgba(0,0,0,0.9)">
 <h3 style="color:#ffcc00;font-size:20px;margin-bottom:10px">🏠 العودة إلى البيت</h3><p style="color:#ddd;font-size:14px;margin-bottom:20px">هل أنت متأكد أنك تريد مغادرة المرحلة والعودة للقائمة الرئيسية؟</p>
 <div style="display:flex;gap:10px;justify-content:center"><button class="btn-main" onclick="confirmQuitToHome()" style="width:130px;margin:0">نعم، خروج</button><button class="btn-main" onclick="closeQuitModal()" style="background:rgba(100,100,100,0.3);width:130px;margin:0">إلغاء</button></div></div></div>
@@ -151,6 +190,8 @@ tr:{play:"Başlamak için dokun 🎮",quit:"🏠 Ana Sayfa",confirmQuit:"Çıkı
 de:{play:"Tippen zum Starten 🎮",quit:"🏠 Startseite",confirmQuit:"Möchtest du wirklich beenden und zum Hauptmenü zurückkehren?",yes:"Ja, Beenden",cancel:"Abbrechen"}
 };
 let currentLang=localStorage.getItem("superdrix_lang")||null;
+let sfxEnabled=true, bgmEnabled=true;
+
 function applyTranslations(){
     const t=translations[currentLang]||translations.ar;
     document.getElementById("play-btn").innerText=t.play;
@@ -161,9 +202,19 @@ function applyTranslations(){
 function setLanguage(lang){
     currentLang=lang;localStorage.setItem("superdrix_lang",lang);
     document.getElementById("language-modal").style.display="none";applyTranslations();
+    document.getElementById("settings-lang-select").value=lang;
     if(!localStorage.getItem("superdrix_onboarding_done")){showScreen("onboarding-screen");updateOnboardingUI()}
     else document.getElementById("start-screen").style.display="flex";
 }
+function changeGameLanguage(lang){
+    currentLang=lang;localStorage.setItem("superdrix_lang",lang);
+    applyTranslations();
+}
+function openSettingsModal(){document.getElementById("settings-modal").style.display="flex";document.getElementById("settings-lang-select").value=currentLang||"ar"}
+function closeSettingsModal(){document.getElementById("settings-modal").style.display="none"}
+function toggleSFX(){sfxEnabled=!sfxEnabled;document.getElementById("sfx-toggle-btn").innerText=sfxEnabled?"تفعيل ✔️":"إيقاف ❌";document.getElementById("sfx-toggle-btn").className=sfxEnabled?"buy-btn equipped":"buy-btn"}
+function toggleBGM(){bgmEnabled=!bgmEnabled;document.getElementById("bgm-toggle-btn").innerText=bgmEnabled?"تفعيل ✔️":"إيقاف ❌";document.getElementById("bgm-toggle-btn").className=bgmEnabled?"buy-btn equipped":"buy-btn";if(!bgmEnabled)stopBGM();else if(gameActive)startBGM()}
+
 window.addEventListener("load",()=>{
     if(currentLang){document.getElementById("language-modal").style.display="none";applyTranslations();
         if(!localStorage.getItem("superdrix_onboarding_done")){showScreen("onboarding-screen");updateOnboardingUI()}
@@ -197,10 +248,10 @@ function finishOnboarding(){localStorage.setItem("superdrix_onboarding_done","tr
 /* ===== Audio ===== */
 let audioCtx,bgmInterval=null;
 function initAudio(){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume()}catch(e){}}
-function startBGM(){if(!audioCtx)return;if(bgmInterval)clearInterval(bgmInterval);const melody=[261.63,293.66,329.63,349.23,392,440,493.88,523.25,440,392,349.23,329.63];let n=0;
-bgmInterval=setInterval(()=>{if(!audioCtx||audioCtx.state!=="running"||!gameActive)return;try{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type="triangle";o.frequency.value=melody[n++%melody.length];g.gain.setValueAtTime(.05,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.35);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.35)}catch(e){}},400)}
+function startBGM(){if(!audioCtx||!bgmEnabled)return;if(bgmInterval)clearInterval(bgmInterval);const melody=[261.63,293.66,329.63,349.23,392,440,493.88,523.25,440,392,349.23,329.63];let n=0;
+bgmInterval=setInterval(()=>{if(!audioCtx||audioCtx.state!=="running"||!gameActive||!bgmEnabled)return;try{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type="triangle";o.frequency.value=melody[n++%melody.length];g.gain.setValueAtTime(.05,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.35);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.35)}catch(e){}},400)}
 function stopBGM(){if(bgmInterval){clearInterval(bgmInterval);bgmInterval=null}}
-function playSound(type){if(!audioCtx)return;try{const o=audioCtx.createOscillator(),g=audioCtx.createGain(),now=audioCtx.currentTime;o.connect(g);g.connect(audioCtx.destination);
+function playSound(type){if(!audioCtx||!sfxEnabled)return;try{const o=audioCtx.createOscillator(),g=audioCtx.createGain(),now=audioCtx.currentTime;o.connect(g);g.connect(audioCtx.destination);
 let start=0,end=0,dur=.15,wave="sine",vol=.2;
 if(type==="jump"){wave="square";start=280;end=600;dur=.18}else if(type==="coin"){start=1200;end=1800;dur=.25;vol=.25}else if(type==="shoot"){wave="sawtooth";start=700;end=200;dur=.12;vol=.25}else if(type==="bossShoot"){wave="sawtooth";start=450;end=100;dur=.3;vol=.35}else if(type==="skill"){start=400;end=1200;dur=.4;vol=.35}else if(type==="hit"){wave="sawtooth";start=150;end=40;dur=.45;vol=.45}else{wave="triangle";start=900;end=1200;dur=.06;vol=.12}
 o.type=wave;o.frequency.setValueAtTime(start,now);o.frequency.exponentialRampToValueAtTime(end,now+dur);g.gain.setValueAtTime(vol,now);g.gain.exponentialRampToValueAtTime(.01,now+dur);o.start(now);o.stop(now+dur)}catch(e){}}
@@ -270,7 +321,7 @@ function selectTerrain(v){selectedWorld.terrain=v;["grass","mud","snow"].forEach
 function triggerLevelStart(lvl){pendingLevel=lvl;document.getElementById("world-modal").style.display="flex";selectTime(selectedWorld.time);selectTerrain(selectedWorld.terrain)}
 function confirmWorldAndStart(){document.getElementById("world-modal").style.display="none";startLevel(pendingLevel)}
 
-/* ===== Game (Camera Zoom Widened and Centered) ===== */
+/* ===== Game ===== */
 const canvas=document.getElementById("gameCanvas"),ctx=canvas.getContext("2d");
 let dpr=1,worldZoom=0.75;
 function resizeCanvas(){dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.max(1,Math.floor(window.innerWidth*dpr));canvas.height=Math.max(1,Math.floor(window.innerHeight*dpr));canvas.style.width=window.innerWidth+"px";canvas.style.height=window.innerHeight+"px"}
@@ -361,15 +412,14 @@ if(finishLine&&player.x+player.width>finishLine.x&&player.x<finishLine.x+finishL
 cameraX+=((player.x-(window.innerWidth/worldZoom)/2)-cameraX)*.1;if(cameraX<0)cameraX=0;if(shakeTime>0)shakeTime--;document.getElementById("score-val").innerText=score
 }
 
-/* ===== Render (Centered Natural Background) ===== */
+/* ===== Render ===== */
 function render(){
 const bg=ctx.createLinearGradient(0,0,0,canvas.height);
-if(selectedWorld.time==="night"||true){bg.addColorStop(0,"#05050f");bg.addColorStop(1,"#000000")}
+bg.addColorStop(0,"#05050f");bg.addColorStop(1,"#000000");
 ctx.fillStyle=bg;ctx.fillRect(0,0,canvas.width,canvas.height);ctx.save();ctx.scale(worldZoom*dpr,worldZoom*dpr);
 if(shakeTime>0)ctx.translate((Math.random()-.5)*6,(Math.random()-.5)*6);
 const rw=window.innerWidth/worldZoom,rh=window.innerHeight/worldZoom, groundY = rh - 140;
 
-// خلفية النجوم المتساقطة والمجرات في اللعبة
 nightStars.forEach(s=>{let a=(Math.sin(Date.now()*s.twinkleSpeed+s.twinkleOffset)+1)/2;ctx.fillStyle=`rgba(255,255,255,${.2+a*.8})`;let x=cameraX+((s.x-cameraX*s.driftSpeed)%(rw+400));ctx.beginPath();ctx.arc(x,s.y,s.size*(.7+a*.5),0,Math.PI*2);ctx.fill()});
 if(selectedWorld.terrain==="snow")snowflakes.forEach(s=>{ctx.fillStyle="rgba(255,255,255,.85)";let x=cameraX+((s.x-cameraX*.25)%(rw+200));ctx.beginPath();ctx.arc(x,s.y,s.size,0,Math.PI*2);ctx.fill()});
 
