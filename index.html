@@ -28,6 +28,24 @@
             left: 0;
         }
 
+        /* تثبيت الشاشة بالعرض إجبارياً حتى في جوجل بلاي */
+        @media screen and (orientation: portrait) {
+            html, body {
+                transform: rotate(-90deg);
+                transform-origin: left top;
+                width: 100vh !important;
+                height: 100vw !important;
+                overflow: hidden;
+                position: absolute;
+                top: 100%;
+                left: 0;
+            }
+            #start-screen::before {
+                content: "يرجى تدوير الهاتف بالعرض 🔄 Rotate your phone";
+                position: absolute; top: 15%; background: #ff3d00; color: white; padding: 10px; border-radius: 10px; z-index: 999999; text-align: center;
+            }
+        }
+
         canvas { 
             display: block; 
             width: 100vw; 
@@ -36,8 +54,6 @@
             top: 0;
             left: 0;
         }
-
-        
 
         #ad-modal {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
@@ -185,14 +201,24 @@
 </head>
 <body>
 
-<body>
-    <!-- ⬇️ ضعه هنا في البداية تماماً -->
-    <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 99999;">
+    <div id="language-modal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0f172a; z-index: 100000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; padding: 20px;">
+        <h1 style="color: #ffcc00; font-size: 26px; margin-bottom: 10px;">🌍 Select Your Language</h1>
+        <p style="color: #94a3b8; font-size: 14px; margin-bottom: 15px;">Please choose your preferred game language:</p>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 450px; width: 100%; margin-top: 15px;">
+            <button onclick="setLanguage('ar')" style="background: #1e293b; border: 2px solid #6366f1; color: white; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px;">العربية 🇸🇦</button>
+            <button onclick="setLanguage('en')" style="background: #1e293b; border: 2px solid #6366f1; color: white; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px;">English 🇺🇸</button>
+            <button onclick="setLanguage('fr')" style="background: #1e293b; border: 2px solid #6366f1; color: white; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px;">Français 🇫🇷</button>
+            <button onclick="setLanguage('es')" style="background: #1e293b; border: 2px solid #6366f1; color: white; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px;">Español 🇪🇸</button>
+            <button onclick="setLanguage('tr')" style="background: #1e293b; border: 2px solid #6366f1; color: white; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px;">Türkçe 🇹🇷</button>
+            <button onclick="setLanguage('de')" style="background: #1e293b; border: 2px solid #6366f1; color: white; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px;">Deutsch 🇩🇪</button>
+        </div>
+    </div>
+
+    <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 99999;">
         <h1 style="color: white; font-family: sans-serif; margin-bottom: 20px; font-size: 28px;">Super Mindrix</h1>
         <button id="play-btn" style="padding: 15px 40px; font-size: 22px; background: #6366f1; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);">اضغط للبدء 🎮</button>
     </div>
 
-    <!-- نافذة تأكيد الخروج المخصصة الجميلة -->
     <div id="quit-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 30000; justify-content: center; align-items: center; flex-direction: column;">
         <div style="background: #111422; border: 2px solid #ff3d00; border-radius: 15px; padding: 25px; text-align: center; max-width: 350px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
             <h3 style="color: #ffcc00; font-size: 20px; margin-bottom: 10px;">🏠 العودة إلى البيت</h3>
@@ -204,9 +230,7 @@
         </div>
     </div>
 
-    <!-- باقي عناصر لعبتك (مثل الـ Canvas أو الـ divs الخاصة باللعبة) -->
     <canvas id="gameCanvas"></canvas>
-...
 
 
     <div id="ad-modal">
@@ -382,11 +406,64 @@
         </div>
     </div>
 
- 
-<canvas id="gameCanvas"></canvas>
+    <canvas id="gameCanvas"></canvas>
 
 
     <script>
+    const translations = {
+        ar: { play: "اضغط للبدء 🎮", quit: "🏠 العودة إلى البيت", confirmQuit: "هل أنت متأكد أنك تريد مغادرة المرحلة والعودة للقائمة الرئيسية؟", yes: "نعم، خروج", cancel: "إلغاء" },
+        en: { play: "Tap to Start 🎮", quit: "🏠 Home", confirmQuit: "Are you sure you want to quit and return to the main menu?", yes: "Yes, Quit", cancel: "Cancel" },
+        fr: { play: "Appuyer pour démarrer 🎮", quit: "🏠 Accueil", confirmQuit: "Êtes-vous sûr de vouloir quitter et retourner au menu principal?", yes: "Oui, Quitter", cancel: "Annuler" },
+        es: { play: "Tocar para empezar 🎮", quit: "🏠 Inicio", confirmQuit: "¿Estás seguro de que quieres salir y volver al menú principal?", yes: "Sí, Salir", cancel: "Cancelar" },
+        tr: { play: "Başlamak için dokun 🎮", quit: "🏠 Ana Sayfa", confirmQuit: "Çıkıp ana menüye dönmek istediğinden emin misin?", yes: "Evet, Çık", cancel: "İptal" },
+        de: { play: "Tippen zum Starten 🎮", quit: "🏠 Startseite", confirmQuit: "Möchtest du wirklich beenden und zum Hauptmenü zurückkehren?", yes: "Ja, Beenden", cancel: "Abbrechen" }
+    };
+
+    let currentLang = localStorage.getItem('superdrix_lang');
+
+    function applyTranslations() {
+        if(!currentLang) currentLang = 'ar';
+        const t = translations[currentLang] || translations.ar;
+        const playBtn = document.getElementById('play-btn');
+        if(playBtn) playBtn.innerText = t.play;
+        const quitTitle = document.querySelector('#quit-modal h3');
+        if(quitTitle) quitTitle.innerText = t.quit;
+        const quitDesc = document.querySelector('#quit-modal p');
+        if(quitDesc) quitDesc.innerText = t.confirmQuit;
+        const quitBtns = document.querySelectorAll('#quit-modal .btn-main');
+        if(quitBtns.length >= 2) { quitBtns[0].innerText = t.yes; quitBtns[1].innerText = t.cancel; }
+    }
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        localStorage.setItem('superdrix_lang', lang);
+        document.getElementById('language-modal').style.display = 'none';
+        applyTranslations();
+        
+        if (!localStorage.getItem('superdrix_onboarding_done')) {
+            document.getElementById('onboarding-screen').style.display = 'flex';
+            updateOnboardingUI();
+        } else {
+            document.getElementById('start-screen').style.display = 'flex';
+        }
+    }
+
+    window.addEventListener('load', () => {
+        if (localStorage.getItem('superdrix_lang')) {
+            document.getElementById('language-modal').style.display = 'none';
+            applyTranslations();
+            if (!localStorage.getItem('superdrix_onboarding_done')) {
+                document.getElementById('onboarding-screen').style.display = 'flex';
+                updateOnboardingUI();
+            } else {
+                document.getElementById('start-screen').style.display = 'flex';
+            }
+        } else {
+            document.getElementById('onboarding-screen').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'none';
+        }
+    });
+
     document.getElementById('play-btn').addEventListener('click', async () => {
     try {
         const elem = document.documentElement;
@@ -403,10 +480,9 @@
         console.log("تم تخطي قفل الشاشة:", err);
     }
     
-    // إخفاء شاشة البداية وعرض اللعبة
     document.getElementById('start-screen').style.display = 'none';
-});
-
+    showScreen('home-screen');
+    });
 
     let currentOnboardingStep = 0;
     const onboardingSteps = [
@@ -441,15 +517,6 @@
         document.getElementById('onboarding-screen').style.display = 'none';
         showScreen('home-screen');
     }
-
-    window.addEventListener('load', () => {
-        if (!localStorage.getItem('superdrix_onboarding_done')) {
-            document.getElementById('onboarding-screen').style.display = 'flex';
-            updateOnboardingUI();
-        } else {
-            showScreen('home-screen');
-        }
-    });
 
     let audioCtx;
     let bgmInterval = null;
@@ -1332,7 +1399,24 @@
     }
 
     function render() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // --- إصلاح مشكلة اهتزاز/تغير الخلفية: رسم الخلفية بشكل ثابت تماماً 100% ---
+        let bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        if (selectedWorld.time === 'night') {
+            bgGradient.addColorStop(0, '#0a0f24');
+            bgGradient.addColorStop(1, '#020208');
+        } else if (selectedWorld.terrain === 'snow') {
+            bgGradient.addColorStop(0, '#00bcd4');
+            bgGradient.addColorStop(1, '#006064');
+        } else {
+            // سماء الصباح المشرقة
+            bgGradient.addColorStop(0, '#29b6f6');
+            bgGradient.addColorStop(0.5, '#4fc3f7');
+            bgGradient.addColorStop(1, '#81d4fa');
+        }
+        ctx.fillStyle = bgGradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        // -------------------------------------------------------------
+
         ctx.save();
         
         ctx.scale(worldZoom * dpr, worldZoom * dpr);
@@ -1341,22 +1425,6 @@
 
         let renderWidth = window.innerWidth / worldZoom;
         let renderHeight = window.innerHeight / worldZoom;
-
-        let bgGradient = ctx.createLinearGradient(0, 0, 0, renderHeight);
-        if (selectedWorld.time === 'night') {
-            bgGradient.addColorStop(0, '#0a0f24');
-            bgGradient.addColorStop(1, '#020208');
-        } else if (selectedWorld.terrain === 'snow') {
-            bgGradient.addColorStop(0, '#00bcd4');
-            bgGradient.addColorStop(1, '#006064');
-        } else {
-            // Morning Sky gradient (bright, cheerful morning)
-            bgGradient.addColorStop(0, '#29b6f6');
-            bgGradient.addColorStop(0.5, '#4fc3f7');
-            bgGradient.addColorStop(1, '#81d4fa');
-        }
-        ctx.fillStyle = bgGradient;
-        ctx.fillRect(cameraX, 0, renderWidth, renderHeight);
 
         if (selectedWorld.time === 'night') {
             nightStars.forEach(star => {
