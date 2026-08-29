@@ -1,1623 +1,430 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>SuperDrix Pro - النسخة النهائية (شاشة واسعة)</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Changa:wght@700;800&display=swap');
-        
-        * { 
-            box-sizing: border-box; 
-            user-select: none; 
-            -webkit-user-select: none; 
-            -webkit-touch-callout: none;
-            margin: 0; 
-            padding: 0; 
-            touch-action: manipulation; 
-        }
-
-        html, body { 
-            width: 100vw; 
-            height: 100vh; 
-            overflow: hidden; 
-            background: #0b0b16; 
-            font-family: 'Changa', sans-serif;
-            position: fixed;
-            top: 0;
-            left: 0;
-        }
-
-        /* تثبيت الشاشة بالعرض إجبارياً حتى في جوجل بلاي */
-        @media screen and (orientation: portrait) {
-            html, body {
-                transform: rotate(-90deg);
-                transform-origin: left top;
-                width: 100vh !important;
-                height: 100vw !important;
-                overflow: hidden;
-                position: absolute;
-                top: 100%;
-                left: 0;
-            }
-            #start-screen::before {
-                content: "يرجى تدوير الهاتف بالعرض 🔄 Rotate your phone";
-                position: absolute; top: 15%; background: #ff3d00; color: white; padding: 10px; border-radius: 10px; z-index: 999999; text-align: center;
-            }
-        }
-
-        canvas { 
-            display: block; 
-            width: 100vw; 
-            height: 100vh; 
-            position: absolute;
-            top: 0;
-            left: 0;
-        }
-
-        #ad-modal {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.98); z-index: 200; display: none;
-            flex-direction: column; justify-content: center; align-items: center;
-            color: #fff; text-align: center; padding: 15px;
-        }
-
-        .screen {
-            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(10, 12, 20, 0.98);
-            z-index: 30; display: none; flex-direction: column; justify-content: flex-start; align-items: center; color: white; text-align: center;
-            overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 10px 20px;
-        }
-        #home-screen { justify-content: center; background: #0b0b16; }
-        
-        h1.title { font-size: 32px; color: #ff3d00; text-shadow: 0 0 20px rgba(255,61,0,0.9), 3px 3px #000; font-weight: 900; letter-spacing: 2px; margin-bottom: 2px; }
-        h2.subtitle { font-size: 18px; color: #ffcc00; text-shadow: 2px 2px #000; margin-bottom: 8px; }
-
-        .btn-main { background: #ff3d00; color: #fff; font-size: 14px; font-weight: 800; padding: 6px 15px; margin: 3px; border-radius: 30px; border: 2px solid #fff; cursor: pointer; box-shadow: 0 3px 0px #b71c1c; transition: all 0.1s; width: 220px; }
-        .btn-main:active { transform: translateY(3px); box-shadow: 0 0px 0px #b71c1c; }
-        .btn-shop { background: #ff9800; box-shadow: 0 3px 0px #e65100; color: #fff; }
-        .btn-weapons { background: #e91e63; box-shadow: 0 3px 0px #880e4f; color: #fff; }
-        .btn-boosters { background: #00bcd4; box-shadow: 0 3px 0px #006064; color: #fff; }
-        .btn-promo { background: #9c27b0; box-shadow: 0 3px 0px #4a148c; color: #fff; }
-        .btn-back { background: #f44336; box-shadow: 0 3px 0px #b71c1c; margin: 10px 0; color: #fff; width: 160px; }
-        .btn-retry { background: #ffcc00; box-shadow: 0 3px 0px #f57f17; color: #000; }
-
-        .grid-container { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; max-width: 850px; padding: 5px; margin-bottom: 10px; }
-        
-        .card { background: rgba(25,25,35,0.9); border: 2px solid #555; border-radius: 12px; padding: 8px; width: 130px; text-align: center; box-shadow: 0 3px 10px rgba(0,0,0,0.3); position: relative; transition: 0.2s; }
-        .card.locked { opacity: 0.4; filter: grayscale(100%); pointer-events: none; }
-        .card-title { font-size: 12px; margin-bottom: 3px; font-weight: bold; text-shadow: 1px 1px #000; }
-        
-        .card.tier-rare { border-color: #00bcd4; box-shadow: 0 0 8px rgba(0,188,212,0.5); }
-        .card.tier-epic { border-color: #9c27b0; box-shadow: 0 0 10px rgba(156,39,176,0.6); }
-        .card.tier-legendary { border-color: #ff4500; box-shadow: 0 0 15px rgba(255,69,0,0.8); }
-        .card.tier-rainbow { border-color: #ff00ff; box-shadow: 0 0 20px #00ffff; animation: rainbowGlow 2s infinite linear; }
-        .tier-godlike { background: linear-gradient(135deg, #1a0000, #ff6600, #ffcc00, #ffffff); border: 2px solid #ffcc00; box-shadow: 0 0 20px #ff3300; }
-
-        @keyframes rainbowGlow { 0% { filter: hue-rotate(0deg); } 100% { filter: hue-rotate(360deg); } }
-
-        .buy-btn, .level-btn { background: #ffcc00; color: #000; font-weight: 800; border: 2px solid #000; padding: 4px; border-radius: 8px; width: 100%; cursor: pointer; margin-top: 4px; font-size: 11px; }
-        .buy-btn:disabled { background: #444; color: #888; cursor: not-allowed; border-color: #222; }
-        .buy-btn.equipped { background: #00e676; border-color: #fff; color: #fff; }
-
-        #world-modal {
-            display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(10, 12, 20, 0.98); z-index: 100;
-            justify-content: center; align-items: center; flex-direction: column; padding: 10px;
-            overflow-y: auto; -webkit-overflow-scrolling: touch;
-        }
-        .world-selection-box {
-            background: #111422; border: 2px solid #333;
-            border-radius: 15px; padding: 15px; max-width: 600px; width: 100%; text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.7);
-        }
-        .world-cards-container {
-            display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-top: 5px;
-        }
-        .world-card {
-            width: 100px; height: 100px; border-radius: 12px; border: 2px solid #fff;
-            cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5); transition: 0.3s; padding: 5px; position: relative;
-        }
-        .world-card h3 { font-size: 11px; color: #fff; text-shadow: 1px 1px #000; margin-top: 3px; }
-        .world-card p { font-size: 8px; color: #ddd; text-shadow: 1px 1px #000; }
-
-        #onboarding-screen {
-            background: #0b0b16; z-index: 50;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-        }
-        .onboarding-card {
-            background: #111422; border: 2px solid #333;
-            border-radius: 15px; padding: 15px; max-width: 400px; width: 90%;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.5); text-align: center; margin-bottom: 10px;
-        }
-        .onboarding-card h2 { color: #ff3d00; font-size: 20px; margin-bottom: 6px; text-shadow: 2px 2px #000; }
-        .onboarding-card p { color: #ddd; font-size: 12px; line-height: 1.4; margin-bottom: 10px; }
-        .dots-container { display: flex; gap: 5px; justify-content: center; margin-bottom: 10px; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.3); transition: 0.3s; }
-        .dot.active { background: #ff3d00; width: 20px; border-radius: 4px; }
-        .onboarding-buttons { display: flex; gap: 6px; justify-content: center; width: 100%; max-width: 400px; }
-
-        /* الشريط العلوي */
-        #ui-layer {
-            position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 10000; pointer-events: none;
-            display: none; flex-direction: column; justify-content: space-between; padding: 0;
-        }
-        .top-hud-container { 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            pointer-events: auto; 
-            background: rgba(11, 11, 22, 0.95);
-            border-bottom: 2px solid #ff3d00;
-            padding: 5px 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.8);
-            display: flex; 
-            flex-direction: row; 
-            justify-content: space-between; 
-            align-items: center;
-            flex-wrap: nowrap;
-        }
-        
-        .hud-group { display: flex; gap: 8px; align-items: center; }
-        
-        .score-box { background: #000; color: #ffcc00; padding: 3px 10px; border-radius: 20px; font-size: 13px; font-weight: 900; border: 2px solid #ffcc00; display: flex; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.6); white-space: nowrap; }
-        
-        .home-icon-btn { font-size: 14px; background: #ff3d00; border: 2px solid #fff; border-radius: 50%; width: 28px; height: 28px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 0px #b71c1c; color: #fff; flex-shrink: 0; }
-        .home-icon-btn:active { transform: translateY(2px); box-shadow: 0 0px 0px #b71c1c; }
-
-        .level-indicator { 
-            background: transparent; 
-            color: #fff; padding: 0 10px; font-size: 12px; font-weight: 900; 
-            border: none; margin: 0; white-space: nowrap;
-            text-shadow: 1px 1px #000; box-shadow: none; display: flex; align-items: center;
-        }
-        
-        #boss-hud { display: none; flex-grow: 1; max-width: 180px; height: 14px; background: #111; border: 2px solid #ff3d00; border-radius: 8px; margin: 0 10px; overflow: hidden; position: relative; }
-        #boss-hp-bar { width: 100%; height: 100%; background: #ffea00; transition: width 0.2s; }
-        #boss-name-text { position: absolute; width: 100%; top: -2px; font-size: 10px; font-weight: bold; color: #000; text-shadow: none; text-align: center; }
-
-        /* التحكمات الأفقية */
-        .controls-bar {
-            position: absolute; bottom: 10px; width: 100%; left: 0; 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 0 20px; z-index: 20; pointer-events: auto; direction: ltr;
-        }
-        .control-group { display: flex; gap: 10px; align-items: center; }
-        .control-btn {
-            width: 50px; height: 50px; background: rgba(255, 255, 255, 0.95); 
-            border: 2px solid #111; border-radius: 50%; font-size: 18px; 
-            font-weight: bold; color: #111; display: flex; justify-content: center; 
-            align-items: center; box-shadow: 0 3px 0px rgba(0,0,0,0.6); cursor: pointer;
-        }
-        .control-btn:active { transform: translateY(3px); box-shadow: 0 0px 0px rgba(0,0,0,0.6); background: #ccc; }
-        #btn-jump { background: #ffcc00; color: #111; }
-        #btn-shoot { background: #e91e63; color: #fff; }
-        #btn-skill { background: #9c27b0; color: #fff; font-size: 16px; }
-        #btn-skill.cooldown { opacity: 0.4; pointer-events: none; }
-
-        #total-coins-display { font-size: 15px; color: #ffcc00; font-weight: bold; margin-bottom: 6px; background: rgba(0,0,0,0.6); padding: 3px 10px; border-radius: 15px; border: 2px solid #fff; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>SuperDrix Pro</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Changa:wght@700;800&display=swap');
+*{box-sizing:border-box;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;margin:0;padding:0;touch-action:manipulation}
+html,body,#game-container{width:100vw;height:100vh;margin:0;padding:0;overflow:hidden}
+html,body{background:#0b0b16;font-family:'Changa',sans-serif;position:fixed;inset:0}
+body{overscroll-behavior:none}
+canvas{display:block;width:100vw;height:100vh;position:fixed;inset:0;z-index:1}
+#language-modal,#start-screen{position:fixed;inset:0}
+#language-modal{background:#0f172a;z-index:100000;display:flex;flex-direction:column;justify-content:center;align-items:center;color:white;padding:20px}
+#start-screen{background:#0f172a;display:none;flex-direction:column;justify-content:center;align-items:center;z-index:99999}
+#start-screen h1{color:white;font-family:sans-serif;margin-bottom:20px;font-size:28px}
+#play-btn{padding:15px 40px;font-size:22px;background:#6366f1;color:white;border:none;border-radius:12px;cursor:pointer;font-weight:bold;box-shadow:0 4px 15px rgba(99,102,241,.4)}
+.screen{position:fixed;inset:0;background:rgba(10,12,20,.98);z-index:30;display:none;flex-direction:column;justify-content:flex-start;align-items:center;color:white;text-align:center;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 20px}
+#home-screen{justify-content:center;background:#0b0b16}
+h1.title{font-size:32px;color:#ff3d00;text-shadow:0 0 20px rgba(255,61,0,.9),3px 3px #000;font-weight:900;letter-spacing:2px;margin-bottom:2px}
+h2.subtitle{font-size:18px;color:#ffcc00;text-shadow:2px 2px #000;margin-bottom:8px}
+.btn-main{background:#ff3d00;color:#fff;font-size:14px;font-weight:800;padding:6px 15px;margin:3px;border-radius:30px;border:2px solid #fff;cursor:pointer;box-shadow:0 3px 0 #b71c1c;transition:all .1s;width:220px}
+.btn-main:active{transform:translateY(3px);box-shadow:0 0 #b71c1c}
+.btn-shop{background:#ff9800;box-shadow:0 3px 0 #e65100}.btn-weapons{background:#e91e63;box-shadow:0 3px 0 #880e4f}.btn-boosters{background:#00bcd4;box-shadow:0 3px 0 #006064}.btn-promo{background:#9c27b0;box-shadow:0 3px 0 #4a148c}.btn-back{background:#f44336;box-shadow:0 3px 0 #b71c1c;margin:10px 0;color:#fff;width:160px}.btn-retry{background:#ffcc00;box-shadow:0 3px 0 #f57f17;color:#000}
+.grid-container{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;max-width:850px;padding:5px;margin-bottom:10px}
+.card{background:rgba(25,25,35,.9);border:2px solid #555;border-radius:12px;padding:8px;width:130px;text-align:center;box-shadow:0 3px 10px rgba(0,0,0,.3);position:relative;transition:.2s}
+.card.locked{opacity:.4;filter:grayscale(100%);pointer-events:none}.card-title{font-size:12px;margin-bottom:3px;font-weight:bold;text-shadow:1px 1px #000}
+.card.tier-rare{border-color:#00bcd4;box-shadow:0 0 8px rgba(0,188,212,.5)}.card.tier-epic{border-color:#9c27b0;box-shadow:0 0 10px rgba(156,39,176,.6)}.card.tier-legendary{border-color:#ff4500;box-shadow:0 0 15px rgba(255,69,0,.8)}.card.tier-rainbow{border-color:#ff00ff;box-shadow:0 0 20px #00ffff;animation:rainbowGlow 2s infinite linear}.tier-godlike{background:linear-gradient(135deg,#1a0000,#ff6600,#ffcc00,#fff);border:2px solid #ffcc00;box-shadow:0 0 20px #ff3300}
+@keyframes rainbowGlow{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+.buy-btn,.level-btn{background:#ffcc00;color:#000;font-weight:800;border:2px solid #000;padding:4px;border-radius:8px;width:100%;cursor:pointer;margin-top:4px;font-size:11px}
+.buy-btn:disabled{background:#444;color:#888;cursor:not-allowed;border-color:#222}.buy-btn.equipped{background:#00e676;border-color:#fff;color:#fff}
+#world-modal{display:none;position:fixed;inset:0;background:rgba(10,12,20,.98);z-index:100;justify-content:center;align-items:center;flex-direction:column;padding:10px;overflow-y:auto}
+.world-selection-box{background:#111422;border:2px solid #333;border-radius:15px;padding:15px;max-width:600px;width:100%;text-align:center;box-shadow:0 10px 25px rgba(0,0,0,.7)}
+.world-cards-container{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:5px}
+.world-card{width:100px;height:100px;border-radius:12px;border:2px solid #fff;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;box-shadow:0 5px 15px rgba(0,0,0,.5);transition:.3s;padding:5px;position:relative}
+.world-card h3{font-size:11px;color:#fff;text-shadow:1px 1px #000;margin-top:3px}.world-card p{font-size:8px;color:#ddd;text-shadow:1px 1px #000}
+#onboarding-screen{background:#0b0b16;z-index:50;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.onboarding-card{background:#111422;border:2px solid #333;border-radius:15px;padding:15px;max-width:400px;width:90%;box-shadow:0 8px 20px rgba(0,0,0,.5);text-align:center;margin-bottom:10px}
+.onboarding-card h2{color:#ff3d00;font-size:20px;margin-bottom:6px;text-shadow:2px 2px #000}.onboarding-card p{color:#ddd;font-size:12px;line-height:1.4;margin-bottom:10px}
+.dots-container{display:flex;gap:5px;justify-content:center;margin-bottom:10px}.dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);transition:.3s}.dot.active{background:#ff3d00;width:20px;border-radius:4px}
+.onboarding-buttons{display:flex;gap:6px;justify-content:center;width:100%;max-width:400px}
+#ui-layer{position:fixed;inset:0;z-index:10000;pointer-events:none;display:none;flex-direction:column;justify-content:space-between}
+.top-hud-container{position:absolute;top:0;left:0;width:100%;pointer-events:auto;background:rgba(11,11,22,.95);border-bottom:2px solid #ff3d00;padding:5px 15px;box-shadow:0 4px 15px rgba(0,0,0,.8);display:flex;flex-direction:row;justify-content:space-between;align-items:center;flex-wrap:nowrap}
+.hud-group{display:flex;gap:8px;align-items:center}.score-box{background:#000;color:#ffcc00;padding:3px 10px;border-radius:20px;font-size:13px;font-weight:900;border:2px solid #ffcc00;display:flex;align-items:center;box-shadow:0 2px 8px rgba(0,0,0,.6);white-space:nowrap}
+.home-icon-btn{font-size:14px;background:#ff3d00;border:2px solid #fff;border-radius:50%;width:28px;height:28px;display:flex;justify-content:center;align-items:center;cursor:pointer;box-shadow:0 2px 0 #b71c1c;color:#fff;flex-shrink:0}
+.level-indicator{background:transparent;color:#fff;padding:0 10px;font-size:12px;font-weight:900;border:none;margin:0;white-space:nowrap;text-shadow:1px 1px #000;display:flex;align-items:center}
+#boss-hud{display:none;flex-grow:1;max-width:180px;height:14px;background:#111;border:2px solid #ff3d00;border-radius:8px;margin:0 10px;overflow:hidden;position:relative}#boss-hp-bar{width:100%;height:100%;background:#ffea00;transition:width .2s}#boss-name-text{position:absolute;width:100%;top:-2px;font-size:10px;font-weight:bold;color:#000;text-align:center}
+.controls-bar{position:absolute;bottom:10px;width:100%;left:0;display:flex;justify-content:space-between;align-items:center;padding:0 20px;z-index:20;pointer-events:auto;direction:ltr}
+.control-group{display:flex;gap:10px;align-items:center}.control-btn{width:50px;height:50px;background:rgba(255,255,255,.95);border:2px solid #111;border-radius:50%;font-size:18px;font-weight:bold;color:#111;display:flex;justify-content:center;align-items:center;box-shadow:0 3px 0 rgba(0,0,0,.6);cursor:pointer}
+.control-btn:active{transform:translateY(3px);box-shadow:0 0 rgba(0,0,0,.6);background:#ccc}#btn-jump{background:#ffcc00}#btn-shoot{background:#e91e63;color:#fff}#btn-skill{background:#9c27b0;color:#fff;font-size:16px}#btn-skill.cooldown{opacity:.4;pointer-events:none}
+#ad-modal{position:fixed;inset:0;background:rgba(0,0,0,.98);z-index:200;display:none;flex-direction:column;justify-content:center;align-items:center;color:#fff;text-align:center;padding:15px}
+#quit-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:30000;justify-content:center;align-items:center;flex-direction:column}
+#total-coins-display{font-size:15px;color:#ffcc00;font-weight:bold;margin-bottom:6px;background:rgba(0,0,0,.6);padding:3px 10px;border-radius:15px;border:2px solid #fff}
+@keyframes spin{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+@media(max-height:420px){.control-btn{width:44px;height:44px}.controls-bar{bottom:6px}.top-hud-container{padding:3px 10px}.btn-main{padding:4px 12px}.card{padding:6px}}
+</style>
 </head>
 <body>
+<div id="game-container">
+<div id="language-modal">
+<h1 style="color:#ffcc00;font-size:26px;margin-bottom:10px">🌍 Select Your Language</h1>
+<p style="color:#94a3b8;font-size:14px;margin-bottom:15px">Please choose your preferred game language:</p>
+<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;max-width:450px;width:100%;margin-top:15px">
+<button class="lang-btn" onclick="setLanguage('ar')">العربية 🇸🇦</button><button class="lang-btn" onclick="setLanguage('en')">English 🇺🇸</button>
+<button class="lang-btn" onclick="setLanguage('fr')">Français 🇫🇷</button><button class="lang-btn" onclick="setLanguage('es')">Español 🇪🇸</button>
+<button class="lang-btn" onclick="setLanguage('tr')">Türkçe 🇹🇷</button><button class="lang-btn" onclick="setLanguage('de')">Deutsch 🇩🇪</button>
+</div></div>
+<style>.lang-btn{background:#1e293b;border:2px solid #6366f1;color:white;padding:12px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:14px}</style>
 
-    <div id="language-modal" style="position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: #0f172a; z-index: 100000; display: flex; flex-direction: column; justify-content: center; align-items: center; color: white; padding: 20px;">
-        <h1 style="color: #ffcc00; font-size: 26px; margin-bottom: 10px;">🌍 Select Your Language</h1>
-        <p style="color: #94a3b8; font-size: 14px; margin-bottom: 15px;">Please choose your preferred game language:</p>
-        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; max-width: 450px; width: 100%; margin-top: 15px;">
-            <button onclick="setLanguage('ar')" style="background: #1e293b; border: 2px solid #6366f1; color: white; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px;">العربية 🇸🇦</button>
-            <button onclick="setLanguage('en')" style="background: #1e293b; border: 2px solid #6366f1; color: white; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px;">English 🇺🇸</button>
-            <button onclick="setLanguage('fr')" style="background: #1e293b; border: 2px solid #6366f1; color: white; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px;">Français 🇫🇷</button>
-            <button onclick="setLanguage('es')" style="background: #1e293b; border: 2px solid #6366f1; color: white; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px;">Español 🇪🇸</button>
-            <button onclick="setLanguage('tr')" style="background: #1e293b; border: 2px solid #6366f1; color: white; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px;">Türkçe 🇹🇷</button>
-            <button onclick="setLanguage('de')" style="background: #1e293b; border: 2px solid #6366f1; color: white; padding: 12px; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 14px;">Deutsch 🇩🇪</button>
-        </div>
-    </div>
+<div id="start-screen"><h1>Super Mindrix</h1><button id="play-btn">اضغط للبدء 🎮</button></div>
+<div id="quit-modal"><div style="background:#111422;border:2px solid #ff3d00;border-radius:15px;padding:25px;text-align:center;max-width:350px;width:90%;box-shadow:0 10px 30px rgba(0,0,0,.8)">
+<h3 style="color:#ffcc00;font-size:20px;margin-bottom:10px">🏠 العودة إلى البيت</h3><p style="color:#ddd;font-size:14px;margin-bottom:20px">هل أنت متأكد أنك تريد مغادرة المرحلة والعودة للقائمة الرئيسية؟</p>
+<div style="display:flex;gap:10px;justify-content:center"><button class="btn-main" onclick="confirmQuitToHome()" style="width:130px;margin:0">نعم، خروج</button><button class="btn-main" onclick="closeQuitModal()" style="background:#555;width:130px;margin:0">إلغاء</button></div></div></div>
 
-    <div id="start-screen" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 99999;">
-        <h1 style="color: white; font-family: sans-serif; margin-bottom: 20px; font-size: 28px;">Super Mindrix</h1>
-        <button id="play-btn" style="padding: 15px 40px; font-size: 22px; background: #6366f1; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: bold; box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);">اضغط للبدء 🎮</button>
-    </div>
+<canvas id="gameCanvas"></canvas>
 
-    <div id="quit-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 30000; justify-content: center; align-items: center; flex-direction: column;">
-        <div style="background: #111422; border: 2px solid #ff3d00; border-radius: 15px; padding: 25px; text-align: center; max-width: 350px; width: 90%; box-shadow: 0 10px 30px rgba(0,0,0,0.8);">
-            <h3 style="color: #ffcc00; font-size: 20px; margin-bottom: 10px;">🏠 العودة إلى البيت</h3>
-            <p style="color: #ddd; font-size: 14px; margin-bottom: 20px;">هل أنت متأكد أنك تريد مغادرة المرحلة والعودة للقائمة الرئيسية؟</p>
-            <div style="display: flex; gap: 10px; justify-content: center;">
-                <button class="btn-main" onclick="confirmQuitToHome()" style="background: #ff3d00; width: 130px; margin:0;">نعم، خروج</button>
-                <button class="btn-main" onclick="closeQuitModal()" style="background: #555; width: 130px; margin:0;">إلغاء</button>
-            </div>
-        </div>
-    </div>
+<div id="ad-modal"><h2 style="color:#ffcc00;font-size:24px;margin-bottom:10px">📺 إعلان مكافئ قيد التشغيل</h2><p id="ad-timer-text" style="font-size:16px;margin-bottom:15px">جاري تحميل الإعلان...</p><div style="width:40px;height:40px;border:4px solid #ff3d00;border-top:4px solid transparent;border-radius:50%;animation:spin 1s linear infinite"></div></div>
 
-    <canvas id="gameCanvas"></canvas>
+<div id="onboarding-screen" class="screen">
+<div class="onboarding-card"><h2 id="onboarding-title">مرحباً بك في عالم المغامرة!</h2><p id="onboarding-desc">انطلق في تحديات مذهلة، واجه أعتى الزعماء، واجمع العملات والترقيات لتصبح الأسطورة الأقوى.</p>
+<div class="dots-container"><div class="dot active" id="dot-0"></div><div class="dot" id="dot-1"></div><div class="dot" id="dot-2"></div></div></div>
+<div class="onboarding-buttons"><button class="btn-main" id="onboarding-prev-btn" onclick="prevOnboardingStep()" style="background:#555;width:80px;display:none">السابق</button><button class="btn-main" id="onboarding-next-btn" onclick="nextOnboardingStep()" style="width:130px">التالي ⏩</button><button class="btn-main" onclick="skipOnboarding()" style="background:transparent;border-color:#888;color:#aaa;width:80px">تخطي</button></div></div>
 
+<div id="world-modal"><div class="world-selection-box"><h2 style="color:#ffcc00;font-size:18px;margin-bottom:4px">اختر بيئة وعالم المغامرة 🌍✨</h2><p style="color:#ddd;font-size:11px;margin-bottom:8px">حدد وقت اليوم وطبيعة التضاريس قبل دخول المرحلة:</p>
+<div style="display:flex;justify-content:center;gap:15px;flex-wrap:wrap"><div><p style="color:#ff3d00;font-weight:bold;margin-bottom:3px;font-size:12px">1. وقت اليوم:</p><div class="world-cards-container" style="margin-top:0">
+<div class="world-card" id="time-day" onclick="selectTime('day')" style="background:#4a90e2;width:95px;height:95px"><span style="font-size:24px">☀️</span><h3>نهار مشمس</h3></div>
+<div class="world-card" id="time-night" onclick="selectTime('night')" style="background:#0f2027;width:95px;height:95px"><span style="font-size:24px">🌙</span><h3>ليل ومجرة</h3></div></div></div>
+<div><p style="color:#ff3d00;font-weight:bold;margin-bottom:3px;font-size:12px">2. التضاريس:</p><div class="world-cards-container" style="margin-top:0">
+<div class="world-card" id="terrain-grass" onclick="selectTerrain('grass')" style="background:#2e7d32;width:90px;height:95px"><span style="font-size:22px">🌿</span><h3>عشب أخضر</h3></div>
+<div class="world-card" id="terrain-mud" onclick="selectTerrain('mud')" style="background:#795548;width:90px;height:95px"><span style="font-size:22px">🧱</span><h3>طين ثقيل</h3></div>
+<div class="world-card" id="terrain-snow" onclick="selectTerrain('snow')" style="background:#00acc1;width:90px;height:95px"><span style="font-size:22px">❄️</span><h3>شتاء منزلق</h3></div></div></div></div>
+<button class="btn-main" onclick="confirmWorldAndStart()" style="background:#00e676;color:#000;width:100%;max-width:220px;font-size:14px;padding:5px;margin-top:10px">ابدأ المغامرة الآن 🚀</button></div></div>
 
-    <div id="ad-modal">
-        <h2 style="color: #ffcc00; font-size: 24px; margin-bottom: 10px;">📺 إعلان مكافئ قيد التشغيل</h2>
-        <p id="ad-timer-text" style="font-size: 16px; margin-bottom: 15px; color: #fff;">جاري تحميل الإعلان...</p>
-        <div style="width: 40px; height: 40px; border: 4px solid #ff3d00; border-top: 4px solid transparent; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
-    </div>
-    <style>@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }</style>
+<div id="home-screen" class="screen"><h1 class="title">SuperDrix</h1><div id="total-coins-display">🪙 <span id="home-coins">0</span></div><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;max-width:500px">
+<button class="btn-main" onclick="openLevelsScreen()" style="width:190px">▶ المراحل (100)</button><button class="btn-main btn-shop" onclick="openShop()" style="width:190px">🛒 متجر الشخصيات (101)</button>
+<button class="btn-main btn-weapons" onclick="openWeaponsShop()" style="width:190px">🔫 متجر الأسلحة (50)</button><button class="btn-main btn-boosters" onclick="openBoostersScreen()" style="width:190px">🛡️ متجر المعززات</button><button class="btn-main btn-promo" onclick="openPromoScreen()" style="width:190px">🎁 استرداد الأكواد</button></div></div>
 
-    <div id="onboarding-screen" class="screen">
-        <div class="onboarding-card">
-            <h2 id="onboarding-title">مرحباً بك في عالم المغامرة!</h2>
-            <p id="onboarding-desc">انطلق في تحديات مذهلة، واجه أعتى الزعماء، واجمع العملات والترقيات لتصبح الأسطورة الأقوى.</p>
-            <div class="dots-container">
-                <div class="dot active" id="dot-0"></div>
-                <div class="dot" id="dot-1"></div>
-                <div class="dot" id="dot-2"></div>
-            </div>
-        </div>
-        <div class="onboarding-buttons">
-            <button class="btn-main" id="onboarding-prev-btn" onclick="prevOnboardingStep()" style="background:#555; width: 80px; display:none;">السابق</button>
-            <button class="btn-main" id="onboarding-next-btn" onclick="nextOnboardingStep()" style="background:#ff3d00; width: 130px;">التالي ⏩</button>
-            <button class="btn-main" onclick="skipOnboarding()" style="background:transparent; border-color:#888; color:#aaa; width: 80px;">تخطي</button>
-        </div>
-    </div>
+<div id="boosters-screen" class="screen"><h2 class="subtitle">متجر المعززات والأدوات الأسطورية</h2><div id="boosters-coins" class="total-coins-display">رصيدك: 🪙 <span>0</span></div><div class="grid-container" id="boosters-grid"></div><button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button></div>
+<div id="promo-screen" class="screen" style="justify-content:center"><h2 class="subtitle">استرداد الأكواد والجوائز</h2><p style="margin-bottom:10px;color:#ddd;font-size:12px">أدخل الكود الخاص هنا للحصول على مكافآت ضخمة:</p><input type="text" id="promo-input" placeholder="ادخل الكود هنا" style="padding:8px 12px;font-size:16px;border-radius:15px;border:2px solid #ff3d00;background:rgba(0,0,0,.5);color:#fff;text-align:center;width:220px;margin-bottom:8px;font-family:'Changa';outline:none;text-transform:uppercase"><br>
+<button class="btn-main" onclick="redeemCode()" style="width:220px;margin-bottom:6px">تفعيل الكود 🎯</button><button class="btn-main" onclick="resetPromoCodes()" style="background:#555;width:220px;margin-bottom:6px;font-size:12px;padding:4px">إعادة تعيين الأكواد 🔄</button><p id="promo-msg" style="font-size:14px;margin-top:6px;font-weight:bold;min-height:20px"></p><button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button></div>
+<div id="weapons-shop-screen" class="screen"><h2 class="subtitle">متجر الأسلحة المتطورة (50 سلاحاً)</h2><div id="weapons-coins" class="total-coins-display">رصيدك: 🪙 <span>0</span></div><div class="grid-container" id="weapons-grid"></div><button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button></div>
+<div id="levels-screen" class="screen"><h2 class="subtitle">اختر المرحلة (1 إلى 100)</h2><div class="grid-container" id="levels-grid"></div><button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button></div>
+<div id="shop-screen" class="screen"><h2 class="subtitle">المتجر الأسطوري (101 شخصية)</h2><div id="shop-coins" class="total-coins-display">رصيدك: 🪙 <span>0</span></div><div class="grid-container" id="shop-grid"></div><button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button></div>
 
-    <div id="world-modal">
-        <div class="world-selection-box">
-            <h2 style="color: #ffcc00; font-size: 18px; margin-bottom: 4px;">اختر بيئة وعالم المغامرة 🌍✨</h2>
-            <p style="color: #ddd; font-size: 11px; margin-bottom: 8px;">حدد وقت اليوم وطبيعة التضاريس قبل دخول المرحلة:</p>
-            
-            <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
-                <div>
-                    <p style="color: #ff3d00; font-weight: bold; margin-bottom: 3px; font-size: 12px;">1. وقت اليوم:</p>
-                    <div class="world-cards-container" style="margin-top:0;">
-                        <div class="world-card" id="time-day" onclick="selectTime('day')" style="background: #4a90e2; width: 95px; height: 95px;">
-                            <span style="font-size: 24px;">☀️</span>
-                            <h3>نهار مشمس</h3>
-                        </div>
-                        <div class="world-card" id="time-night" onclick="selectTime('night')" style="background: #0f2027; width: 95px; height: 95px;">
-                            <span style="font-size: 24px;">🌙</span>
-                            <h3>ليل ومجرة</h3>
-                        </div>
-                    </div>
-                </div>
+<div id="win-screen" class="screen" style="justify-content:center"><h1 class="title" style="color:#00e676">انتصرت على الزعيم!</h1><p style="font-size:16px;margin-bottom:8px">جمعت: <span id="win-coins">0</span> 🪙</p><div style="display:flex;gap:8px;justify-content:center"><button class="btn-main" onclick="nextLevel()" style="background:#00e676;color:#000;width:150px">المرحلة التالية ⏩</button><button class="btn-main btn-back" onclick="goHome()" style="margin:0;width:150px">العودة للبيت 🏠</button></div></div>
+<div id="game-over-screen" class="screen" style="justify-content:center"><h1 class="title" style="color:#f44336">انتهت اللعبة!</h1><p style="font-size:15px;margin-bottom:6px;color:#ffcc00">لقد خسرت المحاولة!</p><p style="font-size:14px;margin-bottom:8px">النقاط المحفوظة: <span id="game-over-coins">0</span> 🪙</p><button class="btn-main" onclick="watchAdToRevive()" style="background:#00bcd4;color:#000;width:220px;margin-bottom:6px">📺 شاهد إعلان للإنعاش الفوري</button><button class="btn-main btn-retry" onclick="triggerLevelStart(currentLevel)" style="width:220px;margin-bottom:5px">إعادة المحاولة 🔄</button><button class="btn-main btn-back" onclick="goHome()" style="margin:0;width:220px">العودة للبيت 🏠</button></div>
+<div id="boss-game-over-screen" class="screen" style="justify-content:center"><h1 class="title" style="color:#d32f2f">قضى عليك الزعيم!</h1><p style="font-size:14px;margin-bottom:6px;color:#ff5722">أظهر لك الزعيم قوته، شاهد إعلاناً للعودة فوراً والانتقام منه!</p><p style="font-size:14px;margin-bottom:8px">النقاط المحفوظة: <span id="boss-game-over-coins">0</span> 🪙</p><button class="btn-main" onclick="watchAdToRevive()" style="background:#00bcd4;color:#000;width:220px;margin-bottom:6px">📺 شاهد إعلان للإنعاش الفوري</button><button class="btn-main btn-retry" onclick="triggerLevelStart(currentLevel)" style="width:220px;margin-bottom:5px">إعادة مواجهة الزعيم 🔄</button><button class="btn-main btn-back" onclick="goHome()" style="margin:0;width:220px">العودة للبيت 🏠</button></div>
 
-                <div>
-                    <p style="color: #ff3d00; font-weight: bold; margin-bottom: 3px; font-size: 12px;">2. التضاريس:</p>
-                    <div class="world-cards-container" style="margin-top:0;">
-                        <div class="world-card" id="terrain-grass" onclick="selectTerrain('grass')" style="background: #2e7d32; width: 90px; height: 95px;">
-                            <span style="font-size: 22px;">🌿</span>
-                            <h3>عشب أخضر</h3>
-                        </div>
-                        <div class="world-card" id="terrain-mud" onclick="selectTerrain('mud')" style="background: #795548; width: 90px; height: 95px;">
-                            <span style="font-size: 22px;">🧱</span>
-                            <h3>طين ثقيل</h3>
-                        </div>
-                        <div class="world-card" id="terrain-snow" onclick="selectTerrain('snow')" style="background: #00acc1; width: 90px; height: 95px;">
-                            <span style="font-size: 22px;">❄️</span>
-                            <h3>شتاء منزلق</h3>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <button class="btn-main" onclick="confirmWorldAndStart()" style="background: #00e676; color: #000; width: 100%; max-width: 220px; font-size: 14px; padding: 5px; margin-top: 10px;">ابدأ المغامرة الآن 🚀</button>
-        </div>
-    </div>
+<div id="ui-layer"><div class="top-hud-container"><div class="hud-group"><div class="home-icon-btn" onclick="quitToHome()">🏠</div><div class="score-box">🪙 <span id="score-val">0</span></div></div><div class="level-indicator">مرحلة <span id="current-level-text">1</span> | <span id="current-weapon-name" style="color:#ffea00;margin-right:4px">مسدس البداية</span></div><div id="boss-hud"><div id="boss-hp-bar"></div><div id="boss-name-text">الزعيم 🦇🔥</div></div><div class="score-box">❤️ <span id="lives-val">3</span></div></div>
+<div class="controls-bar" id="controls"><div class="control-group"><button class="control-btn" id="btn-left">◀</button><button class="control-btn" id="btn-right">▶</button></div><div class="control-group"><button class="control-btn" id="btn-skill">⚡</button><button class="control-btn" id="btn-shoot">🔥</button><button class="control-btn" id="btn-jump">⤒</button></div></div></div>
+</div>
 
-    <div id="home-screen" class="screen">
-        <h1 class="title">SuperDrix</h1>
-        <div id="total-coins-display">🪙 <span id="home-coins">0</span></div>
-        <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; max-width: 500px;">
-            <button class="btn-main" onclick="openLevelsScreen()" style="width: 190px;">▶ المراحل (100)</button>
-            <button class="btn-main btn-shop" onclick="openShop()" style="width: 190px;">🛒 متجر الشخصيات (101)</button>
-            <button class="btn-main btn-weapons" onclick="openWeaponsShop()" style="width: 190px;">🔫 متجر الأسلحة (50)</button>
-            <button class="btn-main btn-boosters" onclick="openBoostersScreen()" style="width: 190px;">🛡️ متجر المعززات</button>
-            <button class="btn-main btn-promo" onclick="openPromoScreen()" style="width: 190px;">🎁 استرداد الأكواد</button>
-        </div>
-    </div>
+<script>
+"use strict";
 
-    <div id="boosters-screen" class="screen">
-        <h2 class="subtitle">متجر المعززات والأدوات الأسطورية</h2>
-        <div id="total-coins-display">رصيدك: 🪙 <span id="boosters-coins">0</span></div>
-        <div class="grid-container" id="boosters-grid"></div>
-        <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
-    </div>
-
-    <div id="promo-screen" class="screen" style="justify-content: center;">
-        <h2 class="subtitle">استرداد الأكواد والجوائز</h2>
-        <p style="margin-bottom: 10px; color: #ddd; font-size: 12px;">أدخل الكود الخاص هنا للحصول على مكافآت ضخمة:</p>
-        <input type="text" id="promo-input" placeholder="ادخل الكود هنا" style="padding: 8px 12px; font-size: 16px; border-radius: 15px; border: 2px solid #ff3d00; background: rgba(0,0,0,0.5); color: #fff; text-align: center; width: 220px; margin-bottom: 8px; font-family: 'Changa', sans-serif; outline: none; text-transform: uppercase;">
-        <br>
-        <button class="btn-main" onclick="redeemCode()" style="background: #ff3d00; width: 220px; margin-bottom: 6px;">تفعيل الكود 🎯</button>
-        <button class="btn-main" onclick="resetPromoCodes()" style="background: #555; width: 220px; margin-bottom: 6px; font-size: 12px; padding: 4px;">إعادة تعيين الأكواد 🔄</button>
-        <p id="promo-msg" style="font-size: 14px; margin-top: 6px; font-weight: bold; min-height: 20px;"></p>
-        <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
-    </div>
-
-    <div id="weapons-shop-screen" class="screen">
-        <h2 class="subtitle">متجر الأسلحة المتطورة (50 سلاحاً)</h2>
-        <div id="total-coins-display">رصيدك: 🪙 <span id="weapons-coins">0</span></div>
-        <div class="grid-container" id="weapons-grid"></div>
-        <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
-    </div>
-
-    <div id="levels-screen" class="screen">
-        <h2 class="subtitle">اختر المرحلة (1 إلى 100)</h2>
-        <div class="grid-container" id="levels-grid"></div>
-        <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
-    </div>
-
-    <div id="shop-screen" class="screen">
-        <h2 class="subtitle">المتجر الأسطوري (101 شخصية)</h2>
-        <div id="total-coins-display">رصيدك: 🪙 <span id="shop-coins">0</span></div>
-        <div class="grid-container" id="shop-grid"></div>
-        <button class="btn-main btn-back" onclick="goHome()">العودة للبيت 🏠</button>
-    </div>
-
-    <div id="win-screen" class="screen" style="justify-content: center;">
-        <h1 class="title" style="color: #00e676;">انتصرت على الزعيم!</h1>
-        <p style="font-size: 16px; margin-bottom: 8px;">جمعت: <span id="win-coins">0</span> 🪙</p>
-        <div style="display: flex; gap: 8px; justify-content: center;">
-            <button class="btn-main" onclick="nextLevel()" style="background:#00e676; color:#000; width: 150px;">المرحلة التالية ⏩</button>
-            <button class="btn-main btn-back" onclick="goHome()" style="margin: 0; width: 150px;">العودة للبيت 🏠</button>
-        </div>
-    </div>
-
-    <div id="game-over-screen" class="screen" style="justify-content: center;">
-        <h1 class="title" style="color: #f44336; text-shadow: 0 0 12px rgba(244,67,54,0.6), 3px 3px #000;">انتهت اللعبة!</h1>
-        <p style="font-size: 15px; margin-bottom: 6px; color: #ffcc00;">لقد خسرت المحاولة!</p>
-        <p style="font-size: 14px; margin-bottom: 8px;">النقاط المحفوظة: <span id="game-over-coins">0</span> 🪙</p>
-        <button class="btn-main" onclick="watchAdToRevive()" style="background: #00bcd4; color: #000; width: 220px; margin-bottom: 6px;">📺 شاهد إعلان للإنعاش الفوري</button>
-        <button class="btn-main btn-retry" onclick="triggerLevelStart(currentLevel)" style="width: 220px; margin-bottom: 5px;">إعادة المحاولة 🔄</button>
-        <button class="btn-main btn-back" onclick="goHome()" style="margin: 0; width: 220px;">العودة للبيت 🏠</button>
-    </div>
-
-    <div id="boss-game-over-screen" class="screen" style="justify-content: center;">
-        <h1 class="title" style="color: #d32f2f; text-shadow: 0 0 20px rgba(211,47,47,0.9), 3px 3px #000;">قضى عليك الزعيم!</h1>
-        <p style="font-size: 14px; margin-bottom: 6px; color: #ff5722;">أظهر لك الزعيم قوته، شاهد إعلاناً للعودة فوراً والانتقام منه!</p>
-        <p style="font-size: 14px; margin-bottom: 8px;">النقاط المحفوظة: <span id="boss-game-over-coins">0</span> 🪙</p>
-        <button class="btn-main" onclick="watchAdToRevive()" style="background: #00bcd4; color: #000; width: 220px; margin-bottom: 6px;">📺 شاهد إعلان للإنعاش الفوري</button>
-        <button class="btn-main btn-retry" onclick="triggerLevelStart(currentLevel)" style="width: 220px; margin-bottom: 5px;">إعادة مواجهة الزعيم 🔄</button>
-        <button class="btn-main btn-back" onclick="goHome()" style="margin: 0; width: 220px;">العودة للبيت 🏠</button>
-    </div>
-
-    <div id="ui-layer">
-        <div class="top-hud-container">
-            <div class="hud-group">
-                <div class="home-icon-btn" onclick="quitToHome()">🏠</div>
-                <div class="score-box">🪙 <span id="score-val">0</span></div>
-            </div>
-            
-            <div class="level-indicator">مرحلة <span id="current-level-text">1</span> | <span id="current-weapon-name" style="color:#ffea00; margin-right: 4px;">مسدس البداية</span></div>
-            
-            <div id="boss-hud">
-                <div id="boss-hp-bar"></div>
-                <div id="boss-name-text">الزعيم 🦇🔥</div>
-            </div>
-            
-            <div class="score-box">❤️ <span id="lives-val">3</span></div>
-        </div>
-        
-        <div class="controls-bar" id="controls">
-            <div class="control-group">
-                <button class="control-btn" id="btn-left">◀</button>
-                <button class="control-btn" id="btn-right">▶</button>
-            </div>
-            <div class="control-group">
-                <button class="control-btn" id="btn-skill" title="مهارة موجة الطاقة">⚡</button>
-                <button class="control-btn" id="btn-shoot">🔥</button>
-                <button class="control-btn" id="btn-jump">⤒</button>
-            </div>
-        </div>
-    </div>
-
-    <canvas id="gameCanvas"></canvas>
-
-
-    <script>
-    const translations = {
-        ar: { play: "اضغط للبدء 🎮", quit: "🏠 العودة إلى البيت", confirmQuit: "هل أنت متأكد أنك تريد مغادرة المرحلة والعودة للقائمة الرئيسية؟", yes: "نعم، خروج", cancel: "إلغاء" },
-        en: { play: "Tap to Start 🎮", quit: "🏠 Home", confirmQuit: "Are you sure you want to quit and return to the main menu?", yes: "Yes, Quit", cancel: "Cancel" },
-        fr: { play: "Appuyer pour démarrer 🎮", quit: "🏠 Accueil", confirmQuit: "Êtes-vous sûr de vouloir quitter et retourner au menu principal?", yes: "Oui, Quitter", cancel: "Annuler" },
-        es: { play: "Tocar para empezar 🎮", quit: "🏠 Inicio", confirmQuit: "¿Estás seguro de que quieres salir y volver al menú principal?", yes: "Sí, Salir", cancel: "Cancelar" },
-        tr: { play: "Başlamak için dokun 🎮", quit: "🏠 Ana Sayfa", confirmQuit: "Çıkıp ana menüye dönmek istediğinden emin misin?", yes: "Evet, Çık", cancel: "İptal" },
-        de: { play: "Tippen zum Starten 🎮", quit: "🏠 Startseite", confirmQuit: "Möchtest du wirklich beenden und zum Hauptmenü zurückkehren?", yes: "Ja, Beenden", cancel: "Abbrechen" }
-    };
-
-    let currentLang = localStorage.getItem('superdrix_lang');
-
-    function applyTranslations() {
-        if(!currentLang) currentLang = 'ar';
-        const t = translations[currentLang] || translations.ar;
-        const playBtn = document.getElementById('play-btn');
-        if(playBtn) playBtn.innerText = t.play;
-        const quitTitle = document.querySelector('#quit-modal h3');
-        if(quitTitle) quitTitle.innerText = t.quit;
-        const quitDesc = document.querySelector('#quit-modal p');
-        if(quitDesc) quitDesc.innerText = t.confirmQuit;
-        const quitBtns = document.querySelectorAll('#quit-modal .btn-main');
-        if(quitBtns.length >= 2) { quitBtns[0].innerText = t.yes; quitBtns[1].innerText = t.cancel; }
-    }
-
-    function setLanguage(lang) {
-        currentLang = lang;
-        localStorage.setItem('superdrix_lang', lang);
-        document.getElementById('language-modal').style.display = 'none';
-        applyTranslations();
-        
-        if (!localStorage.getItem('superdrix_onboarding_done')) {
-            document.getElementById('onboarding-screen').style.display = 'flex';
-            updateOnboardingUI();
-        } else {
-            document.getElementById('start-screen').style.display = 'flex';
+/* ===== Landscape / Fullscreen (16:9 Fixed Landscape Mode) ===== */
+let orientationRequested=false;
+async function forceLandscape(){
+    if(orientationRequested) return;
+    orientationRequested=true;
+    const element=document.documentElement;
+    try{
+        if(!document.fullscreenElement){
+            if(element.requestFullscreen) await element.requestFullscreen();
+            else if(element.webkitRequestFullscreen) element.webkitRequestFullscreen();
         }
-    }
-
-    window.addEventListener('load', () => {
-        if (localStorage.getItem('superdrix_lang')) {
-            document.getElementById('language-modal').style.display = 'none';
-            applyTranslations();
-            if (!localStorage.getItem('superdrix_onboarding_done')) {
-                document.getElementById('onboarding-screen').style.display = 'flex';
-                updateOnboardingUI();
-            } else {
-                document.getElementById('start-screen').style.display = 'flex';
-            }
-        } else {
-            document.getElementById('onboarding-screen').style.display = 'none';
-            document.getElementById('start-screen').style.display = 'none';
-        }
-    });
-
-    document.getElementById('play-btn').addEventListener('click', async () => {
-    try {
-        const elem = document.documentElement;
-        if (elem.requestFullscreen) {
-            await elem.requestFullscreen();
-        } else if (elem.webkitRequestFullscreen) {
-            await elem.webkitRequestFullscreen();
-        }
-        
-        if (screen.orientation && screen.orientation.lock) {
-            await screen.orientation.lock('landscape');
-        }
-    } catch (err) {
-        console.log("تم تخطي قفل الشاشة:", err);
-    }
-    
-    document.getElementById('start-screen').style.display = 'none';
-    showScreen('home-screen');
-    });
-
-    let currentOnboardingStep = 0;
-    const onboardingSteps = [
-        { title: "مرحباً بك في SuperDrix", desc: "انطلق في مغامرة ملحمية عبر 100 مرحلة متنوعة وعوالم أفقية فخمة مليئة بالتحديات والمخاطر." },
-        { title: "القفز المزدوج والسرعة الخارقة", desc: "استخدم القفز المزدوج للوصول للمنصات العالية، واجمع معززات السرعة الخارقة لتجتاز أصعب المقاطع بثقة." },
-        { title: "واجه الزعماء الأساطير", desc: "جهز أقوى الأسلحة والشخصيات، وواجه الزعماء الضخام في معارك فاصلة تحبس الأنفاس!" }
-    ];
-
-    function updateOnboardingUI() {
-        document.getElementById('onboarding-title').innerText = onboardingSteps[currentOnboardingStep].title;
-        document.getElementById('onboarding-desc').innerText = onboardingSteps[currentOnboardingStep].desc;
-        for(let i=0; i<3; i++) {
-            document.getElementById(`dot-${i}`).classList.toggle('active', i === currentOnboardingStep);
-        }
-        document.getElementById('onboarding-prev-btn').style.display = currentOnboardingStep === 0 ? 'none' : 'block';
-        document.getElementById('onboarding-next-btn').innerText = currentOnboardingStep === 2 ? 'ابدأ اللعبة 🚀' : 'التالي ⏩';
-    }
-
-    function nextOnboardingStep() {
-        if (currentOnboardingStep < 2) { currentOnboardingStep++; updateOnboardingUI(); }
-        else { finishOnboarding(); }
-    }
-
-    function prevOnboardingStep() {
-        if (currentOnboardingStep > 0) { currentOnboardingStep--; updateOnboardingUI(); }
-    }
-
-    function skipOnboarding() { finishOnboarding(); }
-
-    function finishOnboarding() {
-        localStorage.setItem('superdrix_onboarding_done', 'true');
-        document.getElementById('onboarding-screen').style.display = 'none';
-        showScreen('home-screen');
-    }
-
-    let audioCtx;
-    let bgmInterval = null;
-
-    function initAudio() {
-        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        if (audioCtx.state === 'suspended') audioCtx.resume();
-    }
-
-    function startBGM() {
-        if (!audioCtx) return;
-        if (bgmInterval) clearInterval(bgmInterval);
-        const melody = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00, 493.88, 523.25, 440.00, 392.00, 349.23, 329.63];
-        let noteIndex = 0;
-        bgmInterval = setInterval(() => {
-            if (!audioCtx || audioCtx.state !== 'running' || !gameActive) return;
-            try {
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.type = 'triangle';
-                osc.frequency.setValueAtTime(melody[noteIndex % melody.length], audioCtx.currentTime);
-                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.35);
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.35);
-                noteIndex++;
-            } catch(e) {}
-        }, 400);
-    }
-
-    function stopBGM() {
-        if (bgmInterval) {
-            clearInterval(bgmInterval);
-            bgmInterval = null;
-        }
-    }
-
-    function playSound(type) {
-        if (!audioCtx) return;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        osc.connect(gain); gain.connect(audioCtx.destination);
-        const now = audioCtx.currentTime;
-
-        if (type === 'jump') {
-            osc.type = 'square'; osc.frequency.setValueAtTime(280, now); osc.frequency.exponentialRampToValueAtTime(600, now + 0.18);
-            gain.gain.setValueAtTime(0.2, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.18);
-            osc.start(now); osc.stop(now + 0.18);
-        } else if (type === 'coin') {
-            osc.type = 'sine'; osc.frequency.setValueAtTime(1200, now); osc.frequency.setValueAtTime(1800, now + 0.1);
-            gain.gain.setValueAtTime(0.25, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
-            osc.start(now); osc.stop(now + 0.25);
-        } else if (type === 'shoot') {
-            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(700, now); osc.frequency.exponentialRampToValueAtTime(200, now + 0.12);
-            gain.gain.setValueAtTime(0.25, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.12);
-            osc.start(now); osc.stop(now + 0.12);
-        } else if (type === 'bossShoot') {
-            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(450, now); osc.frequency.exponentialRampToValueAtTime(100, now + 0.3);
-            gain.gain.setValueAtTime(0.35, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-            osc.start(now); osc.stop(now + 0.3);
-        } else if (type === 'skill') {
-            osc.type = 'sine'; osc.frequency.setValueAtTime(400, now); osc.frequency.exponentialRampToValueAtTime(1200, now + 0.4);
-            gain.gain.setValueAtTime(0.35, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
-            osc.start(now); osc.stop(now + 0.4);
-        } else if (type === 'hit') {
-            osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(40, now + 0.45);
-            gain.gain.setValueAtTime(0.45, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.45);
-            osc.start(now); osc.stop(now + 0.45);
-        } else if (type === 'click') {
-            osc.type = 'triangle'; osc.frequency.setValueAtTime(900, now); osc.frequency.exponentialRampToValueAtTime(1200, now + 0.06);
-            gain.gain.setValueAtTime(0.12, now); gain.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
-            osc.start(now); osc.stop(now + 0.06);
-        }
-    }
-
-    document.addEventListener('pointerdown', function(e) {
-        if(e.target.tagName === 'BUTTON' || e.target.classList.contains('home-icon-btn') || e.target.closest('button')) {
-            initAudio(); playSound('click');
-        }
-    });
-
-    const skinsData = [];
-    for (let i = 0; i < 100; i++) {
-        let cost = i === 0 ? 0 : (i * 200);
-        let tierClass = "tier-common";
-        let tierName = "عادي";
-        let crown = false;
-        let isRainbow = false;
-        
-        if (i === 99) { tierClass = "tier-rainbow"; tierName = "ملك الألوان 🌈👑"; crown = true; isRainbow = true; }
-        else if (i >= 85) { tierClass = "tier-legendary"; tierName = "أسطوري 🔥"; crown = true; }
-        else if (i >= 50) { tierClass = "tier-epic"; tierName = "ملحمي 💎"; }
-        else if (i >= 25) { tierName = "نادر ✨"; }
-
-        let name = i === 0 ? "رُوكْ فِيكْس" : (i === 99 ? "الملك قوس قزح 👑" : `شخصية ${i + 1}`);
-        let color = isRainbow ? '#ff0000' : `hsl(${i * 3.6}, 85%, 55%)`;
-
-        skinsData.push({
-            id: i, name: name, cost: cost, color: color, eyes: '#ffeb3b',
-            trail: [color, '#ffffff', '#ff9999'], crown: crown, isRainbow: isRainbow,
-            tierName: tierName, cardClass: tierClass
-        });
-    }
-    skinsData.push({
-        id: 100, name: "إله الثروة الأسطوري ⚡🔥", cost: 1000000, color: "#ff9900", eyes: "#00ffff",
-        trail: ["#ff3300", "#ffaa00", "#ffff00", "#ffffff"], crown: true, isRainbow: false,
-        tierName: "مدمّر المليون 🌌⚡", cardClass: "tier-godlike"
-    });
-
-    const weaponsData = [];
-    for (let i = 0; i < 50; i++) {
-        let cost = i === 0 ? 0 : (i * 1000);
-        let coinMultiplier = i + 1; 
-        let damage = (i + 1) * 15;
-        let tierName = "عادي";
-        let tierClass = "tier-common";
-
-        if (i === 49) { tierClass = "tier-rainbow"; tierName = "المدمر الكمومي المجرة 🌌👑"; }
-        else if (i >= 40) { tierClass = "tier-legendary"; tierName = "سلاح أسطوري 🔥"; }
-        else if (i >= 25) { tierClass = "tier-epic"; tierName = "سلاح ملحمي 💎"; }
-        else if (i >= 12) { tierClass = "tier-rare"; tierName = "سلاح نادر ✨"; }
-
-        weaponsData.push({
-            id: i, name: i === 0 ? "مسدس البداية" : (i === 49 ? "المدمر الكمومي 🌌" : `سلاح ليزر ${i + 1}`),
-            cost: cost, damage: damage, coinMultiplier: coinMultiplier, tierName: tierName, cardClass: tierClass
-        });
-    }
-
-    const boostersData = [
-        { id: 'shield', name: 'درع الحماية السحري 🛡️', desc: 'يحميك من ضربة مميتة واحدة لكل مرحلة', cost: 5000 },
-        { id: 'magnet', name: 'مغناطيس العملات 🧲', desc: 'يجذب العملات تلقائياً من مسافة قريبة', cost: 8000 },
-        { id: 'speedboost', name: 'السرعة الخارقة الدائمة ⚡', desc: 'يضاعف سرعة الحركة طوال المرحلة', cost: 7000 },
-        { id: 'extralife', name: 'قلب إضافي دائم ❤️', desc: 'يبدأ كل مرحلة بـ 4 قلوب بدلاً من 3', cost: 15000 }
-    ];
-
-    const maxLevels = 100;
-    let totalCoins = parseInt(localStorage.getItem('superdrix_coins')) || 0;
-    let unlockedLevels = parseInt(localStorage.getItem('superdrix_unlocked_levels')) || 1;
-    let unlockedSkins = JSON.parse(localStorage.getItem('superdrix_skins')) || [0];
-    let currentSkinId = parseInt(localStorage.getItem('superdrix_current_skin')) || 0;
-    let unlockedWeapons = JSON.parse(localStorage.getItem('superdrix_weapons')) || [0];
-    let currentWeaponId = parseInt(localStorage.getItem('superdrix_current_weapon')) || 0;
-    let purchasedBoosters = JSON.parse(localStorage.getItem('superdrix_boosters')) || [];
-
-    const validPromoCodes = {
-        "SUPER100K": { coins: 100000, message: "تم شحن 100,000 عملة بنجاح! 🪙🔥" },
-        "GOLD50K": { coins: 50000, message: "تم شحن 50,000 عملة بنجاح! 🪙✨" },
-        "MINDRIX": { coins: 10000, message: "حصلت على 10,000 عملة هدية! 🎁" },
-        "SUPER2026": { coins: 150000, message: "تم شحن 150,000 عملة جديدة بنجاح! 🚀" },
-        "PRODRIX": { coins: 200000, message: "تم شحن 200,000 عملة بنجاح! 💎" },
-        "LEGENDARY": { coins: 300000, message: "تم شحن 300,000 عملة أسطورية بنجاح! 🔥👑" },
-        "DIAMOND999": { coins: 500000, message: "كود الألماس: تم منحك 500,000 عملة! 💎✨" },
-        "VIPGIFT": { coins: 250000, message: "مكافأة VIP: تم إضافة 250,000 عملة! 🌟" },
-        "KING2026": { coins: 400000, message: "كود الملك: تم إضافة 400,000 عملة! 👑" },
-        "EPICWIN": { coins: 120000, message: "كود الفوز الملحمي: 120,000 عملة! 🔥" },
-        "DRIXPRO": { coins: 175000, message: "كود المحترف: 175,000 عملة! ⚡" },
-        "MONSTERKILL": { coins: 220000, message: "كود اصطياد الوحوش: 220,000 عملة! 👾" },
-        "FREECOINS": { coins: 50000, message: "عملات مجانية: 50,000 عملة! 🪙" },
-        "MEGACHEST": { coins: 1000000, message: "الصندوق الأسطوري الضخم: مليون عملة كاملة! 🌌💰" }
-    };
-    let usedPromoCodes = JSON.parse(localStorage.getItem('superdrix_used_codes')) || [];
-
-    let selectedWorld = { time: 'day', terrain: 'grass' };
-    let pendingLevel = 1;
-    let currentLevel = 1;
-
-    function selectTime(timeVal) {
-        selectedWorld.time = timeVal;
-        document.getElementById('time-day').style.border = timeVal === 'day' ? '3px solid #ffcc00' : '2px solid #fff';
-        document.getElementById('time-night').style.border = timeVal === 'night' ? '3px solid #00ffff' : '2px solid #fff';
-    }
-
-    function selectTerrain(terrainVal) {
-        selectedWorld.terrain = terrainVal;
-        ['grass', 'mud', 'snow'].forEach(t => {
-            document.getElementById(`terrain-${t}`).style.border = t === terrainVal ? '3px solid #00e676' : '2px solid #fff';
-        });
-    }
-
-    function triggerLevelStart(lvl) {
-        pendingLevel = lvl;
-        document.getElementById('world-modal').style.display = 'flex';
-        selectTime(selectedWorld.time);
-        selectTerrain(selectedWorld.terrain);
-    }
-
-    function confirmWorldAndStart() {
-        document.getElementById('world-modal').style.display = 'none';
-        startLevel(pendingLevel);
-    }
-
-    let score = 0, lives = 3, gameActive = false;
-    let isLooping = false;
-    let skillCooldown = 0;
-    let nightStars = [];
-    let snowflakes = [];
-
-    function updateDisplayData() {
-        document.getElementById('home-coins').innerText = totalCoins;
-        document.getElementById('shop-coins').innerText = totalCoins;
-        document.getElementById('weapons-coins').innerText = totalCoins;
-        document.getElementById('boosters-coins').innerText = totalCoins;
-        let curWep = weaponsData[currentWeaponId] || weaponsData[0];
-        document.getElementById('current-weapon-name').innerText = curWep.name;
-
-        localStorage.setItem('superdrix_coins', totalCoins);
-        localStorage.setItem('superdrix_unlocked_levels', unlockedLevels);
-        localStorage.setItem('superdrix_skins', JSON.stringify(unlockedSkins));
-        localStorage.setItem('superdrix_current_skin', currentSkinId);
-        localStorage.setItem('superdrix_weapons', JSON.stringify(unlockedWeapons));
-        localStorage.setItem('superdrix_current_weapon', currentWeaponId);
-        localStorage.setItem('superdrix_boosters', JSON.stringify(purchasedBoosters));
-    }
-
-    function showScreen(id) {
-        initAudio(); document.querySelectorAll('.screen').forEach(s => {
-            if (s.id !== 'onboarding-screen' || id === 'onboarding-screen') s.style.display = 'none';
-        });
-        document.getElementById('ui-layer').style.display = 'none';
-        if (id) {
-            const targetScreen = document.getElementById(id);
-            targetScreen.style.display = 'flex';
-            targetScreen.scrollTop = 0;
-        }
-        updateDisplayData();
-    }
-
-    function goHome() { 
-        gameActive = false; 
-        stopBGM();
-        showScreen('home-screen'); 
-    }
-    
-    function quitToHome() { 
-        document.getElementById('quit-modal').style.display = 'flex'; 
-    }
-
-    function confirmQuitToHome() {
-        document.getElementById('quit-modal').style.display = 'none';
-        goHome();
-    }
-
-    function closeQuitModal() {
-        document.getElementById('quit-modal').style.display = 'none';
-    }
-
-    function openPromoScreen() {
-        showScreen('promo-screen');
-        document.getElementById('promo-input').value = '';
-        document.getElementById('promo-msg').innerText = '';
-    }
-
-    function redeemCode() {
-        const inputVal = document.getElementById('promo-input').value.trim().toUpperCase();
-        const msgEl = document.getElementById('promo-msg');
-        if (!inputVal) { msgEl.style.color = '#f44336'; msgEl.innerText = "الرجاء إدخال الكود أولاً!"; playSound('hit'); return; }
-        if (usedPromoCodes.includes(inputVal)) { msgEl.style.color = '#f44336'; msgEl.innerText = "لقد استخدمت هذا الكود مسبقاً!"; playSound('hit'); return; }
-        if (validPromoCodes[inputVal]) {
-            let reward = validPromoCodes[inputVal];
-            totalCoins += reward.coins;
-            usedPromoCodes.push(inputVal);
-            localStorage.setItem('superdrix_used_codes', JSON.stringify(usedPromoCodes));
-            updateDisplayData();
-            msgEl.style.color = '#00e676'; msgEl.innerText = reward.message;
-            playSound('coin');
-            document.getElementById('promo-input').value = '';
-        } else {
-            msgEl.style.color = '#f44336'; msgEl.innerText = "الكود غير صحيح أو منتهي الصلاحية!"; playSound('hit');
-        }
-    }
-
-    function resetPromoCodes() {
-        usedPromoCodes = [];
-        localStorage.removeItem('superdrix_used_codes');
-        const msgEl = document.getElementById('promo-msg');
-        msgEl.style.color = '#00e676';
-        msgEl.innerText = "تمت إعادة تعيين الأكواد! يمكنك إعادة استخدامها الآن 🔄";
-        playSound('coin');
-    }
-
-    function openShop() {
-        showScreen('shop-screen');
-        const grid = document.getElementById('shop-grid');
-        grid.innerHTML = '';
-        skinsData.forEach(skin => {
-            const isUnlocked = unlockedSkins.includes(skin.id);
-            const isEquipped = currentSkinId === skin.id;
-            let btnHtml = isEquipped ? `<button class="buy-btn equipped" disabled>مُجهز ✔️</button>` :
-                          isUnlocked ? `<button class="buy-btn" onclick="equipSkin(${skin.id})">استخدام</button>` :
-                          `<button class="buy-btn" ${totalCoins < skin.cost ? 'disabled' : ''} onclick="buySkin(${skin.id}, ${skin.cost})">شراء 🪙 ${skin.cost}</button>`;
-            
-            grid.innerHTML += `
-                <div class="card ${skin.cardClass}" style="width: 130px;">
-                    <div style="width: 32px; height: 32px; background: ${skin.color}; border-radius: 50%; margin: 0 auto 4px; border: 2px solid #fff; box-shadow: 0 0 8px ${skin.color};"></div>
-                    <div class="card-title" style="color:#fff;">${skin.name}</div>
-                    <div style="font-size:9px; color:#ffcc00; margin-bottom:4px;">${skin.tierName}</div>
-                    ${btnHtml}
-                </div>`;
-        });
-    }
-
-    function buySkin(id, cost) {
-        if (totalCoins >= cost) { totalCoins -= cost; unlockedSkins.push(id); equipSkin(id); }
-    }
-
-    function equipSkin(id) { currentSkinId = id; updateDisplayData(); openShop(); }
-
-    function openWeaponsShop() {
-        showScreen('weapons-shop-screen');
-        const grid = document.getElementById('weapons-grid');
-        grid.innerHTML = '';
-        weaponsData.forEach(wep => {
-            const isUnlocked = unlockedWeapons.includes(wep.id);
-            const isEquipped = currentWeaponId === wep.id;
-            let btnHtml = isEquipped ? `<button class="buy-btn equipped" disabled>مُجهز ✔️</button>` :
-                          isUnlocked ? `<button class="buy-btn" onclick="equipWeapon(${wep.id})">استخدام</button>` :
-                          `<button class="buy-btn" ${totalCoins < wep.cost ? 'disabled' : ''} onclick="buyWeapon(${wep.id}, ${wep.cost})">شراء 🪙 ${wep.cost}</button>`;
-            
-            grid.innerHTML += `
-                <div class="card ${wep.cardClass}" style="width: 130px;">
-                    <div class="card-title" style="color:#ff4081;">${wep.name}</div>
-                    <div style="font-size:9px; color:#ccc; margin-bottom:4px;">الضرر: ${wep.damage}<br>مضاعف: x${wep.coinMultiplier}</div>
-                    ${btnHtml}
-                </div>`;
-        });
-    }
-
-    function buyWeapon(id, cost) {
-        if (totalCoins >= cost) { totalCoins -= cost; unlockedWeapons.push(id); equipWeapon(id); }
-    }
-
-    function equipWeapon(id) { currentWeaponId = id; updateDisplayData(); openWeaponsShop(); }
-
-    function openBoostersScreen() {
-        showScreen('boosters-screen');
-        const grid = document.getElementById('boosters-grid');
-        grid.innerHTML = '';
-        boostersData.forEach(b => {
-            const isOwned = purchasedBoosters.includes(b.id);
-            let btnHtml = isOwned ? `<button class="buy-btn equipped" disabled>تم التفعيل ✔️</button>` :
-                          `<button class="buy-btn" ${totalCoins < b.cost ? 'disabled' : ''} onclick="buyBooster('${b.id}', ${b.cost})">شراء 🪙 ${b.cost}</button>`;
-            grid.innerHTML += `
-                <div class="card tier-epic" style="width: 180px;">
-                    <div class="card-title" style="color:#00e676;">${b.name}</div>
-                    <div style="font-size:9px; color:#ddd; margin-bottom:5px;">${b.desc}</div>
-                    ${btnHtml}
-                </div>`;
-        });
-    }
-
-    function buyBooster(id, cost) {
-        if (totalCoins >= cost && !purchasedBoosters.includes(id)) {
-            totalCoins -= cost; purchasedBoosters.push(id); updateDisplayData(); openBoostersScreen();
-        }
-    }
-
-    function openLevelsScreen() {
-        showScreen('levels-screen');
-        const grid = document.getElementById('levels-grid');
-        grid.innerHTML = '';
-        for (let i = 1; i <= maxLevels; i++) {
-            let isUnlocked = i <= unlockedLevels;
-            let isBossLevel = i % 10 === 0;
-            grid.innerHTML += `
-                <div class="card ${isUnlocked ? '' : 'locked'} ${isBossLevel ? 'tier-legendary' : ''}" style="width: 85px; padding: 6px;">
-                    <div class="card-title" style="font-size:12px; color:${isBossLevel ? '#ff4500' : '#ffcc00'}">مرحلة ${i}</div>
-                    <div style="font-size:8px; color:#aaa; margin-bottom:4px;">${isBossLevel ? '⚔️ زعيم' : 'عادية'}</div>
-                    <button class="level-btn" ${isUnlocked ? '' : 'disabled'} onclick="triggerLevelStart(${i})">${isUnlocked ? 'دخول ▶' : '🔒'}</button>
-                </div>`;
-        }
-    }
-
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
-    
-    let dpr = window.devicePixelRatio || 1;
-    function resizeCanvas() { 
-        dpr = window.devicePixelRatio || 1;
-        canvas.width = window.innerWidth * dpr; 
-        canvas.height = window.innerHeight * dpr; 
-        canvas.style.width = window.innerWidth + 'px';
-        canvas.style.height = window.innerHeight + 'px';
-    }
-    window.addEventListener('resize', resizeCanvas);
+    }catch(err){console.log("Fullscreen:",err)}
+    try{
+        if(screen.orientation && screen.orientation.lock) await screen.orientation.lock("landscape");
+    }catch(err){console.log("Landscape lock:",err)}
     resizeCanvas();
+}
+window.addEventListener("touchstart",forceLandscape,{once:true,passive:true});
+window.addEventListener("click",forceLandscape,{once:true});
+window.addEventListener("orientationchange",resizeCanvas);
+window.addEventListener("resize",resizeCanvas);
 
-    let player = null;
-    let blocks = [], hazards = [], coins = [], speedBoosts = [], enemies = [], clouds = [], particles = [], floatingTexts = [], bullets = [], bossBullets = [], finishLine = null;
-    let boss = null;
-    let cameraX = 0, shakeTime = 0;
-    const worldZoom = 0.65; 
-
-    function initLevel(lvl) {
-        blocks = []; hazards = []; coins = []; speedBoosts = []; enemies = []; clouds = []; particles = []; floatingTexts = []; bullets = []; bossBullets = []; boss = null;
-        let activeSkin = skinsData[currentSkinId] || skinsData[0];
-        
-        let baseSpeed = purchasedBoosters.includes('speedboost') ? 9.0 : 6.5;
-        if (selectedWorld.terrain === 'mud') baseSpeed *= 0.72;
-        if (selectedWorld.terrain === 'snow') baseSpeed *= 1.15;
-
-        let levelLength = 3500 + (lvl * 300);
-        let isBossLevel = lvl % 10 === 0;
-
-        let renderHeight = window.innerHeight / worldZoom;
-        let groundY = renderHeight - 120;
-
-        finishLine = { x: levelLength - 300, y: groundY - 240, width: 60, height: 240 };
-
-        let cursorX = 0;
-        while (cursorX < levelLength) {
-            let groundWidth = 350 + Math.random() * 300;
-            blocks.push({ x: cursorX, y: groundY, width: groundWidth, height: 200, type: 'ground' });
-            
-            for (let i = 0; i < 3; i++) {
-                let coinX = cursorX + 80 + (i * 70);
-                coins.push({ x: coinX, y: groundY - 60 - Math.random() * 40, width: 24, height: 24, collected: false, float: Math.random() * Math.PI });
-            }
-            cursorX += groundWidth;
-            if (cursorX < finishLine.x - 300) {
-                let gapWidth = 110 + Math.min(lvl * 1.5, 70);
-                hazards.push({ x: cursorX, y: groundY + 20, width: gapWidth, height: 180, type: 'lava' });
-                cursorX += gapWidth;
-            }
-        }
-
-        for (let i = 500; i < finishLine.x - 200; i += 280) {
-            const blockTypes = ['wood', 'pipe', 'stone', 'metal'];
-            let chosenType = blockTypes[Math.floor(Math.random() * blockTypes.length)];
-            let platY = groundY - 150 - Math.random() * 80;
-            blocks.push({ x: i, y: platY, width: 120, height: 28, type: chosenType });
-            coins.push({ x: i + 45, y: platY - 50, width: 24, height: 24, collected: false, float: Math.random() * Math.PI });
-            if (Math.random() > 0.6) speedBoosts.push({ x: i + 75, y: platY - 40, width: 26, height: 26, collected: false });
-            if (Math.random() > 0.2) {
-                enemies.push({ x: i + 60, y: groundY - 60, width: 38, height: 38, vx: 2 + (lvl * 0.04), minX: i, maxX: i + 180, hp: 40 + (lvl * 8), maxHp: 40 + (lvl * 8), alive: true });
-            }
-        }
-
-        for (let i = 0; i < 15; i++) {
-            clouds.push({ x: Math.random() * levelLength, y: Math.random() * (renderHeight / 2.5), size: 40 + Math.random() * 50, speed: 0.2 + Math.random() * 0.4 });
-        }
-
-        nightStars = [];
-        for (let i = 0; i < 90; i++) {
-            nightStars.push({
-                x: Math.random() * (levelLength + 1000),
-                y: Math.random() * (renderHeight * 0.7),
-                size: 1 + Math.random() * 2,
-                twinkleSpeed: 0.003 + Math.random() * 0.008,
-                twinkleOffset: Math.random() * Math.PI * 2,
-                driftSpeed: 0.15 + Math.random() * 0.35
-            });
-        }
-
-        snowflakes = [];
-        if (selectedWorld.terrain === 'snow') {
-            for (let i = 0; i < 150; i++) {
-                snowflakes.push({
-                    x: Math.random() * levelLength,
-                    y: Math.random() * renderHeight,
-                    size: 2 + Math.random() * 4,
-                    vy: 1 + Math.random() * 2,
-                    vx: -0.5 + Math.random() * 1
-                });
-            }
-        }
-
-        if (isBossLevel) {
-            let bossBaseY = groundY - 220;
-            boss = {
-                x: finishLine.x - 200, y: bossBaseY, baseY: bossBaseY, width: 100, height: 100,
-                hp: 600 + (lvl * 150), maxHp: 600 + (lvl * 150), vx: 3.5, alive: true, shootTimer: 0
-            };
-            document.getElementById('boss-hud').style.display = 'block';
-        } else {
-            document.getElementById('boss-hud').style.display = 'none';
-        }
-
-        player = {
-            x: 100, y: 0, width: 38, height: 38, vx: 0, vy: 0,
-            speed: baseSpeed, jumpForce: selectedWorld.terrain === 'mud' ? -11.5 : -13.5,
-            grounded: true, canDoubleJump: true, dir: 1, trail: [],
-            color: activeSkin.color, eyesColor: activeSkin.eyes, trailColors: activeSkin.trail,
-            crown: activeSkin.crown, isRainbow: activeSkin.isRainbow, scaleX: 1, scaleY: 1
-        };
-
-        let startBlock = blocks.find(b => b.x <= 100 && b.x + b.width >= 100 && b.type === 'ground');
-        if (startBlock) {
-            player.y = startBlock.y - player.height - 10;
-        } else {
-            player.y = groundY - 100;
-        }
+/* ===== Translation ===== */
+const translations={
+ar:{play:"اضغط للبدء 🎮",quit:"🏠 العودة إلى البيت",confirmQuit:"هل أنت متأكد أنك تريد مغادرة المرحلة والعودة للقائمة الرئيسية؟",yes:"نعم، خروج",cancel:"إلغاء"},
+en:{play:"Tap to Start 🎮",quit:"🏠 Home",confirmQuit:"Are you sure you want to quit and return to the main menu?",yes:"Yes, Quit",cancel:"Cancel"},
+fr:{play:"Appuyer pour démarrer 🎮",quit:"🏠 Accueil",confirmQuit:"Êtes-vous sûr de vouloir quitter et retourner au menu principal?",yes:"Oui, Quitter",cancel:"Annuler"},
+es:{play:"Tocar para empezar 🎮",quit:"🏠 Inicio",confirmQuit:"¿Estás seguro de que quieres salir y volver al menú principal?",yes:"Sí, Salir",cancel:"Cancelar"},
+tr:{play:"Başlamak için dokun 🎮",quit:"🏠 Ana Sayfa",confirmQuit:"Çıkıp ana menüye dönmek istediğinden emin misin?",yes:"Evet, Çık",cancel:"İptal"},
+de:{play:"Tippen zum Starten 🎮",quit:"🏠 Startseite",confirmQuit:"Möchtest du wirklich beenden und zum Hauptmenü zurückkehren?",yes:"Ja, Beenden",cancel:"Abbrechen"}
+};
+let currentLang=localStorage.getItem("superdrix_lang")||null;
+function applyTranslations(){
+    const t=translations[currentLang]||translations.ar;
+    document.getElementById("play-btn").innerText=t.play;
+    document.querySelector("#quit-modal h3").innerText=t.quit;
+    document.querySelector("#quit-modal p").innerText=t.confirmQuit;
+    const b=document.querySelectorAll("#quit-modal .btn-main"); if(b.length>=2){b[0].innerText=t.yes;b[1].innerText=t.cancel}
+}
+function setLanguage(lang){
+    currentLang=lang;localStorage.setItem("superdrix_lang",lang);
+    document.getElementById("language-modal").style.display="none";applyTranslations();
+    if(!localStorage.getItem("superdrix_onboarding_done")){showScreen("onboarding-screen");updateOnboardingUI()}
+    else document.getElementById("start-screen").style.display="flex";
+}
+window.addEventListener("load",()=>{
+    if(currentLang){document.getElementById("language-modal").style.display="none";applyTranslations();
+        if(!localStorage.getItem("superdrix_onboarding_done")){showScreen("onboarding-screen");updateOnboardingUI()}
+        else document.getElementById("start-screen").style.display="flex";
     }
+});
+document.getElementById("play-btn").addEventListener("click",async()=>{
+    await forceLandscape();
+    document.getElementById("start-screen").style.display="none";showScreen("home-screen");
+});
 
-    function startLevel(lvl) {
-        currentLevel = lvl;
-        score = 0;
-        lives = purchasedBoosters.includes('extralife') ? 4 : 3;
-        initLevel(lvl);
-        gameActive = true;
-        document.getElementById('current-level-text').innerText = lvl;
-        document.getElementById('lives-val').innerText = lives;
-        document.getElementById('score-val').innerText = score;
-        showScreen(null);
-        document.getElementById('ui-layer').style.display = 'flex';
-        startBGM();
-        if (!isLooping) { isLooping = true; requestAnimationFrame(gameLoop); }
+/* ===== Onboarding ===== */
+let currentOnboardingStep=0;
+const onboardingSteps=[
+{title:"مرحباً بك في SuperDrix",desc:"انطلق في مغامرة ملحمية عبر 100 مرحلة متنوعة وعوالم أفقية فخمة مليئة بالتحديات والمخاطر."},
+{title:"القفز المزدوج والسرعة الخارقة",desc:"استخدم القفز المزدوج للوصول للمنصات العالية، واجمع معززات السرعة الخارقة لتجتاز أصعب المقاطع بثقة."},
+{title:"واجه الزعماء الأساطير",desc:"جهز أقوى الأسلحة والشخصيات، وواجه الزعماء الضخام في معارك فاصلة تحبس الأنفاس!"}
+];
+function updateOnboardingUI(){
+    const s=onboardingSteps[currentOnboardingStep];
+    document.getElementById("onboarding-title").innerText=s.title;document.getElementById("onboarding-desc").innerText=s.desc;
+    for(let i=0;i<3;i++)document.getElementById(`dot-${i}`).classList.toggle("active",i===currentOnboardingStep);
+    document.getElementById("onboarding-prev-btn").style.display=currentOnboardingStep===0?"none":"block";
+    document.getElementById("onboarding-next-btn").innerText=currentOnboardingStep===2?"ابدأ اللعبة 🚀":"التالي ⏩";
+}
+function nextOnboardingStep(){if(currentOnboardingStep<2){currentOnboardingStep++;updateOnboardingUI()}else finishOnboarding()}
+function prevOnboardingStep(){if(currentOnboardingStep>0){currentOnboardingStep--;updateOnboardingUI()}}
+function skipOnboarding(){finishOnboarding()}
+function finishOnboarding(){localStorage.setItem("superdrix_onboarding_done","true");document.getElementById("onboarding-screen").style.display="none";showScreen("home-screen")}
+
+/* ===== Audio ===== */
+let audioCtx,bgmInterval=null;
+function initAudio(){try{if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume()}catch(e){}}
+function startBGM(){if(!audioCtx)return;if(bgmInterval)clearInterval(bgmInterval);const melody=[261.63,293.66,329.63,349.23,392,440,493.88,523.25,440,392,349.23,329.63];let n=0;
+bgmInterval=setInterval(()=>{if(!audioCtx||audioCtx.state!=="running"||!gameActive)return;try{const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type="triangle";o.frequency.value=melody[n++%melody.length];g.gain.setValueAtTime(.05,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+.35);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+.35)}catch(e){}},400)}
+function stopBGM(){if(bgmInterval){clearInterval(bgmInterval);bgmInterval=null}}
+function playSound(type){if(!audioCtx)return;try{const o=audioCtx.createOscillator(),g=audioCtx.createGain(),now=audioCtx.currentTime;o.connect(g);g.connect(audioCtx.destination);
+let start=0,end=0,dur=.15,wave="sine",vol=.2;
+if(type==="jump"){wave="square";start=280;end=600;dur=.18}else if(type==="coin"){start=1200;end=1800;dur=.25;vol=.25}else if(type==="shoot"){wave="sawtooth";start=700;end=200;dur=.12;vol=.25}else if(type==="bossShoot"){wave="sawtooth";start=450;end=100;dur=.3;vol=.35}else if(type==="skill"){start=400;end=1200;dur=.4;vol=.35}else if(type==="hit"){wave="sawtooth";start=150;end=40;dur=.45;vol=.45}else{wave="triangle";start=900;end=1200;dur=.06;vol=.12}
+o.type=wave;o.frequency.setValueAtTime(start,now);o.frequency.exponentialRampToValueAtTime(end,now+dur);g.gain.setValueAtTime(vol,now);g.gain.exponentialRampToValueAtTime(.01,now+dur);o.start(now);o.stop(now+dur)}catch(e){}}
+document.addEventListener("pointerdown",e=>{if(e.target.closest("button")){initAudio();playSound("click")}}, {passive:true});
+
+/* ===== Data ===== */
+const skinsData=[];
+for(let i=0;i<100;i++){let cost=i===0?0:i*200,tierClass="tier-common",tierName="عادي",crown=false,isRainbow=false;
+if(i===99){tierClass="tier-rainbow";tierName="ملك الألوان 🌈👑";crown=true;isRainbow=true}else if(i>=85){tierClass="tier-legendary";tierName="أسطوري 🔥";crown=true}else if(i>=50){tierClass="tier-epic";tierName="ملحمي 💎"}else if(i>=25)tierName="نادر ✨";
+let name=i===0?"رُوكْ فِيكْس":i===99?"الملك قوس قزح 👑":`شخصية ${i+1}`,color=isRainbow?"#ff0000":`hsl(${i*3.6},85%,55%)`;
+skinsData.push({id:i,name,cost,color,eyes:"#ffeb3b",trail:[color,"#fff","#ff9999"],crown,isRainbow,tierName,cardClass:tierClass})}
+skinsData.push({id:100,name:"إله الثروة الأسطوري ⚡🔥",cost:1000000,color:"#ff9900",eyes:"#00ffff",trail:["#ff3300","#ffaa00","#ffff00","#fff"],crown:true,isRainbow:false,tierName:"مدمّر المليون 🌌⚡",cardClass:"tier-godlike"});
+const weaponsData=[];
+for(let i=0;i<50;i++){let cost=i===0?0:i*1000,coinMultiplier=i+1,damage=(i+1)*15,tierName="عادي",tierClass="tier-common";
+if(i===49){tierClass="tier-rainbow";tierName="المدمر الكمومي المجرة 🌌👑"}else if(i>=40){tierClass="tier-legendary";tierName="سلاح أسطوري 🔥"}else if(i>=25){tierClass="tier-epic";tierName="سلاح ملحمي 💎"}else if(i>=12){tierClass="tier-rare";tierName="سلاح نادر ✨"}
+weaponsData.push({id:i,name:i===0?"مسدس البداية":i===49?"المدمر الكمومي 🌌":`سلاح ليزر ${i+1}`,cost,damage,coinMultiplier,tierName,cardClass:tierClass})}
+const boostersData=[
+{id:"shield",name:"درع الحماية السحري 🛡️",desc:"يحميك من ضربة مميتة واحدة لكل مرحلة",cost:5000},
+{id:"magnet",name:"مغناطيس العملات 🧲",desc:"يجذب العملات تلقائياً من مسافة قريبة",cost:8000},
+{id:"speedboost",name:"السرعة الخارقة الدائمة ⚡",desc:"يضاعف سرعة الحركة طوال المرحلة",cost:7000},
+{id:"extralife",name:"قلب إضافي دائم ❤️",desc:"يبدأ كل مرحلة بـ 4 قلوب بدلاً من 3",cost:15000}];
+const maxLevels=100;
+let totalCoins=parseInt(localStorage.getItem("superdrix_coins")||"0",10);
+let unlockedLevels=Math.max(1,parseInt(localStorage.getItem("superdrix_unlocked_levels")||"1",10));
+let unlockedSkins=JSON.parse(localStorage.getItem("superdrix_skins")||"[0]");
+let currentSkinId=parseInt(localStorage.getItem("superdrix_current_skin")||"0",10);
+let unlockedWeapons=JSON.parse(localStorage.getItem("superdrix_weapons")||"[0]");
+let currentWeaponId=parseInt(localStorage.getItem("superdrix_current_weapon")||"0",10);
+let purchasedBoosters=JSON.parse(localStorage.getItem("superdrix_boosters")||"[]");
+const validPromoCodes={"SUPER100K":{coins:100000,message:"تم شحن 100,000 عملة بنجاح! 🪙🔥"},"GOLD50K":{coins:50000,message:"تم شحن 50,000 عملة بنجاح! 🪙✨"},"MINDRIX":{coins:10000,message:"حصلت على 10,000 عملة هدية! 🎁"},"SUPER2026":{coins:150000,message:"تم شحن 150,000 عملة جديدة بنجاح! 🚀"},"PRODRIX":{coins:200000,message:"تم شحن 200,000 عملة بنجاح! 💎"},"LEGENDARY":{coins:300000,message:"تم شحن 300,000 عملة أسطورية بنجاح! 🔥👑"},"DIAMOND999":{coins:500000,message:"كود الألماس: تم منحك 500,000 عملة! 💎✨"},"VIPGIFT":{coins:250000,message:"مكافأة VIP: تم إضافة 250,000 عملة! 🌟"},"KING2026":{coins:400000,message:"كود الملك: تم إضافة 400,000 عملة! 👑"},"EPICWIN":{coins:120000,message:"كود الفوز الملحمي: 120,000 عملة! 🔥"},"DRIXPRO":{coins:175000,message:"كود المحترف: 175,000 عملة! ⚡"},"MONSTERKILL":{coins:220000,message:"كود اصطياد الوحوش: 220,000 عملة! 👾"},"FREECOINS":{coins:50000,message:"عملات مجانية: 50,000 عملة! 🪙"},"MEGACHEST":{coins:1000000,message:"الصندوق الأسطوري الضخم: مليون عملة كاملة! 🌌💰"}};
+let usedPromoCodes=JSON.parse(localStorage.getItem("superdrix_used_codes")||"[]");
+let selectedWorld={time:"day",terrain:"grass"},pendingLevel=1,currentLevel=1;
+
+/* ===== UI ===== */
+function updateDisplayData(){
+document.getElementById("home-coins").innerText=totalCoins;
+document.querySelector("#shop-coins span").innerText=totalCoins;
+document.querySelector("#weapons-coins span").innerText=totalCoins;
+document.querySelector("#boosters-coins span").innerText=totalCoins;
+document.getElementById("current-weapon-name").innerText=(weaponsData[currentWeaponId]||weaponsData[0]).name;
+localStorage.setItem("superdrix_coins",totalCoins);localStorage.setItem("superdrix_unlocked_levels",unlockedLevels);
+localStorage.setItem("superdrix_skins",JSON.stringify(unlockedSkins));localStorage.setItem("superdrix_current_skin",currentSkinId);
+localStorage.setItem("superdrix_weapons",JSON.stringify(unlockedWeapons));localStorage.setItem("superdrix_current_weapon",currentWeaponId);localStorage.setItem("superdrix_boosters",JSON.stringify(purchasedBoosters))}
+function showScreen(id){
+initAudio();document.querySelectorAll(".screen").forEach(s=>s.style.display="none");document.getElementById("ui-layer").style.display="none";
+if(id){const t=document.getElementById(id);t.style.display="flex";t.scrollTop=0}updateDisplayData()}
+function goHome(){gameActive=false;stopBGM();moveLeft=false;moveRight=false;document.getElementById("quit-modal").style.display="none";showScreen("home-screen")}
+function quitToHome(){document.getElementById("quit-modal").style.display="flex"}
+function confirmQuitToHome(){goHome()}
+function closeQuitModal(){document.getElementById("quit-modal").style.display="none"}
+function openPromoScreen(){showScreen("promo-screen");document.getElementById("promo-input").value="";document.getElementById("promo-msg").innerText=""}
+function redeemCode(){const v=document.getElementById("promo-input").value.trim().toUpperCase(),m=document.getElementById("promo-msg");
+if(!v){m.style.color="#f44336";m.innerText="الرجاء إدخال الكود أولاً!";return}if(usedPromoCodes.includes(v)){m.style.color="#f44336";m.innerText="لقد استخدمت هذا الكود مسبقاً!";return}
+if(validPromoCodes[v]){totalCoins+=validPromoCodes[v].coins;usedPromoCodes.push(v);localStorage.setItem("superdrix_used_codes",JSON.stringify(usedPromoCodes));updateDisplayData();m.style.color="#00e676";m.innerText=validPromoCodes[v].message;document.getElementById("promo-input").value="";playSound("coin")}else{m.style.color="#f44336";m.innerText="الكود غير صحيح أو منتهي الصلاحية!";playSound("hit")}}
+function resetPromoCodes(){usedPromoCodes=[];localStorage.removeItem("superdrix_used_codes");const m=document.getElementById("promo-msg");m.style.color="#00e676";m.innerText="تمت إعادة تعيين الأكواد! يمكنك إعادة استخدامها الآن 🔄"}
+function openShop(){showScreen("shop-screen");const g=document.getElementById("shop-grid");g.innerHTML="";skinsData.forEach(s=>{const u=unlockedSkins.includes(s.id),e=currentSkinId===s.id;const btn=e?'<button class="buy-btn equipped" disabled>مُجهز ✔️</button>':u?`<button class="buy-btn" onclick="equipSkin(${s.id})">استخدام</button>`:`<button class="buy-btn" ${totalCoins<s.cost?"disabled":""} onclick="buySkin(${s.id},${s.cost})">شراء 🪙 ${s.cost}</button>`;g.innerHTML+=`<div class="card ${s.cardClass}"><div style="width:32px;height:32px;background:${s.color};border-radius:50%;margin:0 auto 4px;border:2px solid #fff"></div><div class="card-title">${s.name}</div><div style="font-size:9px;color:#ffcc00;margin-bottom:4px">${s.tierName}</div>${btn}</div>`})}
+function buySkin(id,cost){if(totalCoins>=cost&&!unlockedSkins.includes(id)){totalCoins-=cost;unlockedSkins.push(id);equipSkin(id)}}
+function equipSkin(id){if(!skinsData[id])return;currentSkinId=id;updateDisplayData();openShop()}
+function openWeaponsShop(){showScreen("weapons-shop-screen");const g=document.getElementById("weapons-grid");g.innerHTML="";weaponsData.forEach(w=>{const u=unlockedWeapons.includes(w.id),e=currentWeaponId===w.id;const btn=e?'<button class="buy-btn equipped" disabled>مُجهز ✔️</button>':u?`<button class="buy-btn" onclick="equipWeapon(${w.id})">استخدام</button>`:`<button class="buy-btn" ${totalCoins<w.cost?"disabled":""} onclick="buyWeapon(${w.id},${w.cost})">شراء 🪙 ${w.cost}</button>`;g.innerHTML+=`<div class="card ${w.cardClass}"><div class="card-title" style="color:#ff4081">${w.name}</div><div style="font-size:9px;color:#ccc;margin-bottom:4px">الضرر: ${w.damage}<br>مضاعف: x${w.coinMultiplier}</div>${btn}</div>`})}
+function buyWeapon(id,cost){if(totalCoins>=cost&&!unlockedWeapons.includes(id)){totalCoins-=cost;unlockedWeapons.push(id);equipWeapon(id)}}
+function equipWeapon(id){if(!weaponsData[id])return;currentWeaponId=id;updateDisplayData();openWeaponsShop()}
+function openBoostersScreen(){showScreen("boosters-screen");const g=document.getElementById("boosters-grid");g.innerHTML="";boostersData.forEach(b=>{const own=purchasedBoosters.includes(b.id),btn=own?'<button class="buy-btn equipped" disabled>تم التفعيل ✔️</button>':`<button class="buy-btn" ${totalCoins<b.cost?"disabled":""} onclick="buyBooster('${b.id}',${b.cost})">شراء 🪙 ${b.cost}</button>`;g.innerHTML+=`<div class="card tier-epic" style="width:180px"><div class="card-title" style="color:#00e676">${b.name}</div><div style="font-size:9px;color:#ddd;margin-bottom:5px">${b.desc}</div>${btn}</div>`})}
+function buyBooster(id,cost){if(totalCoins>=cost&&!purchasedBoosters.includes(id)){totalCoins-=cost;purchasedBoosters.push(id);updateDisplayData();openBoostersScreen()}}
+function openLevelsScreen(){showScreen("levels-screen");const g=document.getElementById("levels-grid");g.innerHTML="";for(let i=1;i<=maxLevels;i++){const u=i<=unlockedLevels,b=i%10===0;g.innerHTML+=`<div class="card ${u?"":"locked"} ${b?"tier-legendary":""}" style="width:85px;padding:6px"><div class="card-title" style="font-size:12px;color:${b?"#ff4500":"#ffcc00"}">مرحلة ${i}</div><div style="font-size:8px;color:#aaa;margin-bottom:4px">${b?"⚔️ زعيم":"عادية"}</div><button class="level-btn" ${u?"":"disabled"} onclick="triggerLevelStart(${i})">${u?"دخول ▶":"🔒"}</button></div>`}}
+function selectTime(v){selectedWorld.time=v;document.getElementById("time-day").style.border=v==="day"?"3px solid #ffcc00":"2px solid #fff";document.getElementById("time-night").style.border=v==="night"?"3px solid #00ffff":"2px solid #fff"}
+function selectTerrain(v){selectedWorld.terrain=v;["grass","mud","snow"].forEach(t=>document.getElementById("terrain-"+t).style.border=t===v?"3px solid #00e676":"2px solid #fff")}
+function triggerLevelStart(lvl){pendingLevel=lvl;document.getElementById("world-modal").style.display="flex";selectTime(selectedWorld.time);selectTerrain(selectedWorld.terrain)}
+function confirmWorldAndStart(){document.getElementById("world-modal").style.display="none";startLevel(pendingLevel)}
+
+/* ===== Game (Camera Zoom Widened to 0.45 for a very wide view) ===== */
+const canvas=document.getElementById("gameCanvas"),ctx=canvas.getContext("2d");
+let dpr=1,worldZoom=0.45;
+function resizeCanvas(){dpr=Math.min(window.devicePixelRatio||1,2);canvas.width=Math.max(1,Math.floor(window.innerWidth*dpr));canvas.height=Math.max(1,Math.floor(window.innerHeight*dpr));canvas.style.width=window.innerWidth+"px";canvas.style.height=window.innerHeight+"px"}
+resizeCanvas();
+
+let player=null,blocks=[],hazards=[],coins=[],speedBoosts=[],enemies=[],clouds=[],particles=[],floatingTexts=[],bullets=[],bossBullets=[],finishLine=null,boss=null,cameraX=0,shakeTime=0;
+let score=0,lives=3,gameActive=false,isLooping=false,skillCooldown=0,nightStars=[],snowflakes=[],moveLeft=false,moveRight=false,damageCooldown=0;
+
+function initLevel(lvl){
+blocks=[];hazards=[];coins=[];speedBoosts=[];enemies=[];clouds=[];particles=[];floatingTexts=[];bullets=[];bossBullets=[];boss=null;cameraX=0;damageCooldown=0;skillCooldown=0;
+const skin=skinsData[currentSkinId]||skinsData[0],baseSpeed=(purchasedBoosters.includes("speedboost")?9:6.5)*(selectedWorld.terrain==="mud"?.72:selectedWorld.terrain==="snow"?1.15:1);
+const levelLength=3500+lvl*300,isBossLevel=lvl%10===0,renderHeight=window.innerHeight/worldZoom,groundY=renderHeight-120;
+finishLine={x:levelLength-300,y:groundY-240,width:60,height:240};
+let x=0;
+while(x<levelLength){let w=350+Math.random()*300;blocks.push({x,y:groundY,width:w,height:200,type:"ground"});
+for(let i=0;i<3;i++)coins.push({x:x+80+i*70,y:groundY-60-Math.random()*40,width:24,height:24,collected:false,float:Math.random()*Math.PI});
+x+=w;if(x<finishLine.x-300){let gap=110+Math.min(lvl*1.5,70);hazards.push({x,y:groundY+20,width:gap,height:180,type:"lava"});x+=gap}}
+for(let i=500;i<finishLine.x-200;i+=280){const types=["wood","pipe","stone","metal"],type=types[Math.floor(Math.random()*types.length)],py=groundY-150-Math.random()*80;
+blocks.push({x:i,y:py,width:120,height:28,type});coins.push({x:i+45,y:py-50,width:24,height:24,collected:false,float:Math.random()*Math.PI});if(Math.random()>.6)speedBoosts.push({x:i+75,y:py-40,width:26,height:26,collected:false});
+if(Math.random()>.2){let hp=40+lvl*8;enemies.push({x:i+60,y:groundY-60,width:38,height:38,vx:2+lvl*.04,minX:i,maxX:i+180,hp,maxHp:hp,alive:true})}}
+clouds=Array.from({length:15},()=>({x:Math.random()*levelLength,y:Math.random()*(renderHeight/2.5),size:40+Math.random()*50,speed:.2+Math.random()*.4}));
+nightStars=Array.from({length:90},()=>({x:Math.random()*(levelLength+1000),y:Math.random()*(renderHeight*.7),size:1+Math.random()*2,twinkleSpeed:.003+Math.random()*.008,twinkleOffset:Math.random()*Math.PI*2,driftSpeed:.15+Math.random()*.35}));
+snowflakes=selectedWorld.terrain==="snow"?Array.from({length:150},()=>({x:Math.random()*levelLength,y:Math.random()*renderHeight,size:2+Math.random()*4,vy:1+Math.random()*2,vx:-.5+Math.random()})):[];
+if(isBossLevel){let by=groundY-220;boss={x:finishLine.x-200,y:by,baseY:by,width:100,height:100,hp:600+lvl*150,maxHp:600+lvl*150,vx:3.5,alive:true,shootTimer:0};document.getElementById("boss-hud").style.display="block"}else document.getElementById("boss-hud").style.display="none";
+player={x:100,y:groundY-100,width:38,height:38,vx:0,vy:0,speed:baseSpeed,jumpForce:selectedWorld.terrain==="mud"?-11.5:-13.5,grounded:true,canDoubleJump:true,dir:1,trail:[],color:skin.color,eyesColor:skin.eyes,trailColors:skin.trail,crown:skin.crown,isRainbow:skin.isRainbow,scaleX:1,scaleY:1};
+const sb=blocks.find(b=>b.type==="ground"&&b.x<=100&&b.x+b.width>=100);if(sb)player.y=sb.y-player.height;
+}
+function startLevel(lvl){currentLevel=lvl;score=0;lives=purchasedBoosters.includes("extralife")?4:3;initLevel(lvl);gameActive=true;document.getElementById("current-level-text").innerText=lvl;document.getElementById("lives-val").innerText=lives;document.getElementById("score-val").innerText=0;showScreen(null);document.getElementById("ui-layer").style.display="flex";startBGM();if(!isLooping){isLooping=true;requestAnimationFrame(gameLoop)}}
+function nextLevel(){if(currentLevel<maxLevels){unlockedLevels=Math.max(unlockedLevels,currentLevel+1);updateDisplayData();triggerLevelStart(currentLevel+1)}else goHome()}
+function applyDamage(color,pushX,isBossDmg=false){
+if(!gameActive||damageCooldown>0)return;
+damageCooldown=45;
+if(purchasedBoosters.includes("shield")){purchasedBoosters=purchasedBoosters.filter(x=>x!=="shield");updateDisplayData();createFloatingText(player.x,player.y-35,"الدرع السحري حماك! 🛡️","#00bcd4");player.vx=-7;player.vy=-5;return}
+lives--;document.getElementById("lives-val").innerText=lives;playSound("hit");shakeTime=15;createParticles(player.x,player.y,color,18);
+if(lives<=0){gameActive=false;stopBGM();document.getElementById("ui-layer").style.display="none";if(isBossDmg){document.getElementById("boss-game-over-coins").innerText=score;showScreen("boss-game-over-screen")}else{document.getElementById("game-over-coins").innerText=score;showScreen("game-over-screen")}}
+else{player.x=Math.max(20,pushX-90);const safe=blocks.find(b=>b.type==="ground"&&b.x<=player.x&&b.x+b.width>=player.x);player.y=safe?safe.y-player.height:80;player.vx=0;player.vy=0}}
+function watchAdToRevive(){
+const modal=document.getElementById("ad-modal");modal.style.display="flex";let timer=3;const text=document.getElementById("ad-timer-text");text.innerText=`جارٍ عرض الإعلان المكافئ... (${timer})`;
+const iv=setInterval(()=>{timer--;if(timer>0)text.innerText=`جارٍ عرض الإعلان المكافئ... (${timer})`;else{clearInterval(iv);modal.style.display="none";lives=1;damageCooldown=60;document.getElementById("lives-val").innerText=lives;document.getElementById("game-over-screen").style.display="none";document.getElementById("boss-game-over-screen").style.display="none";document.getElementById("ui-layer").style.display="flex";gameActive=true;startBGM();if(!isLooping){isLooping=true;requestAnimationFrame(gameLoop)};if(player){const safe=blocks.find(b=>b.type==="ground"&&b.x<=player.x&&b.x+b.width>=player.x);if(safe){player.y=safe.y-player.height;player.vy=0}}createFloatingText(player.x,player.y-35,"تم إنعاشك بنجاح! 🚀","#00e676");playSound("coin")}},1000)}
+function winLevel(){if(!gameActive)return;gameActive=false;stopBGM();document.getElementById("ui-layer").style.display="none";totalCoins+=score;unlockedLevels=Math.max(unlockedLevels,currentLevel+1);updateDisplayData();document.getElementById("win-coins").innerText=score;showScreen("win-screen")}
+function shootBullet(){if(!gameActive||!player)return;playSound("shoot");const w=weaponsData[currentWeaponId]||weaponsData[0];bullets.push({x:player.x+(player.dir===1?player.width:-18),y:player.y+player.height/2-4,vx:player.dir*16,width:22,height:8,damage:w.damage,coinMultiplier:w.coinMultiplier})}
+function useSkill(){if(!gameActive||skillCooldown>0)return;playSound("skill");skillCooldown=280;document.getElementById("btn-skill").classList.add("cooldown");createParticles(player.x,player.y,"#9c27b0",30);createFloatingText(player.x,player.y-25,"موجة الطاقة المدمرة! ⚡","#9c27b0");
+enemies.forEach(en=>{if(en.alive&&Math.abs(en.x-player.x)<650){en.alive=false;score+=100}});if(boss&&boss.alive&&Math.abs(boss.x-player.x)<750){boss.hp-=250;if(boss.hp<=0)killBoss(1)}}
+
+/* ===== Controls ===== */
+function setupControls(){
+const hold=(id,start,end)=>{const el=document.getElementById(id);if(!el)return;let active=false;
+el.addEventListener("pointerdown",e=>{e.preventDefault();if(active)return;active=true;el.setPointerCapture?.(e.pointerId);initAudio();start()});
+["pointerup","pointercancel","pointerleave"].forEach(ev=>el.addEventListener(ev,e=>{if(ev!=="pointerleave"||active){active=false;end()}}))};
+hold("btn-left",()=>moveLeft=true,()=>moveLeft=false);hold("btn-right",()=>moveRight=true,()=>moveRight=false);
+const action=(id,fn)=>{const el=document.getElementById(id);if(!el)return;el.addEventListener("pointerdown",e=>{e.preventDefault();initAudio();fn()})};
+action("btn-jump",()=>{if(!player||!gameActive)return;if(player.grounded){player.vy=player.jumpForce;player.grounded=false;player.canDoubleJump=true;playSound("jump");createParticles(player.x,player.y+player.height,"#fff",6)}else if(player.canDoubleJump){player.vy=player.jumpForce*.9;player.canDoubleJump=false;playSound("jump");createParticles(player.x,player.y+player.height,"#ffcc00",10);createFloatingText(player.x,player.y,"قفزة مزدوجة! ✨","#ffcc00")}});
+action("btn-shoot",shootBullet);action("btn-skill",useSkill)}
+setupControls();
+
+/* ===== Update ===== */
+function createParticles(x,y,color,count){for(let i=0;i<count;i++)particles.push({x,y,vx:(Math.random()-.5)*7,vy:(Math.random()-.5)*7,color,size:2.5+Math.random()*3.5,life:1})}
+function createFloatingText(x,y,text,color){floatingTexts.push({x,y,text,color,life:1,vy:-1})}
+function killBoss(mult=1){if(!boss||!boss.alive)return;boss.alive=false;document.getElementById("boss-hud").style.display="none";let earned=3000*mult;score+=earned;playSound("coin");createParticles(boss.x+50,boss.y+50,"#00e676",40);createFloatingText(boss.x,boss.y,`هزمت الزعيم! +${earned} 🪙`,"#ffcc00")}
+function update(){
+if(!gameActive||!player)return;
+if(damageCooldown>0)damageCooldown--;
+if(skillCooldown>0){skillCooldown--;if(skillCooldown===0)document.getElementById("btn-skill").classList.remove("cooldown")}
+const acc=moveRight?player.speed:moveLeft?-player.speed:0;
+player.vx=selectedWorld.terrain==="snow"?player.vx*.92+acc*.08:acc;if(moveRight)player.dir=1;if(moveLeft)player.dir=-1;
+player.scaleX+=(1-player.scaleX)*.1;player.scaleY+=(1-player.scaleY)*.1;player.vy=Math.min(10,player.vy+.52);player.x+=player.vx;
+blocks.forEach(b=>{if(player.x+player.width>b.x&&player.x<b.x+b.width&&player.y+player.height>b.y&&player.y<b.y+b.height){if(player.vx>0)player.x=b.x-player.width;else if(player.vx<0)player.x=b.x+b.width}});
+player.y+=player.vy;player.grounded=false;
+blocks.forEach(b=>{if(player.x+player.width>b.x&&player.x<b.x+b.width&&player.y+player.height>b.y&&player.y<b.y+b.height){if(player.vy>0){player.y=b.y-player.height;player.vy=0;player.grounded=true;player.canDoubleJump=true}else if(player.vy<0){player.y=b.y+b.height;player.vy=0}}});
+if(selectedWorld.terrain==="snow")snowflakes.forEach(sf=>{sf.y+=sf.vy;sf.x+=sf.vx;if(sf.y>window.innerHeight/worldZoom)sf.y=0});
+for(let i=bullets.length-1;i>=0;i--){let b=bullets[i];b.x+=b.vx;let hit=false;
+if(boss?.alive&&b.x+ b.width>boss.x&&b.x<boss.x+boss.width&&b.y+b.height>boss.y&&b.y<boss.y+boss.height){boss.hp-=b.damage;createParticles(b.x,b.y,"#ffea00",5);hit=true;if(boss.hp<=0)killBoss(b.coinMultiplier)}
+if(!hit)for(const en of enemies){if(en.alive&&b.x+b.width>en.x&&b.x<en.x+en.width&&b.y+b.height>en.y&&b.y<en.y+en.height){en.hp-=b.damage;createParticles(b.x,b.y,"#ffea00",4);hit=true;if(en.hp<=0){en.alive=false;score+=200;createFloatingText(en.x,en.y,"+200","#ffcc00")}break}}
+if(hit||Math.abs(b.x-player.x)>1600)bullets.splice(i,1)}
+for(let i=bossBullets.length-1;i>=0;i--){const bb=bossBullets[i];bb.x+=bb.vx;bb.y+=bb.vy;if(player.x+player.width>bb.x&&player.x<bb.x+bb.width&&player.y+player.height>bb.y&&player.y<bb.y+bb.height){bossBullets.splice(i,1);applyDamage("#ff3d00",player.x-60,true)}else if(Math.abs(bb.x-player.x)>1600)bossBullets.splice(i,1)}
+particles.forEach(p=>{p.vy+=.22;p.x+=p.vx;p.y+=p.vy;p.life-=.03;p.size*=.95});particles=particles.filter(p=>p.life>0);
+floatingTexts.forEach(f=>{f.y+=f.vy;f.life-=.02});floatingTexts=floatingTexts.filter(f=>f.life>0);
+hazards.forEach(h=>{if(player.x+player.width>h.x&&player.x<h.x+h.width&&player.y+player.height>h.y&&player.y<h.y+h.height)applyDamage("#ff3d00",player.x-90,false)});
+enemies.forEach(en=>{if(!en.alive)return;en.x+=en.vx;if(en.x<en.minX||en.x>en.maxX)en.vx*=-1;if(player.x+player.width>en.x&&player.x<en.x+en.width&&player.y+player.height>en.y&&player.y<en.y+en.height){if(player.vy>0&&player.y+player.height-player.vy<=en.y+20){en.hp-=50;player.vy=-9.5;if(en.hp<=0){en.alive=false;score+=150;createFloatingText(en.x,en.y,"+150","#ffcc00")}}else applyDamage("#ff3d00",en.x,false)}});
+if(boss?.alive){boss.x+=boss.vx;if(boss.x<finishLine.x-380||boss.x>finishLine.x+100)boss.vx*=-1;boss.y=boss.baseY+Math.sin(Date.now()*.005)*65;boss.shootTimer++;
+if(boss.shootTimer%60===0){playSound("bossShoot");for(let a=-1;a<=1;a++)bossBullets.push({x:boss.x,y:boss.y+boss.height/2,vx:-7.5,vy:((player.y-boss.y)*.03)+a*1,width:22,height:22})}
+document.getElementById("boss-hp-bar").style.width=Math.max(0,boss.hp/boss.maxHp*100)+"%";
+if(player.x+player.width>boss.x&&player.x<boss.x+boss.width&&player.y+player.height>boss.y&&player.y<boss.y+boss.height)applyDamage("#ff3d00",boss.x-90,true)}
+coins.forEach(c=>{if(c.collected)return;c.float+=.05;if(purchasedBoosters.includes("magnet")){let d=Math.hypot(player.x+19-c.x-12,player.y+19-c.y-12);if(d<220){c.x+=(player.x-c.x)*.1;c.y+=(player.y-c.y)*.1}}
+if(player.x+player.width>c.x&&player.x<c.x+c.width&&player.y+player.height>c.y&&player.y<c.y+c.height){c.collected=true;score+=10;playSound("coin");createParticles(c.x+12,c.y+12,"#ffea00",8);createFloatingText(c.x,c.y,"+10","#ffcc00")}});
+const rh=window.innerHeight/worldZoom;if(player.y>rh+100)applyDamage("#ff3d00",Math.max(0,player.x-100),false);
+if(finishLine&&player.x+player.width>finishLine.x&&player.x<finishLine.x+finishLine.width&&!boss?.alive){winLevel();return}
+cameraX+=((player.x-(window.innerWidth/worldZoom)/2.5)-cameraX)*.08;if(cameraX<0)cameraX=0;if(shakeTime>0)shakeTime--;document.getElementById("score-val").innerText=score
+}
+
+/* ===== Render (With Natural Background: Mountains, Hills, and Trees) ===== */
+function render(){
+const bg=ctx.createLinearGradient(0,0,0,canvas.height);
+if(selectedWorld.time==="night"){bg.addColorStop(0,"#0a0f24");bg.addColorStop(1,"#020208")}else if(selectedWorld.terrain==="snow"){bg.addColorStop(0,"#00bcd4");bg.addColorStop(1,"#006064")}else{bg.addColorStop(0,"#29b6f6");bg.addColorStop(.5,"#4fc3f7");bg.addColorStop(1,"#81d4fa")}
+ctx.fillStyle=bg;ctx.fillRect(0,0,canvas.width,canvas.height);ctx.save();ctx.scale(worldZoom*dpr,worldZoom*dpr);
+if(shakeTime>0)ctx.translate((Math.random()-.5)*6,(Math.random()-.5)*6);
+const rw=window.innerWidth/worldZoom,rh=window.innerHeight/worldZoom, groundY = rh - 120;
+
+/* Natural Background Parallax: Mountains and Hills */
+let mX1 = -(cameraX * 0.15) % rw;
+let hX1 = -(cameraX * 0.35) % rw;
+ctx.fillStyle = selectedWorld.time === "night" ? "#1e293b" : "#4ade80";
+// Draw Mountains
+for(let i = -1; i < 3; i++){
+    let mx = mX1 + i * rw;
+    ctx.fillStyle = selectedWorld.time === "night" ? "#111827" : "#38a169";
+    ctx.beginPath();
+    ctx.moveTo(mx, groundY);
+    ctx.lineTo(mx + 300, groundY - 350);
+    ctx.lineTo(mx + 600, groundY);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.fillStyle = selectedWorld.time === "night" ? "#1f2937" : "#2f855a";
+    ctx.beginPath();
+    ctx.moveTo(mx + 400, groundY);
+    ctx.lineTo(mx + 750, groundY - 450);
+    ctx.lineTo(mx + 1100, groundY);
+    ctx.closePath();
+    ctx.fill();
+}
+
+// Draw Natural Hills & Trees in background
+for(let i = -1; i < 3; i++){
+    let hx = hX1 + i * rw;
+    ctx.fillStyle = selectedWorld.time === "night" ? "#064e3b" : "#68d391";
+    ctx.beginPath();
+    ctx.arc(hx + 150, groundY, 180, Math.PI, 0, false);
+    ctx.arc(hx + 500, groundY, 220, Math.PI, 0, false);
+    ctx.fill();
+
+    // Small background trees
+    ctx.fillStyle = selectedWorld.time === "night" ? "#022c22" : "#22543d";
+    for(let t = 80; t < rw; t += 250){
+        let tx = hx + t;
+        ctx.beginPath();
+        ctx.moveTo(tx, groundY);
+        ctx.lineTo(tx + 20, groundY - 90);
+        ctx.lineTo(tx + 40, groundY);
+        ctx.closePath();
+        ctx.fill();
     }
+}
 
-    function nextLevel() {
-        if (currentLevel < maxLevels) {
-            unlockedLevels = Math.max(unlockedLevels, currentLevel + 1);
-            triggerLevelStart(currentLevel + 1);
-        } else {
-            goHome();
-        }
-    }
-
-    function applyDamage(color, pushX, isBossDmg = false) {
-        if (purchasedBoosters.includes('shield')) {
-            purchasedBoosters = purchasedBoosters.filter(b => b !== 'shield');
-            createFloatingText(player.x, player.y - 35, "الدرع السحري حماك! 🛡️", "#00bcd4");
-            playSound('skill');
-            player.vx = -7; player.vy = -5;
-            return;
-        }
-        lives--;
-        document.getElementById('lives-val').innerText = lives;
-        playSound('hit');
-        shakeTime = 15;
-        createParticles(player.x, player.y, color, 18);
-        if (lives <= 0) {
-            gameActive = false;
-            stopBGM();
-            document.getElementById('ui-layer').style.display = 'none';
-            if (isBossDmg) {
-                document.getElementById('boss-game-over-coins').innerText = score;
-                showScreen('boss-game-over-screen');
-            } else {
-                document.getElementById('game-over-coins').innerText = score;
-                showScreen('game-over-screen');
-            }
-        } else {
-            player.x = pushX - 90;
-            player.y = 80;
-            player.vx = 0; player.vy = 0;
-        }
-    }
-
-    function watchAdToRevive() {
-        const adModal = document.getElementById('ad-modal');
-        adModal.style.display = 'flex';
-        let timer = 3;
-        const adTimerText = document.getElementById('ad-timer-text');
-        adTimerText.innerText = `جارٍ عرض الإعلان المكافئ... (${timer})`;
-        
-        let interval = setInterval(() => {
-            timer--;
-            if (timer > 0) {
-                adTimerText.innerText = `جارٍ عرض الإعلان المكافئ... (${timer})`;
-            } else {
-                clearInterval(interval);
-                adModal.style.display = 'none';
-                
-                lives = 1;
-                document.getElementById('lives-val').innerText = lives;
-                document.getElementById('game-over-screen').style.display = 'none';
-                document.getElementById('boss-game-over-screen').style.display = 'none';
-                document.getElementById('ui-layer').style.display = 'flex';
-                gameActive = true;
-                startBGM();
-                if (!isLooping) { isLooping = true; requestAnimationFrame(gameLoop); }
-                createFloatingText(player.x, player.y - 35, "تم إنعاشك بنجاح! 🚀", "#00e676");
-                playSound('coin');
-            }
-        }, 1000);
-    }
-
-    function winLevel() {
-        gameActive = false;
-        stopBGM();
-        document.getElementById('ui-layer').style.display = 'none';
-        totalCoins += score;
-        unlockedLevels = Math.max(unlockedLevels, currentLevel + 1);
-        updateDisplayData();
-        document.getElementById('win-coins').innerText = score;
-        showScreen('win-screen');
-    }
-
-    function shootBullet() {
-        playSound('shoot');
-        let curWep = weaponsData[currentWeaponId] || weaponsData[0];
-        bullets.push({
-            x: player.x + (player.dir === 1 ? player.width : -18),
-            y: player.y + player.height / 2 - 4,
-            vx: player.dir * 16, width: 22, height: 8,
-            damage: curWep.damage, coinMultiplier: curWep.coinMultiplier
-        });
-    }
-
-    function useSkill() {
-        if (skillCooldown > 0) return;
-        playSound('skill');
-        skillCooldown = 280;
-        document.getElementById('btn-skill').classList.add('cooldown');
-        createParticles(player.x, player.y, '#9c27b0', 30);
-        createFloatingText(player.x, player.y - 25, "موجة الطاقة المدمرة! ⚡", "#9c27b0");
-        enemies.forEach(en => {
-            if (en.alive && Math.abs(en.x - player.x) < 650) {
-                en.alive = false; score += 100; createParticles(en.x, en.y, '#ffea00', 15);
-            }
-        });
-        if (boss && boss.alive && Math.abs(boss.x - player.x) < 750) {
-            boss.hp -= 250; createParticles(boss.x, boss.y, '#ff4500', 20);
-        }
-    }
-
-    let moveLeft = false, moveRight = false;
-    function setupControls() {
-        const bindBtn = (id, start, end) => {
-            const el = document.getElementById(id);
-            if(!el) return;
-            el.addEventListener('touchstart', (e) => { e.preventDefault(); initAudio(); start(); });
-            el.addEventListener('touchend', (e) => { e.preventDefault(); end(); });
-            el.addEventListener('mousedown', () => { initAudio(); start(); });
-            el.addEventListener('mouseup', end);
-        };
-        bindBtn('btn-left', () => moveLeft = true, () => moveLeft = false);
-        bindBtn('btn-right', () => moveRight = true, () => moveRight = false);
-        
-        const jumpBtn = document.getElementById('btn-jump');
-        if(jumpBtn) {
-            const triggerJump = (e) => {
-                if(e) e.preventDefault(); initAudio();
-                if (player) {
-                    if (player.grounded) {
-                        player.vy = player.jumpForce; player.grounded = false; player.canDoubleJump = true;
-                        player.scaleX = 0.7; player.scaleY = 1.3; playSound('jump');
-                        createParticles(player.x, player.y + player.height, '#fff', 6);
-                    } else if (player.canDoubleJump) {
-                        player.vy = player.jumpForce * 0.9; player.canDoubleJump = false;
-                        player.scaleX = 0.6; player.scaleY = 1.4; playSound('jump');
-                        createParticles(player.x, player.y + player.height, '#ffcc00', 10);
-                        createFloatingText(player.x, player.y, "قفزة مزدوجة! ✨", "#ffcc00");
-                    }
-                }
-            };
-            jumpBtn.addEventListener('touchstart', triggerJump);
-            jumpBtn.addEventListener('mousedown', triggerJump);
-        }
-
-        const shootBtn = document.getElementById('btn-shoot');
-        if(shootBtn) {
-            const triggerShoot = (e) => { if(e) e.preventDefault(); initAudio(); if(player) shootBullet(); };
-            shootBtn.addEventListener('touchstart', triggerShoot);
-            shootBtn.addEventListener('mousedown', triggerShoot);
-        }
-
-        const skillBtn = document.getElementById('btn-skill');
-        if(skillBtn) {
-            const triggerSkill = (e) => { if(e) e.preventDefault(); initAudio(); if(player) useSkill(); };
-            skillBtn.addEventListener('touchstart', triggerSkill);
-            skillBtn.addEventListener('mousedown', triggerSkill);
-        }
-    }
-    setupControls();
-
-    function createParticles(x, y, color, count) {
-        for(let i=0; i<count; i++) {
-            particles.push({
-                x: x, y: y, vx: (Math.random() - 0.5) * 7, vy: (Math.random() - 0.5) * 7,
-                color: color, size: 2.5 + Math.random() * 3.5, life: 1.0
-            });
-        }
-    }
-
-    function createFloatingText(x, y, text, color) {
-        floatingTexts.push({ x: x, y: y, text: text, color: color, life: 1.0, vy: -1.0 });
-    }
-
-    function update() {
-        if (!gameActive || !player) return;
-
-        if (skillCooldown > 0) {
-            skillCooldown--;
-            if (skillCooldown === 0) document.getElementById('btn-skill').classList.remove('cooldown');
-        }
-
-        let currentAcc = moveRight ? player.speed : (moveLeft ? -player.speed : 0);
-        if (selectedWorld.terrain === 'snow') {
-            player.vx = player.vx * 0.92 + currentAcc * 0.08;
-        } else {
-            player.vx = currentAcc;
-        }
-
-        if (moveRight) player.dir = 1;
-        if (moveLeft) player.dir = -1;
-
-        player.scaleX += (1 - player.scaleX) * 0.1;
-        player.scaleY += (1 - player.scaleY) * 0.1;
-
-        player.vy += 0.52;
-        if (player.vy > 10) player.vy = 10;
-
-        player.x += player.vx;
-        blocks.forEach(b => {
-            if (player.x + player.width > b.x && player.x < b.x + b.width && player.y + player.height > b.y && player.y < b.y + b.height) {
-                if (player.vx > 0) {
-                    player.x = b.x - player.width;
-                } else if (player.vx < 0) {
-                    player.x = b.x + b.width;
-                }
-            }
-        });
-
-        player.y += player.vy;
-        player.grounded = false;
-        blocks.forEach(b => {
-            if (player.x + player.width > b.x && player.x < b.x + b.width && player.y + player.height > b.y && player.y < b.y + b.height) {
-                if (player.vy > 0) { 
-                    player.y = b.y - player.height;
-                    player.vy = 0;
-                    player.grounded = true;
-                    player.canDoubleJump = true;
-                } else if (player.vy < 0) { 
-                    player.y = b.y + b.height;
-                    player.vy = 0;
-                }
-            }
-        });
-
-        if (selectedWorld.terrain === 'snow' && snowflakes) {
-            snowflakes.forEach(sf => {
-                sf.y += sf.vy;
-                sf.x += sf.vx;
-                let renderHeight = window.innerHeight / worldZoom;
-                if (sf.y > renderHeight) sf.y = 0;
-            });
-        }
-
-        for (let i = bullets.length - 1; i >= 0; i--) {
-            let b = bullets[i];
-            b.x += b.vx;
-
-            let bulletHit = false;
-
-            if (boss && boss.alive && b.x > boss.x && b.x < boss.x + boss.width && b.y > boss.y && b.y < boss.y + boss.height) {
-                boss.hp -= b.damage;
-                createParticles(b.x, b.y, '#ffea00', 5);
-                bulletHit = true;
-                if (boss.hp <= 0) {
-                    boss.alive = false;
-                    document.getElementById('boss-hud').style.display = 'none';
-                    let earnedCoins = 3000 * b.coinMultiplier;
-                    score += earnedCoins;
-                    document.getElementById('score-val').innerText = score;
-                    playSound('coin');
-                    createParticles(boss.x + 50, boss.y + 50, '#00e676', 40);
-                    createFloatingText(boss.x, boss.y, `هزمت الزعيم الأسطوري الطائر! +${earnedCoins} 🪙`, "#ffcc00");
-                }
-            }
-
-            if (!bulletHit) {
-                for (let j = 0; j < enemies.length; j++) {
-                    let en = enemies[j];
-                    if (en.alive && b.x > en.x && b.x < en.x + en.width && b.y > en.y && b.y < en.y + en.height) {
-                        en.hp -= b.damage;
-                        createParticles(b.x, b.y, '#ffea00', 4);
-                        bulletHit = true;
-                        if (en.hp <= 0) {
-                            en.alive = false;
-                            score += 200;
-                            createFloatingText(en.x, en.y, "+200", "#ffcc00");
-                        }
-                        break;
-                    }
-                }
-            }
-
-            if (bulletHit || Math.abs(b.x - player.x) > 1400) {
-                bullets.splice(i, 1);
-            }
-        }
-
-        bossBullets.forEach((bb, idx) => {
-            bb.x += bb.vx; bb.y += bb.vy;
-            if (player.x + player.width > bb.x && player.x < bb.x + bb.width && player.y + player.height > bb.y && player.y < bb.y + bb.height) {
-                bossBullets.splice(idx, 1);
-                applyDamage('#ff3d00', player.x - 60, true);
-            }
-        });
-        bossBullets = bossBullets.filter(bb => Math.abs(bb.x - player.x) < 1400);
-
-        particles.forEach(p => { p.vy += 0.22; p.x += p.vx; p.y += p.vy; p.life -= 0.03; p.size *= 0.95; });
-        particles = particles.filter(p => p.life > 0);
-
-        floatingTexts.forEach(ft => { ft.y += ft.vy; ft.life -= 0.02; });
-        floatingTexts = floatingTexts.filter(ft => ft.life > 0);
-
-        hazards.forEach(hz => {
-            if (player.x + player.width > hz.x && player.x < hz.x + hz.width && player.y + player.height > hz.y && player.y < hz.y + hz.height) {
-                applyDamage('#ff3d00', cameraX + 130, false);
-            }
-        });
-
-        enemies.forEach(en => {
-            if (!en.alive) return;
-            en.x += en.vx;
-            if (en.x < en.minX || en.x > en.maxX) en.vx *= -1;
-            if (player.x + player.width > en.x && player.x < en.x + en.width && player.y + player.height > en.y && player.y < en.y + en.height) {
-                if (player.vy > 0 && player.y + player.height - player.vy <= en.y + 20) {
-                    en.hp -= 50; player.vy = -9.5; playSound('jump');
-                    createParticles(en.x, en.y, '#ff3d00', 8);
-                    if (en.hp <= 0) { en.alive = false; score += 150; createFloatingText(en.x, en.y, "+150", "#ffcc00"); }
-                } else {
-                    applyDamage('#ff3d00', en.x, false);
-                }
-            }
-        });
-
-        if (boss && boss.alive) {
-            boss.x += boss.vx;
-            if (boss.x < finishLine.x - 380 || boss.x > finishLine.x + 100) boss.vx *= -1;
-            // Boss flying up and down dynamically using Sine wave
-            boss.y = boss.baseY + Math.sin(Date.now() * 0.005) * 65;
-
-            boss.shootTimer++;
-            if (boss.shootTimer % 60 === 0) {
-                playSound('bossShoot');
-                // Powerful triple spread shooting ability
-                for (let angleOffset = -0.25; angleOffset <= 0.25; angleOffset += 0.25) {
-                    bossBullets.push({ 
-                        x: boss.x, 
-                        y: boss.y + boss.height / 2, 
-                        vx: -7.5, 
-                        vy: ((player.y - boss.y) * 0.03) + angleOffset * 4, 
-                        width: 22, 
-                        height: 22 
-                    });
-                }
-            }
-            let hpPercent = Math.max(0, (boss.hp / boss.maxHp) * 100);
-            document.getElementById('boss-hp-bar').style.width = hpPercent + '%';
-            if (player.x + player.width > boss.x && player.x < boss.x + boss.width && player.y + player.height > boss.y && player.y < boss.y + boss.height) {
-                applyDamage('#ff3d00', boss.x - 90, true);
-            }
-        }
-
-        coins.forEach(c => {
-            c.float += 0.05;
-            if (purchasedBoosters.includes('magnet')) {
-                let dist = Math.hypot((player.x + player.width/2) - (c.x + c.width/2), (player.y + player.height/2) - (c.y + c.height/2));
-                if (dist < 220) { c.x += ((player.x - c.x) * 0.1); c.y += ((player.y - c.y) * 0.1); }
-            }
-            if (!c.collected && player.x + player.width > c.x && player.x < c.x + c.width && player.y + player.height > c.y && player.y < c.y + c.height) {
-                c.collected = true; score += 10;
-                document.getElementById('score-val').innerText = score;
-                playSound('coin'); createParticles(c.x + 12, c.y + 12, '#ffea00', 8);
-                createFloatingText(c.x, c.y, "+10", "#ffcc00");
-            }
-        });
-
-        let renderHeight = window.innerHeight / worldZoom;
-        if (player.y > renderHeight + 100) { applyDamage('#ff3d00', cameraX + 130, false); }
-
-        if (finishLine && player.x + player.width > finishLine.x && player.x < finishLine.x + finishLine.width) {
-            if (!boss || !boss.alive) {
-                playSound('coin'); createParticles(player.x, player.y, '#00e676', 30);
-                createFloatingText(player.x, player.y - 35, "فوز!", "#00e676"); winLevel();
-            } else {
-                createFloatingText(player.x, player.y - 35, "قضِ على الزعيم أولاً! ⚠️", "#ff3d00");
-            }
-        }
-
-        let scaledViewWidth = (window.innerWidth / worldZoom);
-        cameraX += ((player.x - scaledViewWidth / 2.5) - cameraX) * 0.08;
-        if (cameraX < 0) cameraX = 0;
-        if (shakeTime > 0) shakeTime--;
-    }
-
-    function render() {
-        // --- إصلاح مشكلة اهتزاز/تغير الخلفية: رسم الخلفية بشكل ثابت تماماً 100% ---
-        let bgGradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        if (selectedWorld.time === 'night') {
-            bgGradient.addColorStop(0, '#0a0f24');
-            bgGradient.addColorStop(1, '#020208');
-        } else if (selectedWorld.terrain === 'snow') {
-            bgGradient.addColorStop(0, '#00bcd4');
-            bgGradient.addColorStop(1, '#006064');
-        } else {
-            // سماء الصباح المشرقة
-            bgGradient.addColorStop(0, '#29b6f6');
-            bgGradient.addColorStop(0.5, '#4fc3f7');
-            bgGradient.addColorStop(1, '#81d4fa');
-        }
-        ctx.fillStyle = bgGradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        // -------------------------------------------------------------
-
-        ctx.save();
-        
-        ctx.scale(worldZoom * dpr, worldZoom * dpr);
-
-        if (shakeTime > 0) { ctx.translate((Math.random() - 0.5) * 6, (Math.random() - 0.5) * 6); }
-
-        let renderWidth = window.innerWidth / worldZoom;
-        let renderHeight = window.innerHeight / worldZoom;
-
-        if (selectedWorld.time === 'night') {
-            nightStars.forEach(star => {
-                let alpha = (Math.sin(Date.now() * star.twinkleSpeed + star.twinkleOffset) + 1) / 2;
-                ctx.fillStyle = `rgba(255, 255, 255, ${0.15 + alpha * 0.85})`;
-                let sX = cameraX + ((star.x - cameraX * star.driftSpeed) % (renderWidth + 400));
-                ctx.beginPath();
-                ctx.arc(sX, star.y, star.size * (0.7 + alpha * 0.5), 0, Math.PI * 2);
-                ctx.fill();
-            });
-        }
-
-        if (selectedWorld.terrain === 'snow' && snowflakes) {
-            ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
-            snowflakes.forEach(sf => {
-                let sX = cameraX + ((sf.x - cameraX * 0.25) % (renderWidth + 200));
-                ctx.beginPath();
-                ctx.arc(sX, sf.y, sf.size, 0, Math.PI * 2);
-                ctx.fill();
-            });
-        }
-
-        ctx.fillStyle = selectedWorld.time === 'night' ? "rgba(255, 255, 255, 0.06)" : "rgba(255, 255, 255, 0.22)";
-        clouds.forEach(cl => {
-            cl.x -= cl.speed;
-            let cx = cameraX + ((cl.x - cameraX * 0.4) % (renderWidth + 600));
-            ctx.beginPath();
-            ctx.arc(cx, cl.y, cl.size * 0.5, 0, Math.PI * 2);
-            ctx.arc(cx + cl.size * 0.4, cl.y - cl.size * 0.2, cl.size * 0.4, 0, Math.PI * 2);
-            ctx.arc(cx + cl.size * 0.8, cl.y, cl.size * 0.45, 0, Math.PI * 2);
-            ctx.fill();
-        });
-
-        hazards.forEach(hz => {
-            ctx.shadowBlur = 12; ctx.shadowColor = "#ff3d00";
-            ctx.fillStyle = "#ff3d00"; ctx.fillRect(hz.x - cameraX, hz.y + 15, hz.width, hz.height - 15);
-            ctx.shadowBlur = 0; ctx.fillStyle = "#ffea00";
-            for(let i = 0; i < hz.width; i += 25) {
-                ctx.beginPath(); ctx.arc(hz.x - cameraX + i + 12, hz.y + 20, 6 + Math.sin(Date.now()*0.01 + i)*2.5, 0, Math.PI, true); ctx.fill();
-            }
-        });
-
-        if (finishLine) {
-            ctx.fillStyle = "#00e676"; ctx.fillRect(finishLine.x - cameraX, finishLine.y, 10, finishLine.height);
-            ctx.fillStyle = "#ffcc00"; ctx.fillRect(finishLine.x - cameraX + 10, finishLine.y, 45, 32);
-            ctx.fillStyle = "#000"; ctx.font = "bold 15px Changa"; ctx.fillText("🏁 النهاية", finishLine.x - cameraX + 13, finishLine.y + 22);
-        }
-
-        blocks.forEach(b => {
-            let bx = b.x - cameraX;
-            if (b.type === 'ground') {
-                if (selectedWorld.terrain === 'mud') {
-                    ctx.fillStyle = "#3e2723"; ctx.fillRect(bx, b.y + 16, b.width, renderHeight - b.y + 50);
-                    ctx.fillStyle = "#795548"; ctx.fillRect(bx, b.y, b.width, 16);
-                } else if (selectedWorld.terrain === 'snow') {
-                    ctx.fillStyle = "#006064"; ctx.fillRect(bx, b.y + 18, b.width, renderHeight - b.y + 50);
-                    ctx.fillStyle = "#ffffff"; ctx.fillRect(bx, b.y, b.width, 18);
-                } else {
-                    ctx.fillStyle = "#5D4037"; ctx.fillRect(bx, b.y + 18, b.width, renderHeight - b.y + 50);
-                    ctx.fillStyle = "#43A047"; ctx.fillRect(bx, b.y, b.width, 18);
-                    ctx.strokeStyle = "#1B5E20"; ctx.lineWidth = 2.5; ctx.strokeRect(bx, b.y, b.width, 18);
-                }
-            } else {
-                ctx.fillStyle = b.type === 'wood' ? '#8d6e63' : (b.type === 'metal' ? '#78909c' : '#b0bec5');
-                ctx.fillRect(bx, b.y, b.width, b.height);
-                ctx.strokeStyle = "#000"; ctx.lineWidth = 2; ctx.strokeRect(bx, b.y, b.width, b.height);
-            }
-        });
-
-        coins.forEach(c => {
-            if (!c.collected) {
-                let cx = c.x - cameraX;
-                let floatY = Math.sin(c.float) * 4;
-                ctx.shadowBlur = 8; ctx.shadowColor = "#ffea00";
-                ctx.fillStyle = "#ffcc00";
-                ctx.beginPath(); ctx.arc(cx + c.width/2, c.y + c.height/2 + floatY, c.width/2, 0, Math.PI*2); ctx.fill();
-                ctx.fillStyle = "#ffee58";
-                ctx.beginPath(); ctx.arc(cx + c.width/2, c.y + c.height/2 + floatY, c.width/3, 0, Math.PI*2); ctx.fill();
-                ctx.shadowBlur = 0;
-            }
-        });
-
-        enemies.forEach(en => {
-            if (en.alive) {
-                let ex = en.x - cameraX;
-                ctx.fillStyle = "#141414";
-                ctx.fillRect(ex, en.y, en.width, en.height);
-                ctx.strokeStyle = "#ff3d00"; ctx.lineWidth = 2;
-                ctx.strokeRect(ex, en.y, en.width, en.height);
-                ctx.fillStyle = "#ff3d00";
-                ctx.fillRect(ex + 6, en.y + 7, 7, 7);
-                ctx.fillRect(ex + 22, en.y + 7, 7, 7);
-            }
-        });
-
-        if (boss && boss.alive) {
-            let bx = boss.x - cameraX;
-            ctx.shadowBlur = 18; ctx.shadowColor = "#ff3d00";
-            // Flying boss visual design
-            ctx.fillStyle = "#b71c1c";
-            ctx.fillRect(bx, boss.y, boss.width, boss.height);
-            ctx.fillStyle = "#ffea00";
-            ctx.fillRect(bx + 12, boss.y + 20, 22, 18);
-            ctx.fillRect(bx + 64, boss.y + 20, 22, 18);
-            // Boss wings animation for flying
-            ctx.fillStyle = "#ff5722";
-            let wingOffset = Math.sin(Date.now() * 0.02) * 12;
-            ctx.beginPath();
-            ctx.moveTo(bx, boss.y + 40);
-            ctx.lineTo(bx - 30, boss.y + 20 + wingOffset);
-            ctx.lineTo(bx, boss.y + 70);
-            ctx.closePath();
-            ctx.fill();
-
-            ctx.beginPath();
-            ctx.moveTo(bx + boss.width, boss.y + 40);
-            ctx.lineTo(bx + boss.width + 30, boss.y + 20 + wingOffset);
-            ctx.lineTo(bx + boss.width, boss.y + 70);
-            ctx.closePath();
-            ctx.fill();
-
-            ctx.shadowBlur = 0;
-        }
-
-        bullets.forEach(b => {
-            ctx.shadowBlur = 8; ctx.shadowColor = "#00ffff";
-            ctx.fillStyle = "#00ffff"; ctx.fillRect(b.x - cameraX, b.y, b.width, b.height);
-            ctx.shadowBlur = 0;
-        });
-
-        bossBullets.forEach(bb => {
-            ctx.shadowBlur = 10; ctx.shadowColor = "#ff3d00";
-            ctx.fillStyle = "#ff3d00";
-            ctx.beginPath(); ctx.arc(bb.x - cameraX + bb.width/2, bb.y + bb.height/2, bb.width/2, 0, Math.PI*2); ctx.fill();
-            ctx.shadowBlur = 0;
-        });
-
-        if (player) {
-            ctx.save();
-            ctx.translate(player.x - cameraX + player.width/2, player.y + player.height);
-            ctx.scale(player.scaleX, player.scaleY);
-            let activeColor = player.isRainbow ? `hsl(${Date.now() * 0.3 % 360}, 100%, 55%)` : player.color;
-            
-            ctx.shadowBlur = 10; ctx.shadowColor = activeColor;
-            ctx.fillStyle = activeColor;
-            ctx.fillRect(-player.width/2, -player.height, player.width, player.height);
-            ctx.strokeStyle = "#000"; ctx.lineWidth = 2;
-            ctx.strokeRect(-player.width/2, -player.height, player.width, player.height);
-
-            ctx.fillStyle = player.eyesColor;
-            let eyeOffset = player.dir === 1 ? 4 : -4;
-            ctx.fillRect(-player.width/2 + 6 + eyeOffset, -player.height + 8, 8, 9);
-            ctx.fillRect(-player.width/2 + 20 + eyeOffset, -player.height + 8, 8, 9);
-
-            if(player.crown) {
-                ctx.fillStyle = "#ffcc00";
-                ctx.beginPath();
-                ctx.moveTo(-player.width/2 + 3, -player.height - 2);
-                ctx.lineTo(-player.width/2 + 7, -player.height - 13);
-                ctx.lineTo(-player.width/2 + 19, -player.height - 6);
-                ctx.lineTo(-player.width/2 + 29, -player.height - 13);
-                ctx.lineTo(-player.width/2 + 33, -player.height - 2);
-                ctx.closePath();
-                ctx.fill();
-                ctx.strokeStyle = "#000"; ctx.lineWidth = 1.5; ctx.stroke();
-            }
-            ctx.restore();
-        }
-
-        particles.forEach(p => {
-            ctx.globalAlpha = p.life; ctx.fillStyle = p.color;
-            ctx.beginPath(); ctx.arc(p.x - cameraX, p.y, p.size, 0, Math.PI * 2); ctx.fill();
-        });
-        ctx.globalAlpha = 1.0;
-
-        floatingTexts.forEach(ft => {
-            ctx.globalAlpha = ft.life; ctx.fillStyle = ft.color;
-            ctx.font = "bold 18px Changa";
-            ctx.shadowBlur = 3; ctx.shadowColor = "#000";
-            ctx.fillText(ft.text, ft.x - cameraX, ft.y);
-            ctx.shadowBlur = 0;
-        });
-        ctx.globalAlpha = 1.0;
-
-        ctx.restore();
-    }
-
-    function gameLoop() {
-        if (!gameActive) { isLooping = false; return; }
-        update();
-        render();
-        requestAnimationFrame(gameLoop);
-    }
+if(selectedWorld.time==="night")nightStars.forEach(s=>{let a=(Math.sin(Date.now()*s.twinkleSpeed+s.twinkleOffset)+1)/2;ctx.fillStyle=`rgba(255,255,255,${.15+a*.85})`;let x=cameraX+((s.x-cameraX*s.driftSpeed)%(rw+400));ctx.beginPath();ctx.arc(x,s.y,s.size*(.7+a*.5),0,Math.PI*2);ctx.fill()});
+if(selectedWorld.terrain==="snow")snowflakes.forEach(s=>{ctx.fillStyle="rgba(255,255,255,.85)";let x=cameraX+((s.x-cameraX*.25)%(rw+200));ctx.beginPath();ctx.arc(x,s.y,s.size,0,Math.PI*2);ctx.fill()});
+ctx.fillStyle=selectedWorld.time==="night"?"rgba(255,255,255,.06)":"rgba(255,255,255,.22)";clouds.forEach(c=>{c.x-=c.speed;let x=cameraX+((c.x-cameraX*.4)%(rw+600));ctx.beginPath();ctx.arc(x,c.y,c.size*.5,0,Math.PI*2);ctx.arc(x+c.size*.4,c.y-c.size*.2,c.size*.4,0,Math.PI*2);ctx.arc(x+c.size*.8,c.y,c.size*.45,0,Math.PI*2);ctx.fill()});
+hazards.forEach(h=>{ctx.fillStyle="#ff3d00";ctx.fillRect(h.x-cameraX,h.y+15,h.width,h.height-15);ctx.fillStyle="#ffea00";for(let i=0;i<h.width;i+=25){ctx.beginPath();ctx.arc(h.x-cameraX+i+12,h.y+20,6,0,Math.PI,true);ctx.fill()}});
+if(finishLine){ctx.fillStyle="#00e676";ctx.fillRect(finishLine.x-cameraX,finishLine.y,10,finishLine.height);ctx.fillStyle="#ffcc00";ctx.fillRect(finishLine.x-cameraX+10,finishLine.y,45,32);ctx.fillStyle="#000";ctx.font="bold 15px Changa";ctx.fillText("🏁 النهاية",finishLine.x-cameraX+13,finishLine.y+22)}
+blocks.forEach(b=>{let x=b.x-cameraX;if(b.type==="ground"){if(selectedWorld.terrain==="mud"){ctx.fillStyle="#3e2723";ctx.fillRect(x,b.y+16,b.width,rh-b.y+50);ctx.fillStyle="#795548";ctx.fillRect(x,b.y,b.width,16)}else if(selectedWorld.terrain==="snow"){ctx.fillStyle="#006064";ctx.fillRect(x,b.y+18,b.width,rh-b.y+50);ctx.fillStyle="#fff";ctx.fillRect(x,b.y,b.width,18)}else{ctx.fillStyle="#5D4037";ctx.fillRect(x,b.y+18,b.width,rh-b.y+50);ctx.fillStyle="#43A047";ctx.fillRect(x,b.y,b.width,18)}}else{ctx.fillStyle=b.type==="wood"?"#8d6e63":b.type==="metal"?"#78909c":"#b0bec5";ctx.fillRect(x,b.y,b.width,b.height);ctx.strokeStyle="#000";ctx.strokeRect(x,b.y,b.width,b.height)}});
+coins.forEach(c=>{if(!c.collected){let x=c.x-cameraX,y=c.y+Math.sin(c.float)*4;ctx.fillStyle="#ffcc00";ctx.beginPath();ctx.arc(x+12,y+12,12,0,Math.PI*2);ctx.fill();ctx.fillStyle="#ffee58";ctx.beginPath();ctx.arc(x+12,y+12,8,0,Math.PI*2);ctx.fill()}});
+enemies.forEach(e=>{if(e.alive){let x=e.x-cameraX;ctx.fillStyle="#141414";ctx.fillRect(x,e.y,e.width,e.height);ctx.fillStyle="#ff3d00";ctx.fillRect(x+6,e.y+7,7,7);ctx.fillRect(x+22,e.y+7,7,7)}});
+if(boss?.alive){let x=boss.x-cameraX;ctx.fillStyle="#b71c1c";ctx.fillRect(x,boss.y,boss.width,boss.height);ctx.fillStyle="#ffea00";ctx.fillRect(x+12,boss.y+20,22,18);ctx.fillRect(x+64,boss.y+20,22,18);ctx.fillStyle="#ff5722";let w=Math.sin(Date.now()*.02)*12;ctx.beginPath();ctx.moveTo(x,boss.y+40);ctx.lineTo(x-30,boss.y+20+w);ctx.lineTo(x,boss.y+70);ctx.fill();ctx.beginPath();ctx.moveTo(x+100,boss.y+40);ctx.lineTo(x+130,boss.y+20+w);ctx.lineTo(x+100,boss.y+70);ctx.fill()}
+bullets.forEach(b=>{ctx.fillStyle="#00ffff";ctx.fillRect(b.x-cameraX,b.y,b.width,b.height)});bossBullets.forEach(b=>{ctx.fillStyle="#ff3d00";ctx.beginPath();ctx.arc(b.x-cameraX+11,b.y+11,11,0,Math.PI*2);ctx.fill()});
+if(player){ctx.save();ctx.translate(player.x-cameraX+19,player.y+38);ctx.scale(player.scaleX,player.scaleY);let col=player.isRainbow?`hsl(${Date.now()*.3%360},100%,55%)`:player.color;ctx.fillStyle=col;ctx.fillRect(-19,-38,38,38);ctx.strokeStyle="#000";ctx.strokeRect(-19,-38,38,38);ctx.fillStyle=player.eyesColor;let o=player.dir===1?4:-4;ctx.fillRect(-13+o,-30,8,9);ctx.fillRect(1+o,-30,8,9);if(player.crown){ctx.fillStyle="#ffcc00";ctx.beginPath();ctx.moveTo(-16,-40);ctx.lineTo(-12,-51);ctx.lineTo(0,-44);ctx.lineTo(10,-51);ctx.lineTo(14,-40);ctx.closePath();ctx.fill()}ctx.restore()}
+particles.forEach(p=>{ctx.globalAlpha=p.life;ctx.fillStyle=p.color;ctx.beginPath();ctx.arc(p.x-cameraX,p.y,p.size,0,Math.PI*2);ctx.fill()});ctx.globalAlpha=1;
+floatingTexts.forEach(f=>{ctx.globalAlpha=f.life;ctx.fillStyle=f.color;ctx.font="bold 18px Changa";ctx.fillText(f.text,f.x-cameraX,f.y)});ctx.globalAlpha=1;ctx.restore()
+}
+function gameLoop(){if(!gameActive){isLooping=false;return}update();render();requestAnimationFrame(gameLoop)}
 </script>
 </body>
 </html>
